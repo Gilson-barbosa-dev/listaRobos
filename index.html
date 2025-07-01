@@ -72,54 +72,42 @@
       border-radius: 10px;
       background-color: #000;
     }
-
-    .icon {
-      width: 16px;
-      height: 16px;
-      margin-right: 6px;
-    }
   </style>
 </head>
 <body>
 
   <h1>Painel de Estratégias</h1>
 
-  <div class="grid">
+  <div class="grid" id="painel"></div>
 
-    <div class="card">
-      <h2>GoldWin 1.0</h2>
-      <div class="info-line">
-        📊 Ativo: <span>XAUUSD</span>
-      </div>
-      <div class="info-line">
-        🕒 Início: <span>01/07/2025</span>
-      </div>
-      <iframe src="https://tradingportfolios.com/portfolios/barbosasgil/strategy/chart/348741/real/?height=400&width=container&data=balance" title="GoldWin"></iframe>
-    </div>
+  <script>
+    async function carregarEstrategias() {
+      try {
+        const resposta = await fetch('estrategias.json');
+        const estrategias = await resposta.json();
 
-    <div class="card">
-      <h2>Grid EURUSD</h2>
-      <div class="info-line">
-        📊 Ativo: <span>EURUSD</span>
-      </div>
-      <div class="info-line">
-        🕒 Início: <span>28/06/2025</span>
-      </div>
-      <iframe src="https://tradingportfolios.com/portfolios/barbosasgil/strategy/chart/348741/real/?height=400&width=container&data=profit" title="EURUSD"></iframe>
-    </div>
+        const painel = document.getElementById('painel');
 
-    <div class="card">
-      <h2>BTC Scalper</h2>
-      <div class="info-line">
-        📊 Ativo: <span>BTCUSD</span>
-      </div>
-      <div class="info-line">
-        🕒 Início: <span>15/06/2025</span>
-      </div>
-      <iframe src="https://tradingportfolios.com/portfolios/barbosasgil/strategy/chart/348741/real/?height=400&width=container&data=returns" title="BTCUSD"></iframe>
-    </div>
+        estrategias.forEach(estrategia => {
+          const card = document.createElement('div');
+          card.className = 'card';
 
-  </div>
+          card.innerHTML = `
+            <h2>${estrategia.nome}</h2>
+            <div class="info-line">📊 Ativo: <span>${estrategia.ativo}</span></div>
+            <div class="info-line">🕒 Início: <span>${estrategia.inicio}</span></div>
+            <iframe src="${estrategia.link}" title="${estrategia.nome}"></iframe>
+          `;
+
+          painel.appendChild(card);
+        });
+      } catch (erro) {
+        console.error('Erro ao carregar estratégias:', erro);
+      }
+    }
+
+    carregarEstrategias();
+  </script>
 
 </body>
 </html>
