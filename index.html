@@ -63,15 +63,6 @@
       font-weight: 500;
       color: #fff;
     }
-
-    iframe {
-      margin-top: 16px;
-      width: 100%;
-      height: 400px;
-      border: none;
-      border-radius: 10px;
-      background-color: #000;
-    }
   </style>
 </head>
 <body>
@@ -82,28 +73,49 @@
 
   <script>
     async function carregarEstrategias() {
+      const cacheKey = 'estrategias_cache';
+      const cacheTimeKey = 'estrategias_cache_time';
+      const cacheTime = 60000; // 60 segundos
+
+      const now = Date.now();
+      const lastFetch = parseInt(localStorage.getItem(cacheTimeKey), 10) || 0;
+
+      if (now - lastFetch < cacheTime) {
+        const cached = JSON.parse(localStorage.getItem(cacheKey));
+        renderizar(cached);
+        return;
+      }
+
       try {
-        const resposta = await fetch('estrategias.json');
+        const resposta = await fetch('https://apirobos-production.up.railway.app/dados');
         const estrategias = await resposta.json();
-
-        const painel = document.getElementById('painel');
-
-        estrategias.forEach(estrategia => {
-          const card = document.createElement('div');
-          card.className = 'card';
-
-          card.innerHTML = `
-            <h2>${estrategia.nome}</h2>
-            <div class="info-line">📊 Ativo: <span>${estrategia.ativo}</span></div>
-            <div class="info-line">🕒 Início: <span>${estrategia.inicio}</span></div>
-            <iframe src="${estrategia.link}" title="${estrategia.nome}"></iframe>
-          `;
-
-          painel.appendChild(card);
-        });
+        localStorage.setItem(cacheKey, JSON.stringify(estrategias));
+        localStorage.setItem(cacheTimeKey, now.toString());
+        renderizar(estrategias);
       } catch (erro) {
         console.error('Erro ao carregar estratégias:', erro);
       }
+    }
+
+    function renderizar(estrategias) {
+      const painel = document.getElementById('painel');
+      painel.innerHTML = '';
+      estrategias.forEach(e => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <h2>${e.estrategia || 'Sem nome'}</h2>
+          <div class="info-line">🧠 Magic: <span>${e.magic}</span></div>
+          <div class="info-line">📊 Ativo: <span>${e.ativo}</span></div>
+          <div class="info-line">🕒 Início: <span>${e.data_primeiro_trade}</span></div>
+          <div class="info-line">💰 Lucro Total: <span>${e.lucro_total.toFixed(2)}</span></div>
+          <div class="info-line">📈 Operações: <span>${e.total_operacoes}</span></div>
+          <div class="info-line">✅ Vencedoras: <span>${e.vencedoras}</span></div>
+          <div class="info-line">❌ Perdedoras: <span>${e.perdedoras}</span></div>
+          <div class="info-line">🎯 Assertividade: <span>${e.assertividade.toFixed(2)}%</span></div>
+        `;
+        painel.appendChild(card);
+      });
     }
 
     carregarEstrategias();
