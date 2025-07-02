@@ -110,8 +110,7 @@
         const card = document.createElement('div');
         card.className = 'card';
         card.innerHTML = `
-          <h2>${e.nome || 'Sem nome'}</h2>
-          <div class="info-line">🧠 Magic: <span>${e.magic || '—'}</span></div>
+          <h2>🧠 Magic: <span>${e.magic || '—'}</h2>
           <div class="info-line">📊 Ativo: <span>${e.ativo || '—'}</span></div>
           <div class="info-line">🕒 Início: <span>${e.inicio || '—'}</span></div>
           <div class="info-line">💰 Lucro Total: <span>${Number(e.lucro_total).toFixed(2)}</span></div>
