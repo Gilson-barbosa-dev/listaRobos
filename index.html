@@ -73,29 +73,39 @@
 
   <script>
     async function carregarEstrategias() {
-      const cacheKey = 'estrategias_cache';
-      const cacheTimeKey = 'estrategias_cache_time';
-      const cacheTime = 60000; // 60 segundos
+  const cacheKey = 'estrategias_cache';
+  const cacheTimeKey = 'estrategias_cache_time';
+  const cacheTime = 60000; // 60 segundos
 
-      const now = Date.now();
-      const lastFetch = parseInt(localStorage.getItem(cacheTimeKey), 10) || 0;
+  const now = Date.now();
+  const lastFetch = parseInt(localStorage.getItem(cacheTimeKey), 10) || 0;
 
-      if (now - lastFetch < cacheTime) {
-        const cached = JSON.parse(localStorage.getItem(cacheKey));
+  if (now - lastFetch < cacheTime) {
+    const cachedRaw = localStorage.getItem(cacheKey);
+    if (cachedRaw) {
+      try {
+        const cached = JSON.parse(cachedRaw);
         renderizar(cached);
         return;
-      }
-
-      try {
-        const resposta = await fetch('https://apirobos-production.up.railway.app/dados');
-        const estrategias = await resposta.json();
-        localStorage.setItem(cacheKey, JSON.stringify(estrategias));
-        localStorage.setItem(cacheTimeKey, now.toString());
-        renderizar(estrategias);
-      } catch (erro) {
-        console.error('Erro ao carregar estratégias:', erro);
+      } catch (e) {
+        console.warn('Erro ao parsear cache:', e);
+        localStorage.removeItem(cacheKey);
+        localStorage.removeItem(cacheTimeKey);
       }
     }
+  }
+
+  try {
+    const resposta = await fetch('https://apirobos-production.up.railway.app/dados');
+    const estrategias = await resposta.json();
+    localStorage.setItem(cacheKey, JSON.stringify(estrategias));
+    localStorage.setItem(cacheTimeKey, now.toString());
+    renderizar(estrategias);
+  } catch (erro) {
+    console.error('Erro ao carregar estratégias:', erro);
+  }
+}
+
 
     function renderizar(estrategias) {
       const painel = document.getElementById('painel');
