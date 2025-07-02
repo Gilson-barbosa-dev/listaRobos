@@ -111,13 +111,13 @@
         card.className = 'card';
         card.innerHTML = `
           <h2>🧠 Magic: <span>${e.magic || '—'}</h2>
-          <div class="info-line">📊 Ativo: <span>${e.ativo || '—'}</span></div>
           <div class="info-line">🕒 Início: <span>${e.inicio || '—'}</span></div>
-          <div class="info-line">💰 Lucro Total: <span>${Number(e.lucro_total).toFixed(2)}</span></div>
+          <div class="info-line">📊 Ativo: <span>${e.ativo || '—'}</span></div>
           <div class="info-line">📈 Operações: <span>${e.total_operacoes || 0}</span></div>
           <div class="info-line">✅ Vencedoras: <span>${e.vencedoras || 0}</span></div>
           <div class="info-line">❌ Perdedoras: <span>${e.perdedoras || 0}</span></div>
           <div class="info-line">🎯 Assertividade: <span>${Number(e.assertividade).toFixed(2)}%</span></div>
+          <div class="info-line">💰 Lucro Total: <span>${Number(e.lucro_total).toFixed(2)}</span></div>
         `;
         painel.appendChild(card);
       });
