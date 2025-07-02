@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Painel de Estratégias</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
   <style>
     body {
       background-color: #0e0e0e;
@@ -68,65 +68,57 @@
 <body>
 
   <h1>Painel de Estratégias</h1>
-
   <div class="grid" id="painel"></div>
 
   <script>
     async function carregarEstrategias() {
-  const cacheKey = 'estrategias_cache';
-  const cacheTimeKey = 'estrategias_cache_time';
-  const cacheTime = 60000; // 60 segundos
+      const cacheKey = 'estrategias_cache';
+      const cacheTimeKey = 'estrategias_cache_time';
+      const cacheTime = 60000; // 60 segundos
 
-  const now = Date.now();
-  const lastFetch = parseInt(localStorage.getItem(cacheTimeKey), 10) || 0;
+      const now = Date.now();
+      const lastFetch = parseInt(localStorage.getItem(cacheTimeKey), 10) || 0;
 
-  if (now - lastFetch < cacheTime) {
-    const cachedRaw = localStorage.getItem(cacheKey);
-    if (cachedRaw) {
+      if (now - lastFetch < cacheTime) {
+        try {
+          const cached = JSON.parse(localStorage.getItem(cacheKey));
+          if (cached) {
+            renderizar(cached);
+            return;
+          }
+        } catch (e) {
+          console.warn("Cache corrompido:", e);
+        }
+      }
+
       try {
-        const cached = JSON.parse(cachedRaw);
-        renderizar(cached);
-        return;
-      } catch (e) {
-        console.warn('Erro ao parsear cache:', e);
-        localStorage.removeItem(cacheKey);
-        localStorage.removeItem(cacheTimeKey);
+        const resposta = await fetch('https://apirobos-production.up.railway.app/dados');
+        if (!resposta.ok) throw new Error(`Erro HTTP ${resposta.status}`);
+        const estrategias = await resposta.json();
+        localStorage.setItem(cacheKey, JSON.stringify(estrategias));
+        localStorage.setItem(cacheTimeKey, now.toString());
+        renderizar(estrategias);
+      } catch (erro) {
+        console.error('Erro ao carregar estratégias:', erro);
       }
     }
-  }
-
-  try {
-    const resposta = await fetch('https://apirobos-production.up.railway.app/dados');
-    const estrategias = await resposta.json();
-    localStorage.setItem(cacheKey, JSON.stringify(estrategias));
-    localStorage.setItem(cacheTimeKey, now.toString());
-    renderizar(estrategias);
-  } catch (erro) {
-    console.error('Erro ao carregar estratégias:', erro);
-  }
-}
-
 
     function renderizar(estrategias) {
       const painel = document.getElementById('painel');
       painel.innerHTML = '';
       estrategias.forEach(e => {
-        const dataFormatada = e.inicio
-          ? new Date(e.inicio).toLocaleDateString('pt-BR')
-          : 'Indefinido';
-
         const card = document.createElement('div');
         card.className = 'card';
         card.innerHTML = `
           <h2>${e.nome || 'Sem nome'}</h2>
-          <div class="info-line">🧠 Magic: <span>${e.magic ?? 'Indefinido'}</span></div>
-          <div class="info-line">📊 Ativo: <span>${e.ativo ?? '-'}</span></div>
-          <div class="info-line">🕒 Início: <span>${dataFormatada}</span></div>
-          <div class="info-line">💰 Lucro Total: <span>${e.lucro_total.toFixed(2)}</span></div>
-          <div class="info-line">📈 Operações: <span>${e.total_operacoes}</span></div>
-          <div class="info-line">✅ Vencedoras: <span>${e.vencedoras}</span></div>
-          <div class="info-line">❌ Perdedoras: <span>${e.perdedoras ?? 0}</span></div>
-          <div class="info-line">🎯 Assertividade: <span>${e.assertividade?.toFixed(2) ?? '0.00'}%</span></div>
+          <div class="info-line">🧠 Magic: <span>${e.magic || '—'}</span></div>
+          <div class="info-line">📊 Ativo: <span>${e.ativo || '—'}</span></div>
+          <div class="info-line">🕒 Início: <span>${e.inicio || '—'}</span></div>
+          <div class="info-line">💰 Lucro Total: <span>${Number(e.lucro_total).toFixed(2)}</span></div>
+          <div class="info-line">📈 Operações: <span>${e.total_operacoes || 0}</span></div>
+          <div class="info-line">✅ Vencedoras: <span>${e.vencedoras || 0}</span></div>
+          <div class="info-line">❌ Perdedoras: <span>${e.perdedoras || 0}</span></div>
+          <div class="info-line">🎯 Assertividade: <span>${Number(e.assertividade).toFixed(2)}%</span></div>
         `;
         painel.appendChild(card);
       });
