@@ -97,27 +97,24 @@
       }
     }
 
-    function formatarData(dataStr) {
-      if (!dataStr) return 'Indefinido';
-      const data = new Date(dataStr);
-      return isNaN(data.getTime()) ? 'Indefinido' : data.toLocaleDateString('pt-BR') + ' ' + data.toLocaleTimeString('pt-BR');
-    }
-
     function renderizar(estrategias) {
       const painel = document.getElementById('painel');
       painel.innerHTML = '';
-
       estrategias.forEach(e => {
+        const dataFormatada = e.inicio
+          ? new Date(e.inicio).toLocaleDateString('pt-BR')
+          : 'Indefinido';
+
         const card = document.createElement('div');
         card.className = 'card';
         card.innerHTML = `
-          <h2>${e.nome || e.estrategia || 'Sem nome'}</h2>
+          <h2>${e.nome || 'Sem nome'}</h2>
           <div class="info-line">🧠 Magic: <span>${e.magic ?? 'Indefinido'}</span></div>
-          <div class="info-line">📊 Ativo: <span>${e.ativo ?? 'Indefinido'}</span></div>
-          <div class="info-line">🕒 Início: <span>${formatarData(e.inicio || e.data_primeiro_trade)}</span></div>
-          <div class="info-line">💰 Lucro Total: <span>${e.lucro_total?.toFixed(2) ?? '0.00'}</span></div>
-          <div class="info-line">📈 Operações: <span>${e.total_operacoes ?? 0}</span></div>
-          <div class="info-line">✅ Vencedoras: <span>${e.vencedoras ?? 0}</span></div>
+          <div class="info-line">📊 Ativo: <span>${e.ativo ?? '-'}</span></div>
+          <div class="info-line">🕒 Início: <span>${dataFormatada}</span></div>
+          <div class="info-line">💰 Lucro Total: <span>${e.lucro_total.toFixed(2)}</span></div>
+          <div class="info-line">📈 Operações: <span>${e.total_operacoes}</span></div>
+          <div class="info-line">✅ Vencedoras: <span>${e.vencedoras}</span></div>
           <div class="info-line">❌ Perdedoras: <span>${e.perdedoras ?? 0}</span></div>
           <div class="info-line">🎯 Assertividade: <span>${e.assertividade?.toFixed(2) ?? '0.00'}%</span></div>
         `;
