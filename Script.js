@@ -90,6 +90,12 @@ function renderizar(lista) {
 }
 
 function abrirGrafico(magic) {
+  // 🌈 Define cor do gráfico conforme tema
+  const root = document.documentElement;
+  const tema = document.body.classList.contains('tema-claro') ? 'claro' : 'escuro';
+  const corGrafico = tema === 'claro' ? '#00b89c' : '#00ffb3';
+  root.style.setProperty('--cor-grafico', corGrafico);
+
   fetch(`https://apirobos-production.up.railway.app/historico_detalhado/${magic}`)
     .then(res => res.json())
     .then(data => {
@@ -121,7 +127,7 @@ function abrirGrafico(magic) {
             label: hasDados ? 'Lucro Acumulado' : 'Nenhum dado encontrado',
             data: hasDados ? lucroAcumulado : [0],
             fill: false,
-            borderColor: '#00ffb3',
+            borderColor: getComputedStyle(document.documentElement).getPropertyValue('--cor-grafico') || '#00ffb3',
             tension: 0.3
           }]
         },
