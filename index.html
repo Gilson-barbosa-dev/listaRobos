@@ -36,17 +36,10 @@
 
     .grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 32px;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
       max-width: 1200px;
       margin: 0 auto;
-      padding: 20px;
-    }
-
-    @media (max-width: 1000px) {
-      .grid {
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      }
     }
 
     .card {
@@ -207,7 +200,7 @@
           <h2>🧠 Magic: <span>${e.magic}</span></h2>
           <div class="info-line">🕒 Início: <span>${formatarData(e.inicio)}</span></div>
           <div class="info-line">📊 Ativo: <span>${e.ativo}</span></div>
-          <div class="info-line">📈 Operações: <span>${e.total_operacoes}</span></div>
+          <div class="info-line">✅ Operações: <span>${e.total_operacoes}</span></div>
           <div class="info-line">✅ Vencedoras: <span>${e.vencedoras}</span></div>
           <div class="info-line">❌ Perdedoras: <span>${e.perdedoras}</span></div>
           <div class="info-line">🎯 Assertividade: <span>${e.assertividade.toFixed(2)}%</span></div>
@@ -224,15 +217,20 @@
         .then(data => {
           const ctx = document.getElementById('graficoLucro').getContext('2d');
           const labels = data.map(item => item.data);
-          const lucro = data.map(item => item.lucro_total);
+          let acumulado = 0;
+          const lucroAcumulado = data.map(item => {
+            acumulado += item.lucro;
+            return acumulado;
+          });
+
           if (window.graficoInstancia) window.graficoInstancia.destroy();
           window.graficoInstancia = new Chart(ctx, {
             type: 'line',
             data: {
               labels,
               datasets: [{
-                label: 'Lucro Total',
-                data: lucro,
+                label: 'Lucro Acumulado',
+                data: lucroAcumulado,
                 fill: false,
                 borderColor: '#00ffb3',
                 tension: 0.3
@@ -241,7 +239,7 @@
             options: {
               plugins: {
                 legend: { labels: { color: '#fff' } },
-                tooltip: { callbacks: { label: ctx => `Lucro: ${ctx.raw.toFixed(2)}` } }
+                tooltip: { callbacks: { label: ctx => `Lucro acumulado: ${ctx.raw.toFixed(2)}` } }
               },
               scales: {
                 x: { ticks: { color: '#ccc' } },
