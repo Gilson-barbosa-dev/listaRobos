@@ -212,3 +212,7 @@ button {
   background: #00bfa5;
   color: #fff;
 }
+
+.tema-claro #modalGrafico button {
+  color: #000; /* deixa o X visível no fundo claro */
+}
