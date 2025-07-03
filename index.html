@@ -13,6 +13,7 @@
       margin: 0;
       padding: 20px;
     }
+
     h1 {
       text-align: center;
       margin-bottom: 20px;
@@ -20,6 +21,7 @@
       font-weight: 700;
       font-size: 28px;
     }
+
     #filtro, #ordenar {
       width: 100%;
       max-width: 600px;
@@ -34,37 +36,31 @@
 
     .grid {
       display: grid;
-      gap: 30px;
-      grid-template-columns: 1fr;
-    }
-    @media (min-width: 768px) {
-      .grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-    @media (min-width: 1024px) {
-      .grid {
-        grid-template-columns: repeat(3, 1fr);
-      }
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+      max-width: 1200px;
+      margin: 0 auto;
     }
 
     .card {
       background: linear-gradient(135deg, #1e1e1e, #2a2a2a);
       border-radius: 12px;
       padding: 20px;
-      width: 100%;
       box-shadow: 0 0 15px rgba(0, 255, 179, 0.15);
       transition: transform 0.3s ease;
     }
+
     .card:hover {
       transform: translateY(-5px);
     }
+
     .card h2 {
       font-size: 22px;
       margin-bottom: 12px;
       color: #00ffb3;
       font-weight: 600;
     }
+
     .info-line {
       display: flex;
       align-items: center;
@@ -72,9 +68,52 @@
       font-size: 14px;
       color: #ccc;
     }
+
     .info-line span {
       margin-left: 8px;
       font-weight: 500;
+      color: #fff;
+    }
+
+    button {
+      margin-top: 10px;
+      background: #00ffb3;
+      color: #000;
+      padding: 6px 12px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    #modalGrafico {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.8);
+      z-index: 999;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #modalGrafico > div {
+      background: #1e1e1e;
+      padding: 20px;
+      border-radius: 12px;
+      max-width: 90vw;
+      width: 600px;
+      position: relative;
+    }
+
+    #modalGrafico button {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 20px;
+      background: none;
       color: #fff;
     }
   </style>
@@ -89,14 +128,16 @@
     <option value="data">🕒 Ordenar por Data mais Antiga</option>
   </select>
   <div class="grid" id="painel"></div>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <div id="modalGrafico" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.8);z-index:999;align-items:center;justify-content:center;">
-    <div style="background:#1e1e1e;padding:20px;border-radius:12px;max-width:90vw;width:600px;position:relative;">
-      <button onclick="fecharModal()" style="position:absolute;top:10px;right:10px;font-size:20px;background:none;color:#fff;border:none;cursor:pointer;">&times;</button>
+
+  <div id="modalGrafico">
+    <div>
+      <button onclick="fecharModal()">&times;</button>
       <h2 id="tituloGrafico" style="text-align:center;color:#00ffb3;margin-bottom:10px"></h2>
       <canvas id="graficoLucro"></canvas>
     </div>
   </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
     let estrategiasGlobais = [];
 
@@ -114,13 +155,10 @@
             renderizar(estrategiasGlobais);
             return;
           }
-        } catch (e) {
-          console.warn("Cache corrompido:", e);
-        }
+        } catch (e) {}
       }
       try {
         const resposta = await fetch('https://apirobos-production.up.railway.app/dados');
-        if (!resposta.ok) throw new Error(`Erro HTTP ${resposta.status}`);
         const estrategias = await resposta.json();
         localStorage.setItem(cacheKey, JSON.stringify(estrategias));
         localStorage.setItem(cacheTimeKey, now.toString());
@@ -135,23 +173,21 @@
       const criterio = document.getElementById('ordenar')?.value || 'lucro';
       const copia = [...lista];
       switch (criterio) {
-        case 'assertividade': return copia.sort((a, b) => (b.assertividade || 0) - (a.assertividade || 0));
-        case 'operacoes': return copia.sort((a, b) => (b.total_operacoes || 0) - (a.total_operacoes || 0));
+        case 'assertividade': return copia.sort((a, b) => b.assertividade - a.assertividade);
+        case 'operacoes': return copia.sort((a, b) => b.total_operacoes - a.total_operacoes);
         case 'data': return copia.sort((a, b) => new Date(a.inicio) - new Date(b.inicio));
-        case 'lucro':
-        default: return copia.sort((a, b) => (b.lucro_total || 0) - (a.lucro_total || 0));
+        default: return copia.sort((a, b) => b.lucro_total - a.lucro_total);
       }
     }
 
     function formatarData(dataGMT) {
       if (!dataGMT) return '—';
       const data = new Date(dataGMT);
-      const opcoes = {
+      return data.toLocaleString('pt-BR', {
         day: '2-digit', month: '2-digit', year: 'numeric',
         hour: '2-digit', minute: '2-digit', second: '2-digit',
         hour12: false, timeZone: 'UTC'
-      };
-      return data.toLocaleString('pt-BR', opcoes);
+      });
     }
 
     function renderizar(lista) {
@@ -161,32 +197,19 @@
         const card = document.createElement('div');
         card.className = 'card';
         card.innerHTML = `
-          <h2>🧠 Magic: <span>${e.magic || '—'}</span></h2>
+          <h2>🧠 Magic: <span>${e.magic}</span></h2>
           <div class="info-line">🕒 Início: <span>${formatarData(e.inicio)}</span></div>
-          <div class="info-line">📊 Ativo: <span>${e.ativo || '—'}</span></div>
-          <div class="info-line">📈 Operações: <span>${e.total_operacoes || 0}</span></div>
-          <div class="info-line">✅ Vencedoras: <span>${e.vencedoras || 0}</span></div>
-          <div class="info-line">❌ Perdedoras: <span>${e.perdedoras || 0}</span></div>
-          <div class="info-line">🎯 Assertividade: <span>${Number(e.assertividade).toFixed(2)}%</span></div>
-          <div class="info-line">💰 Lucro Total: <span>${Number(e.lucro_total).toFixed(2)}</span></div>
-          <button onclick="abrirGrafico(${e.magic})" style="margin-top:10px;background:#00ffb3;color:#000;padding:6px 12px;border:none;border-radius:6px;cursor:pointer;font-weight:600">📊 Ver Gráfico</button>
+          <div class="info-line">📊 Ativo: <span>${e.ativo}</span></div>
+          <div class="info-line">📈 Operações: <span>${e.total_operacoes}</span></div>
+          <div class="info-line">✅ Vencedoras: <span>${e.vencedoras}</span></div>
+          <div class="info-line">❌ Perdedoras: <span>${e.perdedoras}</span></div>
+          <div class="info-line">🎯 Assertividade: <span>${e.assertividade.toFixed(2)}%</span></div>
+          <div class="info-line">💰 Lucro Total: <span>${e.lucro_total.toFixed(2)}</span></div>
+          <button onclick="abrirGrafico(${e.magic})">📊 Ver Gráfico</button>
         `;
         painel.appendChild(card);
       });
     }
-
-    document.getElementById('filtro').addEventListener('input', e => {
-      const termo = e.target.value.toLowerCase();
-      const filtradas = estrategiasGlobais.filter(e =>
-        e.magic.toString().includes(termo) || (e.ativo || '').toLowerCase().includes(termo)
-      );
-      renderizar(ordenarEstrategias(filtradas));
-    });
-
-    document.getElementById('ordenar').addEventListener('change', () => {
-      const ordenadas = ordenarEstrategias(estrategiasGlobais);
-      renderizar(ordenadas);
-    });
 
     function abrirGrafico(magic) {
       fetch(`https://apirobos-production.up.railway.app/historico_detalhado/${magic}`)
@@ -227,6 +250,18 @@
     function fecharModal() {
       document.getElementById('modalGrafico').style.display = 'none';
     }
+
+    document.getElementById('filtro').addEventListener('input', e => {
+      const termo = e.target.value.toLowerCase();
+      const filtradas = estrategiasGlobais.filter(e =>
+        e.magic.toString().includes(termo) || (e.ativo || '').toLowerCase().includes(termo)
+      );
+      renderizar(ordenarEstrategias(filtradas));
+    });
+
+    document.getElementById('ordenar').addEventListener('change', () => {
+      renderizar(ordenarEstrategias(estrategiasGlobais));
+    });
 
     carregarEstrategias();
   </script>
