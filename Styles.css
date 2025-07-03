@@ -23,13 +23,10 @@ h1 {
 
 .top-bar input,
 .top-bar select {
-  width: 100%;
-  max-width: 600px;
-  padding: 12px 16px;
-  border-radius: 8px;
-  border: none;
-  font-size: 16px;
-  box-sizing: border-box;
+  padding: 12px 36px 12px 16px; /* aumenta o espaçamento à direita */
+  background-position: right 12px center; /* ajusta a posição da seta */
+  background-repeat: no-repeat;
+  background-size: 12px;
 }
 
 @media (min-width: 768px) {
