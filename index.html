@@ -86,7 +86,7 @@
     <option value="lucro">📈 Ordenar por Lucro Total</option>
     <option value="assertividade">🎯 Ordenar por Assertividade</option>
     <option value="operacoes">📊 Ordenar por Total de Operações</option>
-    <option value="data">🕒 Ordenar por Data mais Recente</option>
+    <option value="data">🕒 Ordenar por Data mais Antiga</option>
   </select>
 
   <div class="grid" id="painel"></div>
@@ -138,7 +138,7 @@
         case 'operacoes':
           return copia.sort((a, b) => (b.total_operacoes || 0) - (a.total_operacoes || 0));
         case 'data':
-          return copia.sort((a, b) => new Date(b.inicio) - new Date(a.inicio));
+          return copia.sort((a, b) => new Date(a.inicio) - new Date(b.inicio));
         case 'lucro':
         default:
           return copia.sort((a, b) => (b.lucro_total || 0) - (a.lucro_total || 0));
