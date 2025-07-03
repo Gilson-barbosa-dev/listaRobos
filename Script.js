@@ -15,7 +15,13 @@ document.getElementById("toggleTema").addEventListener("click", () => {
   // 🔁 Atualiza gráfico se estiver visível
   if (document.getElementById("modalGrafico").style.display === "flex") {
     const magicAtual = document.getElementById("tituloGrafico").innerText.split("Magic ")[1];
-    if (magicAtual) abrirGrafico(parseInt(magicAtual));
+    if (magicAtual) {
+      if (window.graficoInstancia) {
+        window.graficoInstancia.destroy();
+        window.graficoInstancia = null;
+      }
+      setTimeout(() => abrirGrafico(parseInt(magicAtual)), 10);
+    }
   }
 });
 
