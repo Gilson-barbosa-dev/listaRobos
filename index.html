@@ -213,24 +213,40 @@
 
   function abrirGrafico(magic) {
   fetch(`https://apirobos-production.up.railway.app/historico_detalhado/${magic}`)
-    .then(res => res.json())
+    .then(res => {
+      if (!res.ok) throw new Error("Erro ao buscar dados");
+      return res.json();
+    })
     .then(data => {
+      console.log("Dados recebidos:", data);
+
       const ctx = document.getElementById('graficoLucro').getContext('2d');
-      const labels = data.map(item => item.data);
+      const labels = [];
+      const lucroAcumulado = [];
       let acumulado = 0;
-      const lucroAcumulado = data.map(item => {
-        acumulado += parseFloat(item.lucro); // conversão para número
-        return acumulado;
-      });
+
+      for (const item of data) {
+        let lucro = parseFloat(
+          typeof item.lucro === "string" ? item.lucro.replace(",", ".") : item.lucro
+        );
+        if (isNaN(lucro)) lucro = 0;
+
+        labels.push(item.data);
+        acumulado += lucro;
+        lucroAcumulado.push(acumulado);
+      }
 
       if (window.graficoInstancia) window.graficoInstancia.destroy();
+
+      const hasDados = labels.length > 0 && lucroAcumulado.some(l => l !== 0);
+
       window.graficoInstancia = new Chart(ctx, {
         type: 'line',
         data: {
-          labels,
+          labels: hasDados ? labels : ["Sem dados"],
           datasets: [{
-            label: 'Lucro Acumulado',
-            data: lucroAcumulado,
+            label: hasDados ? 'Lucro Acumulado' : 'Nenhum dado encontrado',
+            data: hasDados ? lucroAcumulado : [0],
             fill: false,
             borderColor: '#00ffb3',
             tension: 0.3
@@ -250,8 +266,13 @@
 
       document.getElementById('tituloGrafico').innerText = `Histórico: Magic ${magic}`;
       document.getElementById('modalGrafico').style.display = 'flex';
+    })
+    .catch(err => {
+      console.error("Erro ao carregar gráfico:", err);
+      alert("Não foi possível carregar o gráfico. Verifique a conexão ou os dados.");
     });
 }
+
 
     function fecharModal() {
       document.getElementById('modalGrafico').style.display = 'none';
