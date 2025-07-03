@@ -1,0 +1,174 @@
+body {
+  font-family: 'Inter', sans-serif;
+  margin: 0;
+  padding: 20px;
+  overflow-x: hidden;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+  font-weight: 700;
+  font-size: 28px;
+}
+
+.top-bar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.top-bar input,
+.top-bar select {
+  width: 100%;
+  max-width: 600px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: none;
+  font-size: 16px;
+  box-sizing: border-box;
+}
+
+@media (min-width: 768px) {
+  .top-bar {
+    flex-direction: row;
+    justify-content: center;
+    gap: 16px;
+  }
+
+  .top-bar input,
+  .top-bar select {
+    width: 260px;
+    margin-bottom: 0;
+  }
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.card {
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 0 15px rgba(0, 255, 179, 0.15);
+  transition: transform 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+.card h2 {
+  font-size: 22px;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.info-line {
+  display: flex;
+  align-items: center;
+  margin-bottom: 6px;
+  font-size: 14px;
+}
+
+.info-line span {
+  margin-left: 8px;
+  font-weight: 500;
+}
+
+button {
+  margin-top: 10px;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+#modalGrafico {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.8);
+  z-index: 999;
+  align-items: center;
+  justify-content: center;
+}
+
+#modalGrafico > div {
+  padding: 20px;
+  border-radius: 12px;
+  max-width: 90vw;
+  width: 600px;
+  position: relative;
+  background: white;
+  color: black;
+}
+
+#modalGrafico button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 20px;
+  background: none;
+}
+
+.tema-escuro {
+  background-color: #0e0e0e;
+  color: #fff;
+}
+
+.tema-escuro .card {
+  background: linear-gradient(135deg, #1e1e1e, #2a2a2a);
+  color: #fff;
+}
+
+.tema-escuro .info-line {
+  color: #ccc;
+}
+
+.tema-escuro .card h2,
+.tema-escuro h1 {
+  color: #00ffb3;
+}
+
+.tema-escuro button {
+  background: #00ffb3;
+  color: #000;
+}
+
+.tema-claro {
+  background-color: #ffffff;
+  color: #111;
+}
+
+.tema-claro .card {
+  background: #f9f9f9;
+  border: 1px solid #e0e0e0;
+  color: #111;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.04);
+}
+
+.tema-claro .info-line {
+  color: #444;
+}
+
+.tema-claro .card h2,
+.tema-claro h1 {
+  color: #00b89c;
+}
+
+.tema-claro button {
+  background: #00c9a7;
+  color: #000;
+}
