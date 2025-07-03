@@ -211,46 +211,59 @@
       });
     }
 
-    function abrirGrafico(magic) {
-      fetch(`https://apirobos-production.up.railway.app/historico_detalhado/${magic}`)
-        .then(res => res.json())
-        .then(data => {
-          const ctx = document.getElementById('graficoLucro').getContext('2d');
-          const labels = data.map(item => item.data);
-          let acumulado = 0;
-          const lucroAcumulado = data.map(item => {
-            acumulado += item.lucro;
-            return acumulado;
-          });
+  function abrirGrafico(magic) {
+  // Primeiro exibe o modal (isso garante que o canvas esteja visível no DOM)
+  document.getElementById('modalGrafico').style.display = 'flex';
+  document.getElementById('tituloGrafico').innerText = `Histórico: Magic ${magic}`;
 
-          if (window.graficoInstancia) window.graficoInstancia.destroy();
-          window.graficoInstancia = new Chart(ctx, {
-            type: 'line',
-            data: {
-              labels,
-              datasets: [{
-                label: 'Lucro Acumulado',
-                data: lucroAcumulado,
-                fill: false,
-                borderColor: '#00ffb3',
-                tension: 0.3
-              }]
+  fetch(`https://apirobos-production.up.railway.app/historico_detalhado/${magic}`)
+    .then(res => res.json())
+    .then(data => {
+      const ctx = document.getElementById('graficoLucro').getContext('2d');
+
+      const labels = data.map(item => item.data);
+      let acumulado = 0;
+      const lucroAcumulado = data.map(item => {
+        acumulado += item.lucro;
+        return acumulado;
+      });
+
+      if (window.graficoInstancia) {
+        window.graficoInstancia.destroy();
+      }
+
+      window.graficoInstancia = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Lucro Acumulado',
+            data: lucroAcumulado,
+            fill: false,
+            borderColor: '#00ffb3',
+            tension: 0.3
+          }]
+        },
+        options: {
+          plugins: {
+            legend: {
+              labels: { color: '#fff' }
             },
-            options: {
-              plugins: {
-                legend: { labels: { color: '#fff' } },
-                tooltip: { callbacks: { label: ctx => `Lucro acumulado: ${ctx.raw.toFixed(2)}` } }
-              },
-              scales: {
-                x: { ticks: { color: '#ccc' } },
-                y: { ticks: { color: '#ccc' } }
+            tooltip: {
+              callbacks: {
+                label: ctx => `Lucro acumulado: ${ctx.raw.toFixed(2)}`
               }
             }
-          });
-          document.getElementById('tituloGrafico').innerText = `Histórico: Magic ${magic}`;
-          document.getElementById('modalGrafico').style.display = 'flex';
-        });
-    }
+          },
+          scales: {
+            x: { ticks: { color: '#ccc' } },
+            y: { ticks: { color: '#ccc' } }
+          }
+        }
+      });
+    });
+}
+
 
     function fecharModal() {
       document.getElementById('modalGrafico').style.display = 'none';
