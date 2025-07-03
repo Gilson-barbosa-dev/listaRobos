@@ -32,10 +32,17 @@
       box-sizing: border-box;
     }
     .grid {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
+      display: grid;
       gap: 30px;
+      grid-template-columns: 1fr; /* padrão: 1 coluna (mobile) */
+      justify-content: center;
+      align-items: stretch;
+    }
+    
+    @media (min-width: 768px) {
+      .grid {
+        grid-template-columns: repeat(3, 1fr); /* desktop: 3 colunas */
+      }
     }
     .card {
       background: linear-gradient(135deg, #1e1e1e, #2a2a2a);
