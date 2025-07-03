@@ -67,78 +67,85 @@
 </head>
 <body>
 
-  <h1>Painel de Estratégias</h1>
-  <div class="grid" id="painel"></div>
+  <!-- Adicione isto dentro da tag <body> antes do <h1> -->
+<input type="text" id="filtro" placeholder="🔍 Filtrar por Magic ou Ativo..." style="width:100%;max-width:600px;padding:12px;margin:20px auto;display:block;border-radius:8px;border:none;font-size:16px" />
 
-  <script>
-    async function carregarEstrategias() {
-      const cacheKey = 'estrategias_cache';
-      const cacheTimeKey = 'estrategias_cache_time';
-      const cacheTime = 60000; // 60 segundos
+<h1>Painel de Estratégias</h1>
+<div class="grid" id="painel"></div>
 
-      const now = Date.now();
-      const lastFetch = parseInt(localStorage.getItem(cacheTimeKey), 10) || 0;
+<script>
+  let estrategiasGlobais = [];
 
-      if (now - lastFetch < cacheTime) {
-        try {
-          const cached = JSON.parse(localStorage.getItem(cacheKey));
-          if (cached) {
-            renderizar(cached);
-            return;
-          }
-        } catch (e) {
-          console.warn("Cache corrompido:", e);
-        }
-      }
+  async function carregarEstrategias() {
+    const cacheKey = 'estrategias_cache';
+    const cacheTimeKey = 'estrategias_cache_time';
+    const cacheTime = 60000;
 
+    const now = Date.now();
+    const lastFetch = parseInt(localStorage.getItem(cacheTimeKey), 10) || 0;
+
+    if (now - lastFetch < cacheTime) {
       try {
-        const resposta = await fetch('https://apirobos-production.up.railway.app/dados');
-        if (!resposta.ok) throw new Error(`Erro HTTP ${resposta.status}`);
-        const estrategias = await resposta.json();
-        localStorage.setItem(cacheKey, JSON.stringify(estrategias));
-        localStorage.setItem(cacheTimeKey, now.toString());
-        renderizar(estrategias);
-      } catch (erro) {
-        console.error('Erro ao carregar estratégias:', erro);
+        const cached = JSON.parse(localStorage.getItem(cacheKey));
+        if (cached) {
+          estrategiasGlobais = cached;
+          renderizar(cached);
+          return;
+        }
+      } catch (e) {
+        console.warn("Cache corrompido:", e);
       }
     }
 
-    function formatarDataBrasileira(dataGMT) {
-      if (!dataGMT) return '—';
-      const data = new Date(dataGMT);
-      const opcoes = {
-        timeZone: 'America/Sao_Paulo',
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      };
-      return data.toLocaleString('pt-BR', opcoes).replace(',', '');
+    try {
+      const resposta = await fetch('https://apirobos-production.up.railway.app/dados');
+      if (!resposta.ok) throw new Error(`Erro HTTP ${resposta.status}`);
+      const estrategias = await resposta.json();
+      localStorage.setItem(cacheKey, JSON.stringify(estrategias));
+      localStorage.setItem(cacheTimeKey, now.toString());
+      estrategiasGlobais = estrategias;
+      renderizar(estrategias);
+    } catch (erro) {
+      console.error('Erro ao carregar estratégias:', erro);
     }
+  }
 
-    function renderizar(estrategias) {
-      const painel = document.getElementById('painel');
-      painel.innerHTML = '';
-      estrategias.forEach(e => {
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.innerHTML = `
-          <h2>🧠 Magic: <span>${e.magic || '—'}</h2>
-          <div class="info-line">🕒 Início: <span>${formatarDataBrasileira(e.inicio)}</span></div>
-          <div class="info-line">📊 Ativo: <span>${e.ativo || '—'}</span></div>
-          <div class="info-line">📈 Operações: <span>${e.total_operacoes || 0}</span></div>
-          <div class="info-line">✅ Vencedoras: <span>${e.vencedoras || 0}</span></div>
-          <div class="info-line">❌ Perdedoras: <span>${e.perdedoras || 0}</span></div>
-          <div class="info-line">🎯 Assertividade: <span>${Number(e.assertividade).toFixed(2)}%</span></div>
-          <div class="info-line">💰 Lucro Total: <span>${Number(e.lucro_total).toFixed(2)}</span></div>
-        `;
-        painel.appendChild(card);
-      });
-    }
+  function renderizar(lista) {
+    const painel = document.getElementById('painel');
+    painel.innerHTML = '';
+    lista.forEach(e => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `
+        <h2>🧠 Magic: <span>${e.magic || '—'}</h2>
+        <div class="info-line">🕒 Início: <span>${formatarData(e.inicio)}</span></div>
+        <div class="info-line">📊 Ativo: <span>${e.ativo || '—'}</span></div>
+        <div class="info-line">📈 Operações: <span>${e.total_operacoes || 0}</span></div>
+        <div class="info-line">✅ Vencedoras: <span>${e.vencedoras || 0}</span></div>
+        <div class="info-line">❌ Perdedoras: <span>${e.perdedoras || 0}</span></div>
+        <div class="info-line">🎯 Assertividade: <span>${Number(e.assertividade).toFixed(2)}%</span></div>
+        <div class="info-line">💰 Lucro Total: <span>${Number(e.lucro_total).toFixed(2)}</span></div>
+      `;
+      painel.appendChild(card);
+    });
+  }
 
-    carregarEstrategias();
-  </script>
+  function formatarData(dataGMT) {
+    if (!dataGMT) return '—';
+    const data = new Date(dataGMT);
+    return data.toLocaleString('pt-BR', { timeZone: 'UTC' });
+  }
 
+  document.getElementById('filtro').addEventListener('input', e => {
+    const termo = e.target.value.toLowerCase();
+    const filtradas = estrategiasGlobais.filter(e =>
+      e.magic.toString().includes(termo) ||
+      (e.ativo || '').toLowerCase().includes(termo)
+    );
+    renderizar(filtradas);
+  });
+
+  carregarEstrategias();
+</script>
 </body>
 </html>
