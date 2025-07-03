@@ -219,7 +219,7 @@
       const labels = data.map(item => item.data);
       let acumulado = 0;
       const lucroAcumulado = data.map(item => {
-        acumulado += item.lucro;
+        acumulado += parseFloat(item.lucro); // conversão para número
         return acumulado;
       });
 
@@ -239,11 +239,7 @@
         options: {
           plugins: {
             legend: { labels: { color: '#fff' } },
-            tooltip: {
-              callbacks: {
-                label: ctx => `Lucro acumulado: ${ctx.raw.toFixed(2)}`
-              }
-            }
+            tooltip: { callbacks: { label: ctx => `Lucro acumulado: ${ctx.raw.toFixed(2)}` } }
           },
           scales: {
             x: { ticks: { color: '#ccc' } },
@@ -254,13 +250,8 @@
 
       document.getElementById('tituloGrafico').innerText = `Histórico: Magic ${magic}`;
       document.getElementById('modalGrafico').style.display = 'flex';
-    })
-    .catch(error => {
-      console.error('Erro ao buscar histórico detalhado:', error);
-      alert("Erro ao carregar gráfico. Verifique a conexão com a API.");
     });
 }
-
 
     function fecharModal() {
       document.getElementById('modalGrafico').style.display = 'none';
