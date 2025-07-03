@@ -61,7 +61,7 @@ h1 {
 
 .wrapper-select::after {
   content: '▼';
-  font-size: 14px;
+  font-size: 12px;
   color: #333;
   position: absolute;
   right: 14px;
