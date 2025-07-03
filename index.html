@@ -22,11 +22,11 @@
       font-size: 28px;
     }
 
-    #filtro {
+    #filtro, #ordenar {
       width: 100%;
       max-width: 600px;
       padding: 12px 16px;
-      margin: 0 auto 30px auto;
+      margin: 0 auto 16px auto;
       display: block;
       border-radius: 8px;
       border: none;
@@ -80,7 +80,14 @@
 <body>
 
   <h1>Painel de Estratégias</h1>
+
   <input type="text" id="filtro" placeholder="🔍 Filtrar por Magic ou Ativo..." />
+  <select id="ordenar">
+    <option value="lucro">📈 Ordenar por Lucro Total</option>
+    <option value="assertividade">🎯 Ordenar por Assertividade</option>
+    <option value="operacoes">📊 Ordenar por Total de Operações</option>
+    <option value="data">🕒 Ordenar por Data mais Recente</option>
+  </select>
 
   <div class="grid" id="painel"></div>
 
@@ -99,8 +106,8 @@
         try {
           const cached = JSON.parse(localStorage.getItem(cacheKey));
           if (cached) {
-            estrategiasGlobais = cached;
-            renderizar(cached);
+            estrategiasGlobais = ordenarEstrategias(cached);
+            renderizar(estrategiasGlobais);
             return;
           }
         } catch (e) {
@@ -114,10 +121,27 @@
         const estrategias = await resposta.json();
         localStorage.setItem(cacheKey, JSON.stringify(estrategias));
         localStorage.setItem(cacheTimeKey, now.toString());
-        estrategiasGlobais = estrategias;
-        renderizar(estrategias);
+        estrategiasGlobais = ordenarEstrategias(estrategias);
+        renderizar(estrategiasGlobais);
       } catch (erro) {
         console.error('Erro ao carregar estratégias:', erro);
+      }
+    }
+
+    function ordenarEstrategias(lista) {
+      const criterio = document.getElementById('ordenar')?.value || 'lucro';
+      const copia = [...lista];
+
+      switch (criterio) {
+        case 'assertividade':
+          return copia.sort((a, b) => (b.assertividade || 0) - (a.assertividade || 0));
+        case 'operacoes':
+          return copia.sort((a, b) => (b.total_operacoes || 0) - (a.total_operacoes || 0));
+        case 'data':
+          return copia.sort((a, b) => new Date(b.inicio) - new Date(a.inicio));
+        case 'lucro':
+        default:
+          return copia.sort((a, b) => (b.lucro_total || 0) - (a.lucro_total || 0));
       }
     }
 
@@ -144,7 +168,7 @@
         const card = document.createElement('div');
         card.className = 'card';
         card.innerHTML = `
-          <h2>🧠 Magic: <span>${e.magic || '—'}</h2>
+          <h2>🧠 Magic: <span>${e.magic || '—'}</span></h2>
           <div class="info-line">🕒 Início: <span>${formatarData(e.inicio)}</span></div>
           <div class="info-line">📊 Ativo: <span>${e.ativo || '—'}</span></div>
           <div class="info-line">📈 Operações: <span>${e.total_operacoes || 0}</span></div>
@@ -163,11 +187,15 @@
         e.magic.toString().includes(termo) ||
         (e.ativo || '').toLowerCase().includes(termo)
       );
-      renderizar(filtradas);
+      renderizar(ordenarEstrategias(filtradas));
+    });
+
+    document.getElementById('ordenar').addEventListener('change', () => {
+      const ordenadas = ordenarEstrategias(estrategiasGlobais);
+      renderizar(ordenadas);
     });
 
     carregarEstrategias();
   </script>
-
 </body>
 </html>
