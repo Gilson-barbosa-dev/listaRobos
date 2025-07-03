@@ -227,7 +227,7 @@
 
       for (const item of data) {
         let lucro = parseFloat(
-          typeof item.lucro === "string" ? item.lucro.replace(",", ".") : item.lucro
+          typeof item.lucro_total === "string" ? item.lucro_total.replace(",", ".") : item.lucro_total
         );
         if (isNaN(lucro)) lucro = 0;
 
@@ -272,6 +272,7 @@
       alert("Não foi possível carregar o gráfico. Verifique a conexão ou os dados.");
     });
 }
+
 
 
     function fecharModal() {
