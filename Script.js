@@ -12,7 +12,6 @@ document.getElementById("toggleTema").addEventListener("click", () => {
   const temaAtual = document.body.classList.contains("tema-claro") ? "tema-claro" : "tema-escuro";
   aplicarTema(temaAtual === "tema-claro" ? "tema-escuro" : "tema-claro");
 
-  // 🔁 Atualiza gráfico se estiver visível
   if (document.getElementById("modalGrafico").style.display === "flex") {
     const magicAtual = document.getElementById("tituloGrafico").innerText.split("Magic ")[1];
     if (magicAtual) {
@@ -28,7 +27,6 @@ document.getElementById("toggleTema").addEventListener("click", () => {
 const temaSalvo = localStorage.getItem("temaEscolhido") || "tema-escuro";
 aplicarTema(temaSalvo);
 
-// Estratégias
 let estrategiasGlobais = [];
 
 async function carregarEstrategias() {
@@ -124,6 +122,9 @@ function abrirGrafico(magic) {
       if (window.graficoInstancia) window.graficoInstancia.destroy();
 
       const hasDados = labels.length > 0 && lucroAcumulado.some(l => l !== 0);
+      const isClaro = document.body.classList.contains("tema-claro");
+      const corTexto = isClaro ? "#111" : "#fff";
+      const corLinha = isClaro ? "#00b89c" : "#00ffb3";
 
       window.graficoInstancia = new Chart(ctx, {
         type: 'line',
@@ -133,18 +134,18 @@ function abrirGrafico(magic) {
             label: hasDados ? 'Lucro Acumulado' : 'Nenhum dado encontrado',
             data: hasDados ? lucroAcumulado : [0],
             fill: false,
-            borderColor: document.body.classList.contains("tema-claro") ? '#00b89c' : '#00ffb3',
+            borderColor: corLinha,
             tension: 0.3
           }]
         },
         options: {
           plugins: {
-            legend: { labels: { color: getComputedStyle(document.body).color } },
+            legend: { labels: { color: corTexto } },
             tooltip: { callbacks: { label: ctx => `Lucro acumulado: ${ctx.raw.toFixed(2)}` } }
           },
           scales: {
-            x: { ticks: { color: getComputedStyle(document.body).color } },
-            y: { ticks: { color: getComputedStyle(document.body).color } }
+            x: { ticks: { color: corTexto } },
+            y: { ticks: { color: corTexto } }
           }
         }
       });
