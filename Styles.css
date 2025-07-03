@@ -23,11 +23,24 @@ h1 {
 
 .top-bar input,
 .top-bar select {
-  padding: 12px 36px 12px 16px; /* aumenta o espaçamento à direita */
-  background-position: right 12px center; /* ajusta a posição da seta */
+  width: 100%;
+  max-width: 600px;
+  padding: 12px 16px;
+  padding-right: 42px; /* aumenta espaço para a seta */
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+  box-sizing: border-box;
+  background-color: #fff;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg fill='black' height='18' viewBox='0 0 24 24' width='18' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-size: 12px;
+  background-position: right 12px center;
+  background-size: 16px;
 }
+
 
 @media (min-width: 768px) {
   .top-bar {
