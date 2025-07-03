@@ -22,16 +22,32 @@
       font-size: 28px;
     }
 
-    #filtro, #ordenar {
-      width: 100%;
-      max-width: 600px;
-      padding: 12px 16px;
-      margin: 0 auto 16px auto;
-      display: block;
-      border-radius: 8px;
+    .topo-filtros {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .topo-filtros input,
+    .topo-filtros select {
+      padding: 10px 14px;
+      border-radius: 10px;
       border: none;
-      font-size: 16px;
-      box-sizing: border-box;
+      font-size: 14px;
+      width: 220px;
+      background: #fff;
+      color: #333;
+      box-shadow: 0 0 0 2px transparent;
+      transition: box-shadow 0.2s ease;
+    }
+
+    .topo-filtros input:focus,
+    .topo-filtros select:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px #25D366;
     }
 
     .grid {
@@ -120,13 +136,15 @@
 </head>
 <body>
   <h1>Painel de Estratégias</h1>
-  <input type="text" id="filtro" placeholder="🔍 Filtrar por Magic ou Ativo..." />
-  <select id="ordenar">
-    <option value="lucro">📈 Ordenar por Lucro Total</option>
-    <option value="assertividade">🎯 Ordenar por Assertividade</option>
-    <option value="operacoes">📊 Ordenar por Total de Operações</option>
-    <option value="data">🕒 Ordenar por Data mais Antiga</option>
-  </select>
+  <div class="topo-filtros">
+    <input type="text" id="filtro" placeholder="🔍 Magic ou Ativo..." />
+    <select id="ordenar">
+      <option value="lucro">📈 Lucro Total</option>
+      <option value="assertividade">🎯 Assertividade</option>
+      <option value="operacoes">📊 Total de Operações</option>
+      <option value="data">🕒 Data mais Antiga</option>
+    </select>
+  </div>
   <div class="grid" id="painel"></div>
 
   <div id="modalGrafico">
@@ -211,69 +229,53 @@
       });
     }
 
-  function abrirGrafico(magic) {
-  fetch(`https://apirobos-production.up.railway.app/historico_detalhado/${magic}`)
-    .then(res => {
-      if (!res.ok) throw new Error("Erro ao buscar dados");
-      return res.json();
-    })
-    .then(data => {
-      console.log("Dados recebidos:", data);
-
-      const ctx = document.getElementById('graficoLucro').getContext('2d');
-      const labels = [];
-      const lucroAcumulado = [];
-      let acumulado = 0;
-
-      for (const item of data) {
-        let lucro = parseFloat(
-          typeof item.lucro_total === "string" ? item.lucro_total.replace(",", ".") : item.lucro_total
-        );
-        if (isNaN(lucro)) lucro = 0;
-
-        labels.push(item.data);
-        acumulado += lucro;
-        lucroAcumulado.push(acumulado);
-      }
-
-      if (window.graficoInstancia) window.graficoInstancia.destroy();
-
-      const hasDados = labels.length > 0 && lucroAcumulado.some(l => l !== 0);
-
-      window.graficoInstancia = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: hasDados ? labels : ["Sem dados"],
-          datasets: [{
-            label: hasDados ? 'Lucro Acumulado' : 'Nenhum dado encontrado',
-            data: hasDados ? lucroAcumulado : [0],
-            fill: false,
-            borderColor: '#00ffb3',
-            tension: 0.3
-          }]
-        },
-        options: {
-          plugins: {
-            legend: { labels: { color: '#fff' } },
-            tooltip: { callbacks: { label: ctx => `Lucro acumulado: ${ctx.raw.toFixed(2)}` } }
-          },
-          scales: {
-            x: { ticks: { color: '#ccc' } },
-            y: { ticks: { color: '#ccc' } }
+    function abrirGrafico(magic) {
+      fetch(`https://apirobos-production.up.railway.app/historico_detalhado/${magic}`)
+        .then(res => res.ok ? res.json() : Promise.reject("Erro ao buscar dados"))
+        .then(data => {
+          const ctx = document.getElementById('graficoLucro').getContext('2d');
+          const labels = [], lucroAcumulado = [];
+          let acumulado = 0;
+          for (const item of data) {
+            let lucro = parseFloat(typeof item.lucro_total === "string" ? item.lucro_total.replace(",", ".") : item.lucro_total);
+            if (isNaN(lucro)) lucro = 0;
+            labels.push(item.data);
+            acumulado += lucro;
+            lucroAcumulado.push(acumulado);
           }
-        }
-      });
-
-      document.getElementById('tituloGrafico').innerText = `Histórico: Magic ${magic}`;
-      document.getElementById('modalGrafico').style.display = 'flex';
-    })
-    .catch(err => {
-      console.error("Erro ao carregar gráfico:", err);
-      alert("Não foi possível carregar o gráfico. Verifique a conexão ou os dados.");
-    });
-}
-
-
+          if (window.graficoInstancia) window.graficoInstancia.destroy();
+          const hasDados = labels.length > 0 && lucroAcumulado.some(l => l !== 0);
+          window.graficoInstancia = new Chart(ctx, {
+            type: 'line',
+            data: {
+              labels: hasDados ? labels : ["Sem dados"],
+              datasets: [{
+                label: hasDados ? 'Lucro Acumulado' : 'Nenhum dado encontrado',
+                data: hasDados ? lucroAcumulado : [0],
+                fill: false,
+                borderColor: '#00ffb3',
+                tension: 0.3
+              }]
+            },
+            options: {
+              plugins: {
+                legend: { labels: { color: '#fff' } },
+                tooltip: { callbacks: { label: ctx => `Lucro acumulado: ${ctx.raw.toFixed(2)}` } }
+              },
+              scales: {
+                x: { ticks: { color: '#ccc' } },
+                y: { ticks: { color: '#ccc' } }
+              }
+            }
+          });
+          document.getElementById('tituloGrafico').innerText = `Histórico: Magic ${magic}`;
+          document.getElementById('modalGrafico').style.display = 'flex';
+        })
+        .catch(err => {
+          console.error("Erro ao carregar gráfico:", err);
+          alert("Não foi possível carregar o gráfico. Verifique a conexão ou os dados.");
+        });
+    }
 
     function fecharModal() {
       document.getElementById('modalGrafico').style.display = 'none';
