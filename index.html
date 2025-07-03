@@ -31,21 +31,23 @@
       font-size: 16px;
       box-sizing: border-box;
     }
+
     .grid {
       display: grid;
       gap: 30px;
-      grid-template-columns: 1fr; /* mobile padrão */
+      grid-template-columns: 1fr;
     }
-    @media (min-width: 768px) and (max-width: 1023px) {
+    @media (min-width: 768px) {
       .grid {
-        grid-template-columns: repeat(2, 1fr); /* tablet */
+        grid-template-columns: repeat(2, 1fr);
       }
     }
     @media (min-width: 1024px) {
       .grid {
-        grid-template-columns: repeat(3, 1fr); /* desktop */
+        grid-template-columns: repeat(3, 1fr);
       }
     }
+
     .card {
       background: linear-gradient(135deg, #1e1e1e, #2a2a2a);
       border-radius: 12px;
