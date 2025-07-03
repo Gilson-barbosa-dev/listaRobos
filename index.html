@@ -212,15 +212,10 @@
     }
 
   function abrirGrafico(magic) {
-  // Primeiro exibe o modal (isso garante que o canvas esteja visível no DOM)
-  document.getElementById('modalGrafico').style.display = 'flex';
-  document.getElementById('tituloGrafico').innerText = `Histórico: Magic ${magic}`;
-
   fetch(`https://apirobos-production.up.railway.app/historico_detalhado/${magic}`)
     .then(res => res.json())
     .then(data => {
       const ctx = document.getElementById('graficoLucro').getContext('2d');
-
       const labels = data.map(item => item.data);
       let acumulado = 0;
       const lucroAcumulado = data.map(item => {
@@ -228,10 +223,7 @@
         return acumulado;
       });
 
-      if (window.graficoInstancia) {
-        window.graficoInstancia.destroy();
-      }
-
+      if (window.graficoInstancia) window.graficoInstancia.destroy();
       window.graficoInstancia = new Chart(ctx, {
         type: 'line',
         data: {
@@ -246,9 +238,7 @@
         },
         options: {
           plugins: {
-            legend: {
-              labels: { color: '#fff' }
-            },
+            legend: { labels: { color: '#fff' } },
             tooltip: {
               callbacks: {
                 label: ctx => `Lucro acumulado: ${ctx.raw.toFixed(2)}`
@@ -261,6 +251,13 @@
           }
         }
       });
+
+      document.getElementById('tituloGrafico').innerText = `Histórico: Magic ${magic}`;
+      document.getElementById('modalGrafico').style.display = 'flex';
+    })
+    .catch(error => {
+      console.error('Erro ao buscar histórico detalhado:', error);
+      alert("Erro ao carregar gráfico. Verifique a conexão com a API.");
     });
 }
 
