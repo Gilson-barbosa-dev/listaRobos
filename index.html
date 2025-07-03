@@ -34,14 +34,16 @@
     .grid {
       display: grid;
       gap: 30px;
-      grid-template-columns: 1fr; /* padrão: 1 coluna (mobile) */
-      justify-content: center;
-      align-items: stretch;
+      grid-template-columns: 1fr; /* mobile padrão */
     }
-    
-    @media (min-width: 768px) {
+    @media (min-width: 768px) and (max-width: 1023px) {
       .grid {
-        grid-template-columns: repeat(3, 1fr); /* desktop: 3 colunas */
+        grid-template-columns: repeat(2, 1fr); /* tablet */
+      }
+    }
+    @media (min-width: 1024px) {
+      .grid {
+        grid-template-columns: repeat(3, 1fr); /* desktop */
       }
     }
     .card {
@@ -49,7 +51,6 @@
       border-radius: 12px;
       padding: 20px;
       width: 100%;
-      max-width: 600px;
       box-shadow: 0 0 15px rgba(0, 255, 179, 0.15);
       transition: transform 0.3s ease;
     }
