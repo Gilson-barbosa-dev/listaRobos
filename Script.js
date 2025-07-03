@@ -11,6 +11,12 @@ function aplicarTema(tema) {
 document.getElementById("toggleTema").addEventListener("click", () => {
   const temaAtual = document.body.classList.contains("tema-claro") ? "tema-claro" : "tema-escuro";
   aplicarTema(temaAtual === "tema-claro" ? "tema-escuro" : "tema-claro");
+
+  // 🔁 Atualiza gráfico se estiver visível
+  if (document.getElementById("modalGrafico").style.display === "flex") {
+    const magicAtual = document.getElementById("tituloGrafico").innerText.split("Magic ")[1];
+    if (magicAtual) abrirGrafico(parseInt(magicAtual));
+  }
 });
 
 const temaSalvo = localStorage.getItem("temaEscolhido") || "tema-escuro";
@@ -90,12 +96,6 @@ function renderizar(lista) {
 }
 
 function abrirGrafico(magic) {
-  // 🌈 Define cor do gráfico conforme tema
-  const root = document.documentElement;
-  const tema = document.body.classList.contains('tema-claro') ? 'claro' : 'escuro';
-  const corGrafico = tema === 'claro' ? '#00b89c' : '#00ffb3';
-  root.style.setProperty('--cor-grafico', corGrafico);
-
   fetch(`https://apirobos-production.up.railway.app/historico_detalhado/${magic}`)
     .then(res => res.json())
     .then(data => {
@@ -127,7 +127,7 @@ function abrirGrafico(magic) {
             label: hasDados ? 'Lucro Acumulado' : 'Nenhum dado encontrado',
             data: hasDados ? lucroAcumulado : [0],
             fill: false,
-            borderColor: getComputedStyle(document.documentElement).getPropertyValue('--cor-grafico') || '#00ffb3',
+            borderColor: document.body.classList.contains("tema-claro") ? '#00b89c' : '#00ffb3',
             tension: 0.3
           }]
         },
