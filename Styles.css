@@ -26,7 +26,7 @@ h1 {
   width: 100%;
   max-width: 600px;
   padding: 12px 16px;
-  padding-right: 36px; /* Aumenta espaço à direita da seta */
+  padding-right: 50px; /* Aumenta espaço à direita da seta */
   border-radius: 8px;
   border: 1px solid #ccc;
   font-size: 16px;
