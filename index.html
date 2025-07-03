@@ -7,18 +7,16 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
   <style>
     body {
-      background-color: #0e0e0e;
-      color: #fff;
       font-family: 'Inter', sans-serif;
       margin: 0;
       padding: 20px;
       overflow-x: hidden;
+      transition: background-color 0.3s, color 0.3s;
     }
 
     h1 {
       text-align: center;
       margin-bottom: 20px;
-      color: #00ffb3;
       font-weight: 700;
       font-size: 28px;
     }
@@ -65,7 +63,6 @@
     }
 
     .card {
-      background: linear-gradient(135deg, #1e1e1e, #2a2a2a);
       border-radius: 12px;
       padding: 20px;
       box-shadow: 0 0 15px rgba(0, 255, 179, 0.15);
@@ -79,7 +76,6 @@
     .card h2 {
       font-size: 22px;
       margin-bottom: 12px;
-      color: #00ffb3;
       font-weight: 600;
     }
 
@@ -88,19 +84,15 @@
       align-items: center;
       margin-bottom: 6px;
       font-size: 14px;
-      color: #ccc;
     }
 
     .info-line span {
       margin-left: 8px;
       font-weight: 500;
-      color: #fff;
     }
 
     button {
       margin-top: 10px;
-      background: #00ffb3;
-      color: #000;
       padding: 6px 12px;
       border: none;
       border-radius: 6px;
@@ -122,7 +114,6 @@
     }
 
     #modalGrafico > div {
-      background: #1e1e1e;
       padding: 20px;
       border-radius: 12px;
       max-width: 90vw;
@@ -136,7 +127,55 @@
       right: 10px;
       font-size: 20px;
       background: none;
+    }
+
+    .tema-escuro {
+      background-color: #0e0e0e;
       color: #fff;
+    }
+
+    .tema-escuro .card {
+      background: linear-gradient(135deg, #1e1e1e, #2a2a2a);
+      color: #fff;
+    }
+
+    .tema-escuro .info-line {
+      color: #ccc;
+    }
+
+    .tema-escuro .card h2,
+    .tema-escuro h1 {
+      color: #00ffb3;
+    }
+
+    .tema-escuro button {
+      background: #00ffb3;
+      color: #000;
+    }
+
+    .tema-claro {
+      background-color: #ffffff;
+      color: #111;
+    }
+
+    .tema-claro .card {
+      background: #f9f9f9;
+      border: 1px solid #ddd;
+      color: #111;
+    }
+
+    .tema-claro .info-line {
+      color: #555;
+    }
+
+    .tema-claro .card h2,
+    .tema-claro h1 {
+      color: #00cc99;
+    }
+
+    .tema-claro button {
+      background: #00ffb3;
+      color: #000;
     }
   </style>
 </head>
@@ -151,6 +190,7 @@
       <option value="operacoes">📊 Total de Operações</option>
       <option value="data">🕒 Data mais Antiga</option>
     </select>
+    <button id="toggleTema">🌙 Tema Escuro</button>
   </div>
 
   <div class="grid" id="painel"></div>
@@ -158,12 +198,30 @@
   <div id="modalGrafico">
     <div>
       <button onclick="fecharModal()">&times;</button>
-      <h2 id="tituloGrafico" style="text-align:center;color:#00ffb3;margin-bottom:10px"></h2>
+      <h2 id="tituloGrafico" style="text-align:center;margin-bottom:10px"></h2>
       <canvas id="graficoLucro"></canvas>
     </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    function aplicarTema(tema) {
+      const body = document.body;
+      body.classList.remove("tema-claro", "tema-escuro");
+      body.classList.add(tema);
+      localStorage.setItem("temaEscolhido", tema);
+      document.getElementById("toggleTema").innerText =
+        tema === "tema-claro" ? "🌙 Tema Escuro" : "☀️ Tema Claro";
+    }
+
+    document.getElementById("toggleTema").addEventListener("click", () => {
+      const temaAtual = document.body.classList.contains("tema-claro") ? "tema-claro" : "tema-escuro";
+      aplicarTema(temaAtual === "tema-claro" ? "tema-escuro" : "tema-claro");
+    });
+
+    const temaSalvo = localStorage.getItem("temaEscolhido") || "tema-escuro";
+    aplicarTema(temaSalvo);
+  </script>
   <script>
     let estrategiasGlobais = [];
 
@@ -278,12 +336,12 @@
             },
             options: {
               plugins: {
-                legend: { labels: { color: '#fff' } },
+                legend: { labels: { color: getComputedStyle(document.body).color } },
                 tooltip: { callbacks: { label: ctx => `Lucro acumulado: ${ctx.raw.toFixed(2)}` } }
               },
               scales: {
-                x: { ticks: { color: '#ccc' } },
-                y: { ticks: { color: '#ccc' } }
+                x: { ticks: { color: getComputedStyle(document.body).color } },
+                y: { ticks: { color: getComputedStyle(document.body).color } }
               }
             }
           });
