@@ -21,12 +21,10 @@ h1 {
   margin-bottom: 20px;
 }
 
-.top-bar input,
-.top-bar select {
+.top-bar input {
   width: 100%;
   max-width: 600px;
   padding: 12px 16px;
-  padding-right: 50px; /* Aumenta espaço à direita da seta */
   border-radius: 8px;
   border: 1px solid #ccc;
   font-size: 16px;
@@ -40,6 +38,38 @@ h1 {
   color: #666;
 }
 
+.wrapper-select {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+}
+
+.wrapper-select select {
+  width: 100%;
+  padding: 12px 40px 12px 16px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+  box-sizing: border-box;
+  background-color: #fff;
+  color: #111;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+.wrapper-select::after {
+  content: '▼';
+  font-size: 14px;
+  color: #333;
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
 @media (min-width: 768px) {
   .top-bar {
     flex-direction: row;
@@ -48,7 +78,7 @@ h1 {
   }
 
   .top-bar input,
-  .top-bar select {
+  .wrapper-select {
     width: 260px;
     margin-bottom: 0;
   }
