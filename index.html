@@ -12,6 +12,7 @@
       font-family: 'Inter', sans-serif;
       margin: 0;
       padding: 20px;
+      overflow-x: hidden;
     }
 
     h1 {
@@ -22,49 +23,36 @@
       font-size: 28px;
     }
 
-    .topo-filtros {
+    .top-bar {
       display: flex;
-      gap: 12px;
+      flex-direction: column;
       align-items: center;
-      justify-content: center;
-      margin-bottom: 24px;
-      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 20px;
     }
 
-    .topo-filtros input,
-    .topo-filtros select {
-      padding: 10px 14px;
-      border-radius: 10px;
+    .top-bar input,
+    .top-bar select {
+      width: 100%;
+      max-width: 600px;
+      padding: 12px 16px;
+      border-radius: 8px;
       border: none;
-      font-size: 14px;
-      background: #fff;
-      color: #333;
-      box-shadow: 0 0 0 2px transparent;
-      transition: box-shadow 0.2s ease;
+      font-size: 16px;
+      box-sizing: border-box;
     }
 
-    .topo-filtros input {
-      width: 250px;
-    }
-
-    .topo-filtros select {
-      width: 200px;
-    }
-
-    .topo-filtros input:focus,
-    .topo-filtros select:focus {
-      outline: none;
-      box-shadow: 0 0 0 2px #25D366;
-    }
-
-    @media (max-width: 600px) {
-      .topo-filtros {
-        flex-direction: column;
+    @media (min-width: 768px) {
+      .top-bar {
+        flex-direction: row;
+        justify-content: center;
+        gap: 16px;
       }
-      .topo-filtros input,
-      .topo-filtros select {
-        width: 100%;
-        max-width: 600px;
+
+      .top-bar input,
+      .top-bar select {
+        width: 260px;
+        margin-bottom: 0;
       }
     }
 
@@ -154,7 +142,8 @@
 </head>
 <body>
   <h1>Painel de Estratégias</h1>
-  <div class="topo-filtros">
+
+  <div class="top-bar">
     <input type="text" id="filtro" placeholder="🔍 Magic ou Ativo..." />
     <select id="ordenar">
       <option value="lucro">📈 Lucro Total</option>
@@ -179,10 +168,31 @@
     let estrategiasGlobais = [];
 
     async function carregarEstrategias() {
-      const resposta = await fetch('https://apirobos-production.up.railway.app/dados');
-      const estrategias = await resposta.json();
-      estrategiasGlobais = ordenarEstrategias(estrategias);
-      renderizar(estrategiasGlobais);
+      const cacheKey = 'estrategias_cache';
+      const cacheTimeKey = 'estrategias_cache_time';
+      const cacheTime = 60000;
+      const now = Date.now();
+      const lastFetch = parseInt(localStorage.getItem(cacheTimeKey), 10) || 0;
+      if (now - lastFetch < cacheTime) {
+        try {
+          const cached = JSON.parse(localStorage.getItem(cacheKey));
+          if (cached) {
+            estrategiasGlobais = ordenarEstrategias(cached);
+            renderizar(estrategiasGlobais);
+            return;
+          }
+        } catch (e) {}
+      }
+      try {
+        const resposta = await fetch('https://apirobos-production.up.railway.app/dados');
+        const estrategias = await resposta.json();
+        localStorage.setItem(cacheKey, JSON.stringify(estrategias));
+        localStorage.setItem(cacheTimeKey, now.toString());
+        estrategiasGlobais = ordenarEstrategias(estrategias);
+        renderizar(estrategiasGlobais);
+      } catch (erro) {
+        console.error('Erro ao carregar estratégias:', erro);
+      }
     }
 
     function ordenarEstrategias(lista) {
@@ -229,7 +239,10 @@
 
     function abrirGrafico(magic) {
       fetch(`https://apirobos-production.up.railway.app/historico_detalhado/${magic}`)
-        .then(res => res.json())
+        .then(res => {
+          if (!res.ok) throw new Error("Erro ao buscar dados");
+          return res.json();
+        })
         .then(data => {
           const ctx = document.getElementById('graficoLucro').getContext('2d');
           const labels = [];
@@ -237,8 +250,11 @@
           let acumulado = 0;
 
           for (const item of data) {
-            let lucro = parseFloat(item.lucro_total);
+            let lucro = parseFloat(
+              typeof item.lucro_total === "string" ? item.lucro_total.replace(",", ".") : item.lucro_total
+            );
             if (isNaN(lucro)) lucro = 0;
+
             labels.push(item.data);
             acumulado += lucro;
             lucroAcumulado.push(acumulado);
@@ -246,13 +262,15 @@
 
           if (window.graficoInstancia) window.graficoInstancia.destroy();
 
+          const hasDados = labels.length > 0 && lucroAcumulado.some(l => l !== 0);
+
           window.graficoInstancia = new Chart(ctx, {
             type: 'line',
             data: {
-              labels: labels.length ? labels : ["Sem dados"],
+              labels: hasDados ? labels : ["Sem dados"],
               datasets: [{
-                label: 'Lucro Acumulado',
-                data: lucroAcumulado.length ? lucroAcumulado : [0],
+                label: hasDados ? 'Lucro Acumulado' : 'Nenhum dado encontrado',
+                data: hasDados ? lucroAcumulado : [0],
                 fill: false,
                 borderColor: '#00ffb3',
                 tension: 0.3
@@ -261,11 +279,7 @@
             options: {
               plugins: {
                 legend: { labels: { color: '#fff' } },
-                tooltip: {
-                  callbacks: {
-                    label: ctx => `Lucro acumulado: ${ctx.raw.toFixed(2)}`
-                  }
-                }
+                tooltip: { callbacks: { label: ctx => `Lucro acumulado: ${ctx.raw.toFixed(2)}` } }
               },
               scales: {
                 x: { ticks: { color: '#ccc' } },
@@ -276,6 +290,10 @@
 
           document.getElementById('tituloGrafico').innerText = `Histórico: Magic ${magic}`;
           document.getElementById('modalGrafico').style.display = 'flex';
+        })
+        .catch(err => {
+          console.error("Erro ao carregar gráfico:", err);
+          alert("Não foi possível carregar o gráfico. Verifique a conexão ou os dados.");
         });
     }
 
