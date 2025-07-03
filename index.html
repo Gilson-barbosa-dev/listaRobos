@@ -13,7 +13,6 @@
       margin: 0;
       padding: 20px;
     }
-
     h1 {
       text-align: center;
       margin-bottom: 20px;
@@ -21,7 +20,6 @@
       font-weight: 700;
       font-size: 28px;
     }
-
     #filtro, #ordenar {
       width: 100%;
       max-width: 600px;
@@ -33,14 +31,12 @@
       font-size: 16px;
       box-sizing: border-box;
     }
-
     .grid {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
       gap: 30px;
     }
-
     .card {
       background: linear-gradient(135deg, #1e1e1e, #2a2a2a);
       border-radius: 12px;
@@ -50,18 +46,15 @@
       box-shadow: 0 0 15px rgba(0, 255, 179, 0.15);
       transition: transform 0.3s ease;
     }
-
     .card:hover {
       transform: translateY(-5px);
     }
-
     .card h2 {
       font-size: 22px;
       margin-bottom: 12px;
       color: #00ffb3;
       font-weight: 600;
     }
-
     .info-line {
       display: flex;
       align-items: center;
@@ -69,7 +62,6 @@
       font-size: 14px;
       color: #ccc;
     }
-
     .info-line span {
       margin-left: 8px;
       font-weight: 500;
@@ -78,9 +70,7 @@
   </style>
 </head>
 <body>
-
   <h1>Painel de Estratégias</h1>
-
   <input type="text" id="filtro" placeholder="🔍 Filtrar por Magic ou Ativo..." />
   <select id="ordenar">
     <option value="lucro">📈 Ordenar por Lucro Total</option>
@@ -88,9 +78,15 @@
     <option value="operacoes">📊 Ordenar por Total de Operações</option>
     <option value="data">🕒 Ordenar por Data mais Antiga</option>
   </select>
-
   <div class="grid" id="painel"></div>
-
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <div id="modalGrafico" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.8);z-index:999;align-items:center;justify-content:center;">
+    <div style="background:#1e1e1e;padding:20px;border-radius:12px;max-width:90vw;width:600px;position:relative;">
+      <button onclick="fecharModal()" style="position:absolute;top:10px;right:10px;font-size:20px;background:none;color:#fff;border:none;cursor:pointer;">&times;</button>
+      <h2 id="tituloGrafico" style="text-align:center;color:#00ffb3;margin-bottom:10px"></h2>
+      <canvas id="graficoLucro"></canvas>
+    </div>
+  </div>
   <script>
     let estrategiasGlobais = [];
 
@@ -98,10 +94,8 @@
       const cacheKey = 'estrategias_cache';
       const cacheTimeKey = 'estrategias_cache_time';
       const cacheTime = 60000;
-
       const now = Date.now();
       const lastFetch = parseInt(localStorage.getItem(cacheTimeKey), 10) || 0;
-
       if (now - lastFetch < cacheTime) {
         try {
           const cached = JSON.parse(localStorage.getItem(cacheKey));
@@ -114,7 +108,6 @@
           console.warn("Cache corrompido:", e);
         }
       }
-
       try {
         const resposta = await fetch('https://apirobos-production.up.railway.app/dados');
         if (!resposta.ok) throw new Error(`Erro HTTP ${resposta.status}`);
@@ -131,17 +124,12 @@
     function ordenarEstrategias(lista) {
       const criterio = document.getElementById('ordenar')?.value || 'lucro';
       const copia = [...lista];
-
       switch (criterio) {
-        case 'assertividade':
-          return copia.sort((a, b) => (b.assertividade || 0) - (a.assertividade || 0));
-        case 'operacoes':
-          return copia.sort((a, b) => (b.total_operacoes || 0) - (a.total_operacoes || 0));
-        case 'data':
-          return copia.sort((a, b) => new Date(a.inicio) - new Date(b.inicio));
+        case 'assertividade': return copia.sort((a, b) => (b.assertividade || 0) - (a.assertividade || 0));
+        case 'operacoes': return copia.sort((a, b) => (b.total_operacoes || 0) - (a.total_operacoes || 0));
+        case 'data': return copia.sort((a, b) => new Date(a.inicio) - new Date(b.inicio));
         case 'lucro':
-        default:
-          return copia.sort((a, b) => (b.lucro_total || 0) - (a.lucro_total || 0));
+        default: return copia.sort((a, b) => (b.lucro_total || 0) - (a.lucro_total || 0));
       }
     }
 
@@ -149,14 +137,9 @@
       if (!dataGMT) return '—';
       const data = new Date(dataGMT);
       const opcoes = {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: false,
-        timeZone: 'UTC'
+        day: '2-digit', month: '2-digit', year: 'numeric',
+        hour: '2-digit', minute: '2-digit', second: '2-digit',
+        hour12: false, timeZone: 'UTC'
       };
       return data.toLocaleString('pt-BR', opcoes);
     }
@@ -176,9 +159,7 @@
           <div class="info-line">❌ Perdedoras: <span>${e.perdedoras || 0}</span></div>
           <div class="info-line">🎯 Assertividade: <span>${Number(e.assertividade).toFixed(2)}%</span></div>
           <div class="info-line">💰 Lucro Total: <span>${Number(e.lucro_total).toFixed(2)}</span></div>
-          <button onclick="abrirGrafico(${e.magic})" style="margin-top:10px;background:#00ffb3;color:#000;padding:6px 12px;border:none;border-radius:6px;cursor:pointer;font-weight:600">
-            📊 Ver Gráfico
-          </button>
+          <button onclick="abrirGrafico(${e.magic})" style="margin-top:10px;background:#00ffb3;color:#000;padding:6px 12px;border:none;border-radius:6px;cursor:pointer;font-weight:600">📊 Ver Gráfico</button>
         `;
         painel.appendChild(card);
       });
@@ -187,8 +168,7 @@
     document.getElementById('filtro').addEventListener('input', e => {
       const termo = e.target.value.toLowerCase();
       const filtradas = estrategiasGlobais.filter(e =>
-        e.magic.toString().includes(termo) ||
-        (e.ativo || '').toLowerCase().includes(termo)
+        e.magic.toString().includes(termo) || (e.ativo || '').toLowerCase().includes(termo)
       );
       renderizar(ordenarEstrategias(filtradas));
     });
@@ -198,65 +178,47 @@
       renderizar(ordenadas);
     });
 
+    function abrirGrafico(magic) {
+      fetch(`https://apirobos-production.up.railway.app/historico_detalhado/${magic}`)
+        .then(res => res.json())
+        .then(data => {
+          const ctx = document.getElementById('graficoLucro').getContext('2d');
+          const labels = data.map(item => item.data);
+          const lucro = data.map(item => item.lucro_total);
+          if (window.graficoInstancia) window.graficoInstancia.destroy();
+          window.graficoInstancia = new Chart(ctx, {
+            type: 'line',
+            data: {
+              labels,
+              datasets: [{
+                label: 'Lucro Total',
+                data: lucro,
+                fill: false,
+                borderColor: '#00ffb3',
+                tension: 0.3
+              }]
+            },
+            options: {
+              plugins: {
+                legend: { labels: { color: '#fff' } },
+                tooltip: { callbacks: { label: ctx => `Lucro: ${ctx.raw.toFixed(2)}` } }
+              },
+              scales: {
+                x: { ticks: { color: '#ccc' } },
+                y: { ticks: { color: '#ccc' } }
+              }
+            }
+          });
+          document.getElementById('tituloGrafico').innerText = `Histórico: Magic ${magic}`;
+          document.getElementById('modalGrafico').style.display = 'flex';
+        });
+    }
+
+    function fecharModal() {
+      document.getElementById('modalGrafico').style.display = 'none';
+    }
+
     carregarEstrategias();
   </script>
-
-
-<!-- Chart.js CDN -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<!-- Modal para exibir gráfico -->
-<div id="modalGrafico" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.8);z-index:999;align-items:center;justify-content:center;">
-  <div style="background:#1e1e1e;padding:20px;border-radius:12px;max-width:90vw;width:600px;position:relative;">
-    <button onclick="fecharModal()" style="position:absolute;top:10px;right:10px;font-size:20px;background:none;color:#fff;border:none;cursor:pointer;">&times;</button>
-    <h2 style="text-align:center;color:#00ffb3;margin-bottom:10px">Histórico da Estratégia</h2>
-    <canvas id="graficoLucro"></canvas>
-  </div>
-</div>
-
-<script>
-  function abrirGrafico(magic) {
-    fetch(`https://apirobos-production.up.railway.app/historico/${magic}`)
-      .then(res => res.json())
-      .then(data => {
-        const ctx = document.getElementById('graficoLucro').getContext('2d');
-        const labels = data.map(item => item.data);
-        const lucro = data.map(item => item.lucro_total);
-
-        if (window.graficoInstancia) window.graficoInstancia.destroy();
-
-        window.graficoInstancia = new Chart(ctx, {
-          type: 'line',
-          data: {
-            labels,
-            datasets: [{
-              label: 'Lucro Total',
-              data: lucro,
-              fill: false,
-              borderColor: '#00ffb3',
-              tension: 0.3
-            }]
-          },
-          options: {
-            plugins: {
-              legend: { labels: { color: '#fff' } },
-              tooltip: { callbacks: { label: ctx => `Lucro: ${ctx.raw.toFixed(2)}` } }
-            },
-            scales: {
-              x: { ticks: { color: '#ccc' } },
-              y: { ticks: { color: '#ccc' } }
-            }
-          }
-        });
-
-        document.getElementById('modalGrafico').style.display = 'flex';
-      });
-  }
-
-  function fecharModal() {
-    document.getElementById('modalGrafico').style.display = 'none';
-  }
-</script>
-
 </body>
 </html>
