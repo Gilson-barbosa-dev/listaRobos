@@ -1,17 +1,6 @@
 // Script.js para o Painel com toggle moderno de tema
 let estrategiasGlobais = [];
 
-// 🎯 Referência global da imagem e container de zoom
-let zoomLevel = 1;
-let isDragging = false;
-let startX, startY, scrollLeft, scrollTop;
-let imagemAtual = 0;
-let imagensEstatisticas = [];
-
-const imagem = document.getElementById('imagemEstatistica');
-const container = document.getElementById('containerImagem');
-
-// 🌙 Tema salvo no localStorage
 document.addEventListener('DOMContentLoaded', () => {
   const toggle = document.getElementById('toggle-tema');
   const temaSalvo = localStorage.getItem("temaEscolhido") || "tema-escuro";
@@ -104,7 +93,6 @@ function renderizar(lista) {
       <div class="info-line">🎯 Assertividade: <span>${e.assertividade.toFixed(2)}%</span></div>
       <div class="info-line">💰 Lucro Total: <span>${e.lucro_total.toFixed(2)}</span></div>
       <button onclick="abrirGrafico(${e.magic})">📊 Ver Gráfico</button>
-      <button onclick="abrirEstatisticas(${e.magic})">📷 Estatísticas</button>
     `;
     painel.appendChild(card);
   });
@@ -195,113 +183,3 @@ document.getElementById('filtro').addEventListener('input', e => {
 document.getElementById('ordenar').addEventListener('change', () => {
   renderizar(ordenarEstrategias(estrategiasGlobais));
 });
-
-// 📷 Estatísticas com imagem e zoom
-function abrirEstatisticas(magic) {
-  imagensEstatisticas = [
-    `./img/estatisticas/${magic}_1.png`,
-    `./img/estatisticas/${magic}_2.png`,
-    `./img/estatisticas/${magic}_3.png`
-  ];
-  imagemAtual = 0;
-  atualizarImagem();
-  document.getElementById('tituloEstatistica').innerText = `Estatísticas: Magic ${magic}`;
-  document.getElementById('modalEstatisticas').style.display = 'flex';
-}
-
-function atualizarImagem() {
-  zoomLevel = 1;
-  imagem.style.transform = 'scale(1)';
-  imagem.src = imagensEstatisticas[imagemAtual];
-  container.scrollLeft = 0;
-  container.scrollTop = 0;
-  container.style.overflow = 'hidden';
-}
-
-function imagemAnterior() {
-  if (imagemAtual > 0) {
-    imagemAtual--;
-    atualizarImagem();
-  }
-}
-
-function imagemProxima() {
-  if (imagemAtual < imagensEstatisticas.length - 1) {
-    imagemAtual++;
-    atualizarImagem();
-  }
-}
-
-function fecharModalEstatisticas() {
-  document.getElementById('modalEstatisticas').style.display = 'none';
-  imagem.src = '';
-}
-
-imagem.addEventListener('wheel', (e) => {
-  e.preventDefault();
-  zoomLevel += e.deltaY * -0.001;
-  zoomLevel = Math.min(Math.max(zoomLevel, 1), 3);
-  imagem.style.transform = `scale(${zoomLevel})`;
-});
-
-  if (zoomLevel > 1) {
-    container.style.overflow = 'auto';
-  } else {
-    container.scrollLeft = 0;
-    container.scrollTop = 0;
-    container.style.overflow = 'hidden';
-  };
-
-imagem.addEventListener('mousedown', (e) => {
-  if (zoomLevel === 1) return;
-  isDragging = true;
-  imagem.style.cursor = 'grabbing';
-  startX = e.clientX;
-  startY = e.clientY;
-  scrollLeft = imagem.parentElement.scrollLeft;
-  scrollTop = imagem.parentElement.scrollTop;
-});
-
-imagem.addEventListener('mouseup', () => {
-  isDragging = false;
-  imagem.style.cursor = 'grab';
-});
-
-imagem.addEventListener('mouseleave', () => {
-  isDragging = false;
-  imagem.style.cursor = 'grab';
-});
-
-imagem.addEventListener('mousemove', (e) => {
-  if (!isDragging) return;
-  e.preventDefault();
-  const x = e.clientX;
-  const y = e.clientY;
-  const walkX = (x - startX);
-  const walkY = (y - startY);
-  const wrapper = imagem.parentElement;
-
-  // trava o scroll para não sair do contêiner
-  wrapper.scrollLeft = scrollLeft - walkX;
-  wrapper.scrollTop = scrollTop - walkY;
-});
-
-function zoomIn() {
-  zoomLevel = Math.min(zoomLevel + 0.2, 3);
-  imagem.style.transform = `scale(${zoomLevel})`;
-  container.style.overflow = zoomLevel > 1 ? 'auto' : 'hidden';
-}
-
-function zoomOut() {
-  zoomLevel = Math.max(zoomLevel - 0.2, 1);
-  imagem.style.transform = `scale(${zoomLevel})`;
-  container.style.overflow = zoomLevel > 1 ? 'auto' : 'hidden';
-}
-
-function resetZoom() {
-  zoomLevel = 1;
-  imagem.style.transform = 'scale(1)';
-  container.scrollLeft = 0;
-  container.scrollTop = 0;
-  container.style.overflow = 'hidden';
-}
