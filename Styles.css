@@ -1,4 +1,3 @@
-
 /* ---------- ESTILO GERAL DO PAINEL ---------- */
 body {
   font-family: 'Inter', sans-serif;
@@ -117,6 +116,7 @@ button {
   font-weight: 600;
 }
 
+/* ---------- MODAL GRÁFICO ---------- */
 #modalGrafico {
   display: none;
   position: fixed;
@@ -149,6 +149,84 @@ button {
   border: none;
   cursor: pointer;
   color: black;
+}
+
+/* ---------- MODAL ESTATÍSTICAS ---------- */
+#modalEstatisticas {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(0,0,0,0.8);
+  z-index: 999;
+  align-items: center;
+  justify-content: center;
+}
+
+#modalEstatisticas > div {
+  padding: 20px;
+  border-radius: 12px;
+  max-width: 90vw;
+  width: 600px;
+  background: white;
+  color: black;
+  text-align: center;
+  position: relative;
+}
+
+#modalEstatisticas button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: black;
+}
+
+.tema-escuro #modalEstatisticas > div {
+  background: #1e1e1e;
+  color: white;
+}
+
+.tema-escuro #modalEstatisticas button {
+  color: white;
+}
+
+#imagemEstatistica {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin-top: 10px;
+  border: 2px solid #ddd;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.4);
+  background-color: white;
+  padding: 8px;
+  image-rendering: auto;
+}
+
+#imagemEstatistica:hover {
+  transform: scale(1.02);
+  transition: transform 0.2s ease;
+}
+
+.navegacao-estatistica {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.navegacao-estatistica button {
+  font-size: 22px;
+  padding: 8px 14px;
+  background: #00ffb3;
+  color: black;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
 }
 
 /* ---------- TEMA ESCURO ---------- */
@@ -283,57 +361,3 @@ button {
     transform: scale(0.9);
   }
 }
-
-/* ---------- ESTATISTICAS ---------- */
-
-#modalEstatisticas {
-  display: none;
-  position: fixed;
-  top: 0; left: 0;
-  width: 100vw; height: 100vh;
-  background: rgba(0,0,0,0.8);
-  z-index: 999;
-  align-items: center;
-  justify-content: center;
-}
-
-#modalEstatisticas > div {
-  padding: 20px;
-  border-radius: 12px;
-  max-width: 90vw;
-  width: 600px;
-  background: white;
-  color: black;
-  text-align: center;
-  position: relative;
-}
-
-#modalEstatisticas button {
-  margin: 8px;
-  font-size: 16px;
-  background: #00b89c;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 8px;
-  color: white;
-  cursor: pointer;
-}
-
-.tema-escuro #modalEstatisticas > div {
-  background: #1e1e1e;
-  color: white;
-}
-
-.tema-escuro #modalEstatisticas button {
-  background: #00ffb3;
-  color: black;
-}
-
-#imagemEstatistica {
-  max-width: 100%;
-  height: auto;
-  border-radius: 8px;
-  margin-top: 10px;
-}
-
-
