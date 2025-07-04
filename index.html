@@ -4,23 +4,31 @@
   <meta charset="UTF-8" />
   <title>Painel de Estratégias</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="./Styles.css" />
+  <link rel="stylesheet" href="Styles_Com_Setinha_Select.css" />
+  <link rel="stylesheet" href="toggle_tema.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
 </head>
 <body>
   <h1>Painel de Estratégias</h1>
 
+  <!-- Toggle moderno de tema -->
+  <div class="toggle-wrapper">
+    <input type="checkbox" id="toggle-tema" />
+    <label for="toggle-tema" class="toggle">
+      <span class="icon sol">☀️</span>
+      <span class="icon lua">🌙</span>
+      <span class="ball"></span>
+    </label>
+  </div>
+
   <div class="top-bar">
     <input type="text" id="filtro" placeholder="🔍 Magic ou Ativo..." />
-    <div class="wrapper-select">
-      <select id="ordenar">
-        <option value="lucro">📈 Lucro Total</option>
-        <option value="assertividade">🎯 Assertividade</option>
-        <option value="operacoes">📊 Total de Operações</option>
-        <option value="data">🕒 Data mais Antiga</option>
-      </select>
-    </div>
-    <button id="toggleTema">🌙 Tema Escuro</button>
+    <select id="ordenar">
+      <option value="lucro">📈 Lucro Total</option>
+      <option value="assertividade">🎯 Assertividade</option>
+      <option value="operacoes">📊 Total de Operações</option>
+      <option value="data">🕒 Data mais Antiga</option>
+    </select>
   </div>
 
   <div class="grid" id="painel"></div>
@@ -34,6 +42,7 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="./Script.js"></script>
+  <script src="Script_Final_Gráfico_Com_Fundo.js"></script>
+  <script src="toggle_tema.js"></script>
 </body>
 </html>
