@@ -250,7 +250,7 @@ imagem.addEventListener('wheel', (e) => {
     container.scrollLeft = 0;
     container.scrollTop = 0;
     container.style.overflow = 'hidden';
-  });
+  };
 
 imagem.addEventListener('mousedown', (e) => {
   if (zoomLevel === 1) return;
