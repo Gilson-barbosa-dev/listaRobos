@@ -46,16 +46,17 @@
 
     <div class="imagem-wrapper">
       <img id="imagemEstatistica" src="" alt="Estatística" draggable="false" />
-
-      <!-- Controles verticais de Zoom -->
-      <div class="zoom-controls-vertical">
-        <button onclick="zoomIn()" title="Zoom In">+</button>
-        <button onclick="zoomOut()" title="Zoom Out">−</button>
-        <button onclick="resetZoom()" title="Redefinir">⛶</button>
-      </div>
+      <!-- Controles verticais fixos -->
     </div>
 
-    <!-- Navegação padrão (fora da imagem) -->
+    <!-- Controles de Zoom fixos fora da imagem -->
+    <div class="zoom-controls-vertical-fixed">
+      <button onclick="zoomIn()" title="Zoom In">+</button>
+      <button onclick="zoomOut()" title="Zoom Out">−</button>
+      <button onclick="resetZoom()" title="Redefinir">⛶</button>
+    </div>
+
+    <!-- Navegação -->
     <div class="navegacao-estatistica">
       <button onclick="imagemAnterior()">←</button>
       <button onclick="imagemProxima()">→</button>
