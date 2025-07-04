@@ -21,53 +21,15 @@ h1 {
   margin-bottom: 20px;
 }
 
-.top-bar input {
+.top-bar input,
+.top-bar select {
   width: 100%;
   max-width: 600px;
   padding: 12px 16px;
   border-radius: 8px;
-  border: 1px solid #ccc;
+  border: none;
   font-size: 16px;
   box-sizing: border-box;
-  background: #fff;
-  color: #111;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-}
-
-.top-bar input::placeholder {
-  color: #666;
-}
-
-.wrapper-select {
-  position: relative;
-  width: 100%;
-  max-width: 600px;
-}
-
-.wrapper-select select {
-  width: 100%;
-  padding: 12px 40px 12px 16px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  font-size: 16px;
-  box-sizing: border-box;
-  background-color: #fff;
-  color: #111;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-}
-
-.wrapper-select::after {
-  content: '▼';
-  font-size: 12px;
-  color: #333;
-  position: absolute;
-  right: 14px;
-  top: 50%;
-  transform: translateY(-50%);
-  pointer-events: none;
 }
 
 @media (min-width: 768px) {
@@ -78,7 +40,7 @@ h1 {
   }
 
   .top-bar input,
-  .wrapper-select {
+  .top-bar select {
     width: 260px;
     margin-bottom: 0;
   }
@@ -159,9 +121,12 @@ button {
   right: 10px;
   font-size: 20px;
   background: none;
+  border: none;
+  cursor: pointer;
+  color: black;
 }
 
-/* 🌙 Tema Escuro */
+/* Tema escuro */
 .tema-escuro {
   background-color: #0e0e0e;
   color: #fff;
@@ -186,33 +151,42 @@ button {
   color: #000;
 }
 
-/* ☀️ Tema Claro */
+.tema-escuro #modalGrafico > div {
+  background: #1e1e1e;
+  color: white;
+}
+
+.tema-escuro #modalGrafico button {
+  color: white;
+}
+
+/* Tema claro */
 .tema-claro {
-  background-color: #f2f2f7;
-  color: #1a1a1a;
+  background-color: #ffffff;
+  color: #111;
 }
 
 .tema-claro .card {
-  background: #ffffff;
-  border: 1px solid #dcdcdc;
-  color: #1a1a1a;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  background: #f9f9f9;
+  border: 1px solid #e0e0e0;
+  color: #111;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.04);
 }
 
 .tema-claro .info-line {
-  color: #333;
+  color: #444;
 }
 
 .tema-claro .card h2,
 .tema-claro h1 {
-  color: #00796b;
+  color: #00b89c;
 }
 
 .tema-claro button {
-  background: #00bfa5;
-  color: #fff;
+  background: #00c9a7;
+  color: #000;
 }
 
 .tema-claro #modalGrafico button {
-  color: #000; /* deixa o X visível no fundo claro */
+  color: black;
 }
