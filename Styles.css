@@ -217,6 +217,14 @@ button {
   object-fit: contain; /* Mantém a imagem dentro do espaço visível */
 }
 
+.imagem-scrollable {
+  overflow: auto;
+  max-height: 65vh;
+  max-width: 100%;
+  width: 100%;
+  scroll-behavior: smooth;
+}
+
 .zoom-controls-vertical-fixed {
   position: absolute;
   right: 20px;
