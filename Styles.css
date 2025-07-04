@@ -195,11 +195,20 @@ button {
 
 .imagem-wrapper {
   position: relative;
-  overflow: auto;
+  overflow: hidden;  /* trocamos de auto para hidden */
   border-radius: 12px;
   max-height: 65vh;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.imagem-scrollable {
+  overflow: auto;
+  max-height: 65vh;
   max-width: 100%;
-  display: block;
+  width: 100%;
 }
 
 #imagemEstatistica {
@@ -208,6 +217,8 @@ button {
   user-select: none;
   pointer-events: all;
   cursor: grab;
+  max-width: 100%;
+  height: auto;
   display: block;
 }
 
