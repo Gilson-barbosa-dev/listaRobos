@@ -10,16 +10,6 @@
 <body>
   <h1>Painel de Estratégias</h1>
 
-  <!-- Toggle moderno de tema -->
-  <div class="toggle-wrapper">
-    <input type="checkbox" id="toggle-tema" />
-    <label for="toggle-tema" class="toggle">
-      <span class="icon sol">☀️</span>
-      <span class="icon lua">🌙</span>
-      <span class="ball"></span>
-    </label>
-  </div>
-
   <div class="top-bar">
     <input type="text" id="filtro" placeholder="🔍 Magic ou Ativo..." />
     <select id="ordenar">
@@ -28,6 +18,14 @@
       <option value="operacoes">📊 Total de Operações</option>
       <option value="data">🕒 Data mais Antiga</option>
     </select>
+    <div class="toggle-wrapper">
+      <input type="checkbox" id="toggle-tema" />
+      <label for="toggle-tema" class="toggle">
+        <span class="icon sol">☀️</span>
+        <span class="icon lua">🌙</span>
+        <span class="ball"></span>
+      </label>
+    </div>
   </div>
 
   <div class="grid" id="painel"></div>
@@ -41,6 +39,6 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="./Script.js"></script>
+  <script src="script_final_toggle.js"></script>
 </body>
 </html>
