@@ -283,3 +283,15 @@ function resetZoom() {
   zoomLevel = 1;
   imagem.style.transform = 'scale(1)';
 }
+
+function imagemAnterior() {
+  zoomLevel = 1;
+  imagem.style.transform = 'scale(1)';
+  // lógica de troca de imagem anterior (existente no seu JS)
+}
+
+function imagemProxima() {
+  zoomLevel = 1;
+  imagem.style.transform = 'scale(1)';
+  // lógica de troca de imagem próxima (existente no seu JS)
+}
