@@ -218,12 +218,15 @@ button {
 }
 
 .imagem-scrollable {
-  overflow: auto;
-  max-height: 65vh;
-  max-width: 100%;
+  overflow: hidden; /* evita scroll */
+  position: relative;
   width: 100%;
-  scroll-behavior: smooth;
+  max-height: 65vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
+
 
 .zoom-controls-vertical-fixed {
   position: absolute;
