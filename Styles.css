@@ -33,8 +33,14 @@ h1 {
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
+}
+
+.top-bar select {
+  background-image: url("data:image/svg+xml;charset=UTF-8,<svg xmlns='http://www.w3.org/2000/svg' fill='gray' viewBox='0 0 20 20'><path d='M5.25 7.25L10 12.25L14.75 7.25H5.25Z'/></svg>");
   background-position: right 12px center;
   background-repeat: no-repeat;
+  background-size: 16px;
+  padding-right: 36px;
 }
 
 .tema-claro .top-bar input,
