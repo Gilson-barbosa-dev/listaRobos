@@ -179,7 +179,7 @@ button {
   box-sizing: border-box;
 }
 
-#modalEstatisticas button {
+#modalEstatisticas .fechar-modal {
   position: absolute;
   top: 10px;
   right: 10px;
@@ -196,7 +196,7 @@ button {
   color: white;
 }
 
-.tema-escuro #modalEstatisticas button {
+.tema-escuro #modalEstatisticas .fechar-modal {
   color: white;
 }
 
