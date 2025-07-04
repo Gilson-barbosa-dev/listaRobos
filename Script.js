@@ -225,3 +225,8 @@ function fecharModalEstatisticas() {
   document.getElementById('modalEstatisticas').style.display = 'none';
 }
 
+function abrirImagemZoom() {
+  const src = document.getElementById('imagemEstatistica').src;
+  const win = window.open();
+  win.document.write(`<title>Zoom</title><style>body{margin:0;background:#000;display:flex;align-items:center;justify-content:center}</style><img src="${src}" style="max-width:100vw;max-height:100vh">`);
+}
