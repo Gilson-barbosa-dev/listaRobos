@@ -123,6 +123,8 @@ function abrirGrafico(magic) {
 
       const hasDados = labels.length > 0 && lucroAcumulado.some(l => l !== 0);
       const temaEscuro = document.body.classList.contains("tema-escuro");
+      const corTexto = temaEscuro ? "#ffffff" : "#111111";
+      const corLinha = temaEscuro ? "#00ffb3" : "#00b89c";
 
       window.graficoInstancia = new Chart(ctx, {
         type: 'line',
@@ -132,20 +134,33 @@ function abrirGrafico(magic) {
             label: hasDados ? 'Lucro Acumulado' : 'Nenhum dado encontrado',
             data: hasDados ? lucroAcumulado : [0],
             fill: false,
-            borderColor: temaEscuro ? "#00ffb3" : "#00b89c",
+            borderColor: corLinha,
             tension: 0.3
           }]
         },
         options: {
           plugins: {
-            legend: { labels: { color: temaEscuro ? "#ffffff" : "#111111" } },
+            legend: { labels: { color: corTexto } },
             tooltip: { callbacks: { label: ctx => `Lucro acumulado: ${ctx.raw.toFixed(2)}` } }
           },
           scales: {
-            x: { ticks: { color: temaEscuro ? "#ffffff" : "#111111" } },
-            y: { ticks: { color: temaEscuro ? "#ffffff" : "#111111" } }
+            x: { ticks: { color: corTexto } },
+            y: { ticks: { color: corTexto } }
           }
-        }
+        },
+        plugins: [
+          {
+            id: 'fundoPersonalizado',
+            beforeDraw: (chart) => {
+              const ctx = chart.canvas.getContext('2d');
+              ctx.save();
+              ctx.globalCompositeOperation = 'destination-over';
+              ctx.fillStyle = temaEscuro ? '#0e0e0e' : '#ffffff';
+              ctx.fillRect(0, 0, chart.width, chart.height);
+              ctx.restore();
+            }
+          }
+        ]
       });
 
       document.getElementById('tituloGrafico').innerText = `Histórico: Magic ${magic}`;
