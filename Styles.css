@@ -226,11 +226,10 @@ button {
   font-size: 16px;
   background: none;
   border: 1px solid currentColor;
-  border-radius: 6px;
+  border-radius: 4px;
   width: 28px;
   height: 28px;
   text-align: center;
-  line-height: 24px;
   padding: 0;
   cursor: pointer;
   color: inherit;
