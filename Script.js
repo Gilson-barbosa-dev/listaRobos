@@ -1,6 +1,17 @@
 // Script.js para o Painel com toggle moderno de tema
 let estrategiasGlobais = [];
 
+// 🎯 Referência global da imagem e container de zoom
+let zoomLevel = 1;
+let isDragging = false;
+let startX, startY, scrollLeft, scrollTop;
+let imagemAtual = 0;
+let imagensEstatisticas = [];
+
+const imagem = document.getElementById('imagemEstatistica');
+const container = document.getElementById('containerImagem');
+
+// 🌙 Tema salvo no localStorage
 document.addEventListener('DOMContentLoaded', () => {
   const toggle = document.getElementById('toggle-tema');
   const temaSalvo = localStorage.getItem("temaEscolhido") || "tema-escuro";
@@ -185,53 +196,7 @@ document.getElementById('ordenar').addEventListener('change', () => {
   renderizar(ordenarEstrategias(estrategiasGlobais));
 });
 
-
-// ESTATISTICAS
-let imagensEstatisticas = [];
-let indiceAtual = 0;
-
-function abrirEstatisticas(magic) {
-  imagensEstatisticas = [
-    `./img/estatisticas/${magic}_1.png`,
-    `./img/estatisticas/${magic}_2.png`,
-    `./img/estatisticas/${magic}_3.png`
-  ];
-  indiceAtual = 0;
-  atualizarImagem();
-  document.getElementById('tituloEstatistica').innerText = `Estatísticas: Magic ${magic}`;
-  document.getElementById('modalEstatisticas').style.display = 'flex';
-}
-
-function atualizarImagem() {
-  const img = document.getElementById('imagemEstatistica');
-  img.src = imagensEstatisticas[indiceAtual];
-}
-
-function imagemAnterior() {
-  if (indiceAtual > 0) {
-    indiceAtual--;
-    atualizarImagem();
-  }
-}
-
-function imagemProxima() {
-  if (indiceAtual < imagensEstatisticas.length - 1) {
-    indiceAtual++;
-    atualizarImagem();
-  }
-}
-
-function fecharModalEstatisticas() {
-  document.getElementById('modalEstatisticas').style.display = 'none';
-}
-
-// Zoom e arraste interno da imagem
-let zoomLevel = 1;
-let isDragging = false;
-let startX, startY, scrollLeft, scrollTop;
-let imagemAtual = 0;
-const imagem = document.getElementById('imagemEstatistica');
-
+// 📷 Estatísticas com imagem e zoom
 function abrirEstatisticas(magic) {
   imagensEstatisticas = [
     `./img/estatisticas/${magic}_1.png`,
@@ -248,6 +213,9 @@ function atualizarImagem() {
   zoomLevel = 1;
   imagem.style.transform = 'scale(1)';
   imagem.src = imagensEstatisticas[imagemAtual];
+  container.scrollLeft = 0;
+  container.scrollTop = 0;
+  container.style.overflow = 'hidden';
 }
 
 function imagemAnterior() {
@@ -274,6 +242,14 @@ imagem.addEventListener('wheel', (e) => {
   zoomLevel += e.deltaY * -0.001;
   zoomLevel = Math.min(Math.max(zoomLevel, 1), 3);
   imagem.style.transform = `scale(${zoomLevel})`;
+
+  if (zoomLevel > 1) {
+    container.style.overflow = 'auto';
+  } else {
+    container.scrollLeft = 0;
+    container.scrollTop = 0;
+    container.style.overflow = 'hidden';
+  }
 });
 
 imagem.addEventListener('mousedown', (e) => {
@@ -282,8 +258,8 @@ imagem.addEventListener('mousedown', (e) => {
   imagem.style.cursor = 'grabbing';
   startX = e.pageX;
   startY = e.pageY;
-  scrollLeft = imagem.parentElement.scrollLeft;
-  scrollTop = imagem.parentElement.scrollTop;
+  scrollLeft = container.scrollLeft;
+  scrollTop = container.scrollTop;
 });
 
 imagem.addEventListener('mouseup', () => {
@@ -303,21 +279,26 @@ imagem.addEventListener('mousemove', (e) => {
   const y = e.pageY;
   const walkX = (x - startX);
   const walkY = (y - startY);
-  imagem.parentElement.scrollLeft = scrollLeft - walkX;
-  imagem.parentElement.scrollTop = scrollTop - walkY;
+  container.scrollLeft = scrollLeft - walkX;
+  container.scrollTop = scrollTop - walkY;
 });
 
 function zoomIn() {
   zoomLevel = Math.min(zoomLevel + 0.2, 3);
   imagem.style.transform = `scale(${zoomLevel})`;
+  container.style.overflow = zoomLevel > 1 ? 'auto' : 'hidden';
 }
 
 function zoomOut() {
   zoomLevel = Math.max(zoomLevel - 0.2, 1);
   imagem.style.transform = `scale(${zoomLevel})`;
+  container.style.overflow = zoomLevel > 1 ? 'auto' : 'hidden';
 }
 
 function resetZoom() {
   zoomLevel = 1;
   imagem.style.transform = 'scale(1)';
+  container.scrollLeft = 0;
+  container.scrollTop = 0;
+  container.style.overflow = 'hidden';
 }
