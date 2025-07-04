@@ -1,3 +1,4 @@
+
 /* ---------- ESTILO GERAL DO PAINEL ---------- */
 body {
   font-family: 'Inter', sans-serif;
@@ -218,29 +219,28 @@ button {
 /* ---------- TOGGLE DE TEMA MODERNO ---------- */
 .toggle-wrapper {
   display: flex;
-  justify-content: flex-end;
   align-items: center;
-  margin-bottom: 16px;
-  padding: 0 12px;
+  margin-top: 0;
 }
 
 .toggle {
   position: relative;
   display: inline-block;
-  width: 50px;
-  height: 28px;
+  width: 44px;
+  height: 22px;
   background-color: #ccc;
   border-radius: 999px;
   cursor: pointer;
   transition: background-color 0.3s;
+  margin-top: 2px;
 }
 
 .toggle .ball {
   position: absolute;
   top: 2px;
   left: 2px;
-  width: 28px;
-  height: 28px;
+  width: 18px;
+  height: 18px;
   background-color: white;
   border-radius: 50%;
   transition: transform 0.3s;
@@ -249,20 +249,20 @@ button {
 
 .toggle .icon {
   position: absolute;
-  width: 20px;
-  height: 20px;
-  top: 6px;
+  width: 16px;
+  height: 16px;
+  top: 3px;
   z-index: 1;
-  font-size: 16px;
+  font-size: 14px;
 }
 
 .toggle .sol {
-  left: 8px;
+  left: 6px;
   color: #f39c12;
 }
 
 .toggle .lua {
-  right: 8px;
+  right: 6px;
   color: #2c3e50;
 }
 
@@ -271,7 +271,7 @@ button {
 }
 
 #toggle-tema:checked + .toggle .ball {
-  transform: translateX(28px);
+  transform: translateX(22px);
 }
 
 #toggle-tema:checked + .toggle {
