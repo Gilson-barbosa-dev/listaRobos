@@ -194,7 +194,6 @@ button {
 }
 
 .imagem-wrapper {
-  position: relative;
   overflow: hidden;
   border-radius: 12px;
   max-height: 65vh;
@@ -213,24 +212,24 @@ button {
 }
 
 .zoom-controls {
-  position: absolute;
-  bottom: 10px;
-  right: 10px;
+  margin-top: 16px;
   display: flex;
-  gap: 8px;
+  justify-content: center;
+  gap: 12px;
 }
 
 .zoom-controls button {
   padding: 6px 10px;
-  font-size: 16px;
-  border: none;
+  font-size: 18px;
+  background: none;
+  border: 1px solid #ccc;
   border-radius: 6px;
-  background: #eee;
   cursor: pointer;
+  color: inherit;
 }
 
 .tema-escuro .zoom-controls button {
-  background: #333;
+  border-color: #555;
   color: white;
 }
 
