@@ -166,6 +166,11 @@ button {
   color: #111;
 }
 
+.tema-claro .top-bar input,
+.tema-claro .top-bar select {
+  border: 1px solid #ccc;
+}
+
 .tema-claro .card {
   background: #f9f9f9;
   border: 1px solid #e0e0e0;
