@@ -225,8 +225,47 @@ function fecharModalEstatisticas() {
   document.getElementById('modalEstatisticas').style.display = 'none';
 }
 
-function abrirImagemZoom() {
-  const src = document.getElementById('imagemEstatistica').src;
-  const win = window.open();
-  win.document.write(`<title>Zoom</title><style>body{margin:0;background:#000;display:flex;align-items:center;justify-content:center}</style><img src="${src}" style="max-width:100vw;max-height:100vh">`);
-}
+// Zoom e arraste interno da imagem
+let zoomLevel = 1;
+let isDragging = false;
+let startX, startY, scrollLeft, scrollTop;
+
+const imagem = document.getElementById('imagemEstatistica');
+
+imagem.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  zoomLevel += e.deltaY * -0.001;
+  zoomLevel = Math.min(Math.max(zoomLevel, 1), 3);
+  imagem.style.transform = `scale(${zoomLevel})`;
+});
+
+imagem.addEventListener('mousedown', (e) => {
+  if (zoomLevel === 1) return;
+  isDragging = true;
+  imagem.style.cursor = 'grabbing';
+  startX = e.pageX - imagem.offsetLeft;
+  startY = e.pageY - imagem.offsetTop;
+  scrollLeft = imagem.parentElement.scrollLeft;
+  scrollTop = imagem.parentElement.scrollTop;
+});
+
+imagem.addEventListener('mouseup', () => {
+  isDragging = false;
+  imagem.style.cursor = 'grab';
+});
+
+imagem.addEventListener('mouseleave', () => {
+  isDragging = false;
+  imagem.style.cursor = 'grab';
+});
+
+imagem.addEventListener('mousemove', (e) => {
+  if (!isDragging) return;
+  e.preventDefault();
+  const x = e.pageX - imagem.offsetLeft;
+  const y = e.pageY - imagem.offsetTop;
+  const walkX = (x - startX);
+  const walkY = (y - startY);
+  imagem.parentElement.scrollLeft = scrollLeft - walkX;
+  imagem.parentElement.scrollTop = scrollTop - walkY;
+});
