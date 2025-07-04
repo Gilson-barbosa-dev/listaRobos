@@ -1,4 +1,3 @@
-// Script.js para o Painel com toggle moderno de tema
 let estrategiasGlobais = [];
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -99,7 +98,6 @@ function renderizar(lista) {
   });
 }
 
-
 function abrirGrafico(magic) {
   fetch(`https://apirobos-production.up.railway.app/historico_detalhado/${magic}`)
     .then(res => res.json())
@@ -186,16 +184,17 @@ document.getElementById('ordenar').addEventListener('change', () => {
   renderizar(ordenarEstrategias(estrategiasGlobais));
 });
 
-// 📷 Estatísticas com imagem e zoom
+// Estatísticas com zoom e navegação
 let imagemAtual = 0;
 let imagensEstatisticas = [];
-const imagem = document.getElementById('imagemEstatistica');
-const container = document.getElementById('containerImagem');
 let zoomLevel = 1;
 let isDragging = false;
-let startX, startY, scrollLeft, scrollTop;
+let startX, startY, posX = 0, posY = 0;
 
-function abrirEstatisticas(magic) {
+const imagem = document.getElementById('imagemEstatistica');
+const container = document.getElementById('containerImagem');
+
+window.abrirEstatisticas = function(magic) {
   imagensEstatisticas = [
     `./img/estatisticas/${magic}_1.png`,
     `./img/estatisticas/${magic}_2.png`,
@@ -205,10 +204,13 @@ function abrirEstatisticas(magic) {
   atualizarImagem();
   document.getElementById('tituloEstatistica').innerText = `Estatísticas: Magic ${magic}`;
   document.getElementById('modalEstatisticas').style.display = 'flex';
-}
+};
 
 function atualizarImagem() {
   zoomLevel = 1;
+  scale = 1;
+  posX = 0;
+  posY = 0;
   imagem.style.transform = 'scale(1)';
   imagem.src = imagensEstatisticas[imagemAtual];
   container.scrollLeft = 0;
@@ -235,24 +237,15 @@ function fecharModalEstatisticas() {
   imagem.src = '';
 }
 
-let scale = 1;
-let posX = 0;
-let posY = 0;
-
-const imagem = document.getElementById("imagemEstatistica");
-const container = document.getElementById("containerImagem");
-
 function applyTransform() {
   imagem.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
 }
 
-// Zoom In
 function zoomIn() {
   scale += 0.2;
   applyTransform();
 }
 
-// Zoom Out
 function zoomOut() {
   scale = Math.max(1, scale - 0.2);
   posX = 0;
@@ -260,7 +253,6 @@ function zoomOut() {
   applyTransform();
 }
 
-// Reset
 function resetZoom() {
   scale = 1;
   posX = 0;
@@ -268,7 +260,7 @@ function resetZoom() {
   applyTransform();
 }
 
-// Início do arrasto
+// Arrastar imagem
 imagem.addEventListener("mousedown", (e) => {
   if (scale <= 1) return;
   isDragging = true;
@@ -284,11 +276,9 @@ document.addEventListener("mouseup", () => {
 
 document.addEventListener("mousemove", (e) => {
   if (!isDragging || scale <= 1) return;
-
   let newX = e.clientX - startX;
   let newY = e.clientY - startY;
 
-  // Limites máximos baseados no tamanho da imagem e container
   const boundsX = (imagem.clientWidth * scale - container.clientWidth) / 2;
   const boundsY = (imagem.clientHeight * scale - container.clientHeight) / 2;
 
