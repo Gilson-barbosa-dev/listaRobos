@@ -1,3 +1,4 @@
+/* ---------- ESTILO GERAL DO PAINEL ---------- */
 body {
   font-family: 'Inter', sans-serif;
   margin: 0;
@@ -149,7 +150,7 @@ button {
   color: black;
 }
 
-/* Tema escuro */
+/* ---------- TEMA ESCURO ---------- */
 .tema-escuro {
   background-color: #0e0e0e;
   color: #fff;
@@ -183,7 +184,7 @@ button {
   color: white;
 }
 
-/* Tema claro */
+/* ---------- TEMA CLARO ---------- */
 .tema-claro {
   background-color: #ffffff;
   color: #111;
@@ -212,4 +213,73 @@ button {
 
 .tema-claro #modalGrafico button {
   color: black;
+}
+
+/* ---------- TOGGLE DE TEMA MODERNO ---------- */
+.toggle-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-bottom: 16px;
+  padding: 0 12px;
+}
+
+.toggle {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 32px;
+  background-color: #ccc;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.toggle .ball {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 28px;
+  height: 28px;
+  background-color: white;
+  border-radius: 50%;
+  transition: transform 0.3s;
+  z-index: 2;
+}
+
+.toggle .icon {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  top: 6px;
+  z-index: 1;
+  font-size: 16px;
+}
+
+.toggle .sol {
+  left: 8px;
+  color: #f39c12;
+}
+
+.toggle .lua {
+  right: 8px;
+  color: #2c3e50;
+}
+
+#toggle-tema {
+  display: none;
+}
+
+#toggle-tema:checked + .toggle .ball {
+  transform: translateX(28px);
+}
+
+#toggle-tema:checked + .toggle {
+  background-color: #333;
+}
+
+@media (max-width: 600px) {
+  .toggle {
+    transform: scale(0.9);
+  }
 }
