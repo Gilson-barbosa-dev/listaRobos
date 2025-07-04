@@ -229,7 +229,6 @@ function fecharModalEstatisticas() {
 let zoomLevel = 1;
 let isDragging = false;
 let startX, startY, scrollLeft, scrollTop;
-
 const imagem = document.getElementById('imagemEstatistica');
 
 imagem.addEventListener('wheel', (e) => {
@@ -269,3 +268,18 @@ imagem.addEventListener('mousemove', (e) => {
   imagem.parentElement.scrollLeft = scrollLeft - walkX;
   imagem.parentElement.scrollTop = scrollTop - walkY;
 });
+
+function zoomIn() {
+  zoomLevel = Math.min(zoomLevel + 0.2, 3);
+  imagem.style.transform = `scale(${zoomLevel})`;
+}
+
+function zoomOut() {
+  zoomLevel = Math.max(zoomLevel - 0.2, 1);
+  imagem.style.transform = `scale(${zoomLevel})`;
+}
+
+function resetZoom() {
+  zoomLevel = 1;
+  imagem.style.transform = 'scale(1)';
+}
