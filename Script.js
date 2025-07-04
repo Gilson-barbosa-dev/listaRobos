@@ -1,33 +1,32 @@
-// Tema toggle
-function aplicarTema(tema) {
-  const body = document.body;
-  body.classList.remove("tema-claro", "tema-escuro");
-  body.classList.add(tema);
-  localStorage.setItem("temaEscolhido", tema);
-  document.getElementById("toggleTema").innerText =
-    tema === "tema-claro" ? "🌙 Tema Escuro" : "☀️ Tema Claro";
-}
-
-document.getElementById("toggleTema").addEventListener("click", () => {
-  const temaAtual = document.body.classList.contains("tema-claro") ? "tema-claro" : "tema-escuro";
-  aplicarTema(temaAtual === "tema-claro" ? "tema-escuro" : "tema-claro");
-
-  if (document.getElementById("modalGrafico").style.display === "flex") {
-    const magicAtual = document.getElementById("tituloGrafico").innerText.split("Magic ")[1];
-    if (magicAtual) {
-      if (window.graficoInstancia) {
-        window.graficoInstancia.destroy();
-        window.graficoInstancia = null;
-      }
-      setTimeout(() => abrirGrafico(parseInt(magicAtual)), 50);
-    }
-  }
-});
-
-const temaSalvo = localStorage.getItem("temaEscolhido") || "tema-escuro";
-aplicarTema(temaSalvo);
-
+// Script.js para o Painel com toggle moderno de tema
 let estrategiasGlobais = [];
+
+document.addEventListener('DOMContentLoaded', () => {
+  const toggle = document.getElementById('toggle-tema');
+  const temaSalvo = localStorage.getItem("temaEscolhido") || "tema-escuro";
+  document.body.classList.add(temaSalvo);
+  toggle.checked = temaSalvo === "tema-escuro";
+
+  toggle.addEventListener('change', () => {
+    const novoTema = toggle.checked ? "tema-escuro" : "tema-claro";
+    document.body.classList.remove("tema-claro", "tema-escuro");
+    document.body.classList.add(novoTema);
+    localStorage.setItem("temaEscolhido", novoTema);
+
+    if (document.getElementById("modalGrafico")?.style.display === "flex") {
+      const magicAtual = document.getElementById("tituloGrafico").innerText.split("Magic ")[1];
+      if (magicAtual) {
+        if (window.graficoInstancia) {
+          window.graficoInstancia.destroy();
+          window.graficoInstancia = null;
+        }
+        setTimeout(() => abrirGrafico(parseInt(magicAtual)), 50);
+      }
+    }
+  });
+
+  carregarEstrategias();
+});
 
 async function carregarEstrategias() {
   const cacheKey = 'estrategias_cache';
@@ -113,7 +112,6 @@ function abrirGrafico(magic) {
           typeof item.lucro_total === "string" ? item.lucro_total.replace(",", ".") : item.lucro_total
         );
         if (isNaN(lucro)) lucro = 0;
-
         labels.push(item.data);
         acumulado += lucro;
         lucroAcumulado.push(acumulado);
@@ -121,10 +119,10 @@ function abrirGrafico(magic) {
 
       if (window.graficoInstancia) window.graficoInstancia.destroy();
 
-      const hasDados = labels.length > 0 && lucroAcumulado.some(l => l !== 0);
       const temaEscuro = document.body.classList.contains("tema-escuro");
       const corTexto = temaEscuro ? "#ffffff" : "#111111";
       const corLinha = temaEscuro ? "#00ffb3" : "#00b89c";
+      const hasDados = labels.length > 0 && lucroAcumulado.some(l => l !== 0);
 
       window.graficoInstancia = new Chart(ctx, {
         type: 'line',
@@ -148,19 +146,17 @@ function abrirGrafico(magic) {
             y: { ticks: { color: corTexto } }
           }
         },
-        plugins: [
-          {
-            id: 'fundoPersonalizado',
-            beforeDraw: (chart) => {
-              const ctx = chart.canvas.getContext('2d');
-              ctx.save();
-              ctx.globalCompositeOperation = 'destination-over';
-              ctx.fillStyle = temaEscuro ? '#0e0e0e' : '#ffffff';
-              ctx.fillRect(0, 0, chart.width, chart.height);
-              ctx.restore();
-            }
+        plugins: [{
+          id: 'fundoPersonalizado',
+          beforeDraw: (chart) => {
+            const ctx = chart.canvas.getContext('2d');
+            ctx.save();
+            ctx.globalCompositeOperation = 'destination-over';
+            ctx.fillStyle = temaEscuro ? '#0e0e0e' : '#ffffff';
+            ctx.fillRect(0, 0, chart.width, chart.height);
+            ctx.restore();
           }
-        ]
+        }]
       });
 
       document.getElementById('tituloGrafico').innerText = `Histórico: Magic ${magic}`;
@@ -187,5 +183,3 @@ document.getElementById('filtro').addEventListener('input', e => {
 document.getElementById('ordenar').addEventListener('change', () => {
   renderizar(ordenarEstrategias(estrategiasGlobais));
 });
-
-carregarEstrategias();
