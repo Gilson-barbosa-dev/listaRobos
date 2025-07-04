@@ -38,32 +38,32 @@
     </div>
   </div>
 
-<!-- Modal Estatísticas -->
-<div id="modalEstatisticas">
-  <div class="modal-content">
-    <button class="fechar-modal" onclick="fecharModalEstatisticas()">&times;</button>
-    <h2 id="tituloEstatistica"></h2>
+  <!-- Modal Estatísticas -->
+  <div id="modalEstatisticas">
+    <div class="modal-content">
+      <button class="fechar-modal" onclick="fecharModalEstatisticas()">&times;</button>
+      <h2 id="tituloEstatistica"></h2>
 
-    <div class="imagem-wrapper">
-  <div class="imagem-scrollable" id="containerImagem">
-    <img id="imagemEstatistica" src="" alt="Estatística" />
-  </div>
-  </div>
+      <div class="imagem-wrapper">
+        <div id="containerImagem" class="imagem-scrollable">
+          <img id="imagemEstatistica" src="" alt="Estatística" />
+        </div>
+      </div>
 
-    <!-- Controles de Zoom fixos -->
-    <div class="zoom-controls-vertical-fixed">
-      <button onclick="zoomIn()" title="Zoom In">+</button>
-      <button onclick="zoomOut()" title="Zoom Out">−</button>
-      <button onclick="resetZoom()" title="Redefinir">⛶</button>
+      <!-- Controles de Zoom fixos -->
+      <div class="zoom-controls-vertical-fixed">
+        <button onclick="zoomIn()" title="Zoom In">+</button>
+        <button onclick="zoomOut()" title="Zoom Out">−</button>
+        <button onclick="resetZoom()" title="Redefinir">⛶</button>
+      </div>
+
+      <!-- Navegação -->
+      <div class="navegacao-estatistica">
+        <button onclick="imagemAnterior()">←</button>
+        <button onclick="imagemProxima()">→</button>
+      </div>
     </div>
-
-    <!-- Navegação -->
-    <div class="navegacao-estatistica">
-      <button onclick="imagemAnterior()">←</button>
-      <button onclick="imagemProxima()">→</button>
-    </div>
   </div>
-</div>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="./Script.js"></script>
