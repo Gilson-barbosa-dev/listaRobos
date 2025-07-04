@@ -235,75 +235,67 @@ function fecharModalEstatisticas() {
   imagem.src = '';
 }
 
-// Zoom
-imagem.addEventListener('wheel', (e) => {
-  e.preventDefault();
-  zoomLevel += e.deltaY * -0.001;
-  zoomLevel = Math.min(Math.max(zoomLevel, 1), 3);
-  imagem.style.transform = `scale(${zoomLevel})`;
-  container.style.overflow = zoomLevel > 1 ? 'auto' : 'hidden';
-});
+let scale = 1;
+let posX = 0;
+let posY = 0;
+let isDragging = false;
+let startX, startY;
 
-imagem.addEventListener('mousedown', (e) => {
-  if (zoomLevel === 1) return;
-  isDragging = true;
-  imagem.style.cursor = 'grabbing';
-  startX = e.clientX;
-  startY = e.clientY;
-  scrollLeft = container.scrollLeft;
-  scrollTop = container.scrollTop;
-});
+const imagem = document.getElementById("imagemEstatistica");
+const container = document.getElementById("containerImagem");
 
-imagem.addEventListener('mouseup', () => {
-  isDragging = false;
-  imagem.style.cursor = 'grab';
-});
+function applyTransform() {
+  imagem.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
+}
 
-imagem.addEventListener('mouseleave', () => {
-  isDragging = false;
-  imagem.style.cursor = 'grab';
-});
-
-imagem.addEventListener('mousemove', (e) => {
-  if (!isDragging) return;
-  e.preventDefault();
-
-  const x = e.clientX;
-  const y = e.clientY;
-  const walkX = (x - startX);
-  const walkY = (y - startY);
-
-  let nextScrollLeft = scrollLeft - walkX;
-  let nextScrollTop = scrollTop - walkY;
-
-  // Limites horizontais
-  nextScrollLeft = Math.max(0, Math.min(nextScrollLeft, container.scrollWidth - container.clientWidth));
-
-  // Limites verticais
-  nextScrollTop = Math.max(0, Math.min(nextScrollTop, container.scrollHeight - container.clientHeight));
-
-  container.scrollLeft = nextScrollLeft;
-  container.scrollTop = nextScrollTop;
-});
-
-
+// Zoom In
 function zoomIn() {
-  zoomLevel = Math.min(zoomLevel + 0.2, 3);
-  imagem.style.transform = `scale(${zoomLevel})`;
-  container.style.overflow = zoomLevel > 1 ? 'auto' : 'hidden';
+  scale += 0.2;
+  applyTransform();
 }
 
+// Zoom Out
 function zoomOut() {
-  zoomLevel = Math.max(zoomLevel - 0.2, 1);
-  imagem.style.transform = `scale(${zoomLevel})`;
-  container.style.overflow = zoomLevel > 1 ? 'auto' : 'hidden';
+  scale = Math.max(1, scale - 0.2);
+  posX = 0;
+  posY = 0;
+  applyTransform();
 }
 
+// Reset
 function resetZoom() {
-  zoomLevel = 1;
-  imagem.style.transform = 'scale(1)';
-  container.scrollLeft = 0;
-  container.scrollTop = 0;
-  container.style.overflow = 'hidden';
+  scale = 1;
+  posX = 0;
+  posY = 0;
+  applyTransform();
 }
 
+// Início do arrasto
+imagem.addEventListener("mousedown", (e) => {
+  if (scale <= 1) return;
+  isDragging = true;
+  startX = e.clientX - posX;
+  startY = e.clientY - posY;
+  imagem.style.cursor = "grabbing";
+});
+
+document.addEventListener("mouseup", () => {
+  isDragging = false;
+  imagem.style.cursor = "grab";
+});
+
+document.addEventListener("mousemove", (e) => {
+  if (!isDragging || scale <= 1) return;
+
+  let newX = e.clientX - startX;
+  let newY = e.clientY - startY;
+
+  // Limites máximos baseados no tamanho da imagem e container
+  const boundsX = (imagem.clientWidth * scale - container.clientWidth) / 2;
+  const boundsY = (imagem.clientHeight * scale - container.clientHeight) / 2;
+
+  posX = Math.max(-boundsX, Math.min(boundsX, newX));
+  posY = Math.max(-boundsY, Math.min(boundsY, newY));
+
+  applyTransform();
+});
