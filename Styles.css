@@ -163,81 +163,91 @@ button {
   justify-content: center;
 }
 
-#modalEstatisticas > div {
+.modal-content {
   position: relative;
-  padding: 30px 20px 60px;
-  border-radius: 12px;
-  max-width: 90vw;
-  max-height: 90vh;
-  width: 800px;
-  overflow: auto;
+  border-radius: 16px;
   background: white;
   color: black;
+  padding: 20px;
+  width: 90vw;
+  max-width: 800px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
   display: flex;
   flex-direction: column;
   align-items: center;
-  box-sizing: border-box;
 }
 
-#modalEstatisticas .fechar-modal {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  font-size: 24px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  z-index: 10;
-  color: black;
-}
-
-.tema-escuro #modalEstatisticas > div {
+.tema-escuro .modal-content {
   background: #1e1e1e;
   color: white;
 }
 
-.tema-escuro #modalEstatisticas .fechar-modal {
-  color: white;
+.fechar-modal {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: inherit;
+}
+
+.imagem-wrapper {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  max-height: 65vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 #imagemEstatistica {
   max-width: 100%;
   max-height: 65vh;
-  height: auto;
-  border-radius: 8px;
-  margin-top: 20px;
-  border: 2px solid #ddd;
-  background-color: white;
-  padding: 6px;
-  object-fit: contain;
-  image-rendering: auto;
-  display: block;
-  transition: transform 0.2s ease;
+  transition: transform 0.3s ease;
+  user-select: none;
+  pointer-events: all;
   cursor: grab;
 }
 
-.navegacao-estatistica {
-  margin-top: 20px;
+.zoom-controls {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
   display: flex;
-  justify-content: center;
+  gap: 8px;
+}
+
+.zoom-controls button {
+  padding: 6px 10px;
+  font-size: 16px;
+  border: none;
+  border-radius: 6px;
+  background: #eee;
+  cursor: pointer;
+}
+
+.tema-escuro .zoom-controls button {
+  background: #333;
+  color: white;
+}
+
+.navegacao-estatistica {
+  margin-top: 16px;
+  display: flex;
   gap: 20px;
-  z-index: 5;
 }
 
 .navegacao-estatistica button {
   font-size: 18px;
   padding: 8px 14px;
-  background: transparent;
-  color: inherit;
-  border: 1px solid currentColor;
   border-radius: 6px;
+  border: 1px solid #ccc;
+  background: none;
   cursor: pointer;
-  font-weight: 500;
-  transition: background-color 0.2s;
-}
-
-.navegacao-estatistica button:hover {
-  background-color: rgba(0, 0, 0, 0.05);
+  color: inherit;
 }
 
 /* ---------- TEMA ESCURO ---------- */
