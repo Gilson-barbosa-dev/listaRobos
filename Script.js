@@ -1,192 +1,191 @@
-body {
-  font-family: 'Inter', sans-serif;
-  margin: 0;
-  padding: 20px;
-  overflow-x: hidden;
-  transition: background-color 0.3s, color 0.3s;
+// Tema toggle
+function aplicarTema(tema) {
+  const body = document.body;
+  body.classList.remove("tema-claro", "tema-escuro");
+  body.classList.add(tema);
+  localStorage.setItem("temaEscolhido", tema);
+  document.getElementById("toggleTema").innerText =
+    tema === "tema-claro" ? "🌙 Tema Escuro" : "☀️ Tema Claro";
 }
 
-h1 {
-  text-align: center;
-  margin-bottom: 20px;
-  font-weight: 700;
-  font-size: 28px;
-}
+document.getElementById("toggleTema").addEventListener("click", () => {
+  const temaAtual = document.body.classList.contains("tema-claro") ? "tema-claro" : "tema-escuro";
+  aplicarTema(temaAtual === "tema-claro" ? "tema-escuro" : "tema-claro");
 
-.top-bar {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 20px;
-}
-
-.top-bar input,
-.top-bar select {
-  width: 100%;
-  max-width: 600px;
-  padding: 12px 16px;
-  border-radius: 8px;
-  border: none;
-  font-size: 16px;
-  box-sizing: border-box;
-}
-
-@media (min-width: 768px) {
-  .top-bar {
-    flex-direction: row;
-    justify-content: center;
-    gap: 16px;
+  if (document.getElementById("modalGrafico").style.display === "flex") {
+    const magicAtual = document.getElementById("tituloGrafico").innerText.split("Magic ")[1];
+    if (magicAtual) {
+      if (window.graficoInstancia) {
+        window.graficoInstancia.destroy();
+        window.graficoInstancia = null;
+      }
+      setTimeout(() => abrirGrafico(parseInt(magicAtual)), 50);
+    }
   }
+});
 
-  .top-bar input,
-  .top-bar select {
-    width: 260px;
-    margin-bottom: 0;
+const temaSalvo = localStorage.getItem("temaEscolhido") || "tema-escuro";
+aplicarTema(temaSalvo);
+
+let estrategiasGlobais = [];
+
+async function carregarEstrategias() {
+  const cacheKey = 'estrategias_cache';
+  const cacheTimeKey = 'estrategias_cache_time';
+  const cacheTime = 60000;
+  const now = Date.now();
+  const lastFetch = parseInt(localStorage.getItem(cacheTimeKey), 10) || 0;
+  if (now - lastFetch < cacheTime) {
+    try {
+      const cached = JSON.parse(localStorage.getItem(cacheKey));
+      if (cached) {
+        estrategiasGlobais = ordenarEstrategias(cached);
+        renderizar(estrategiasGlobais);
+        return;
+      }
+    } catch (e) {}
+  }
+  try {
+    const resposta = await fetch('https://apirobos-production.up.railway.app/dados');
+    const estrategias = await resposta.json();
+    localStorage.setItem(cacheKey, JSON.stringify(estrategias));
+    localStorage.setItem(cacheTimeKey, now.toString());
+    estrategiasGlobais = ordenarEstrategias(estrategias);
+    renderizar(estrategiasGlobais);
+  } catch (erro) {
+    console.error('Erro ao carregar estratégias:', erro);
   }
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 24px;
-  max-width: 1200px;
-  margin: 0 auto;
+function ordenarEstrategias(lista) {
+  const criterio = document.getElementById('ordenar')?.value || 'lucro';
+  const copia = [...lista];
+  switch (criterio) {
+    case 'assertividade': return copia.sort((a, b) => b.assertividade - a.assertividade);
+    case 'operacoes': return copia.sort((a, b) => b.total_operacoes - a.total_operacoes);
+    case 'data': return copia.sort((a, b) => new Date(a.inicio) - new Date(b.inicio));
+    default: return copia.sort((a, b) => b.lucro_total - a.lucro_total);
+  }
 }
 
-.card {
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 0 15px rgba(0, 255, 179, 0.15);
-  transition: transform 0.3s ease;
+function formatarData(dataGMT) {
+  if (!dataGMT) return '—';
+  const data = new Date(dataGMT);
+  return data.toLocaleString('pt-BR', {
+    day: '2-digit', month: '2-digit', year: 'numeric',
+    hour: '2-digit', minute: '2-digit', second: '2-digit',
+    hour12: false, timeZone: 'UTC'
+  });
 }
 
-.card:hover {
-  transform: translateY(-5px);
+function renderizar(lista) {
+  const painel = document.getElementById('painel');
+  painel.innerHTML = '';
+  lista.forEach(e => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <h2>🧠 Magic: <span>${e.magic}</span></h2>
+      <div class="info-line">🕒 Início: <span>${formatarData(e.inicio)}</span></div>
+      <div class="info-line">📊 Ativo: <span>${e.ativo}</span></div>
+      <div class="info-line">✅ Operações: <span>${e.total_operacoes}</span></div>
+      <div class="info-line">✅ Vencedoras: <span>${e.vencedoras}</span></div>
+      <div class="info-line">❌ Perdedoras: <span>${e.perdedoras}</span></div>
+      <div class="info-line">🎯 Assertividade: <span>${e.assertividade.toFixed(2)}%</span></div>
+      <div class="info-line">💰 Lucro Total: <span>${e.lucro_total.toFixed(2)}</span></div>
+      <button onclick="abrirGrafico(${e.magic})">📊 Ver Gráfico</button>
+    `;
+    painel.appendChild(card);
+  });
 }
 
-.card h2 {
-  font-size: 22px;
-  margin-bottom: 12px;
-  font-weight: 600;
+function abrirGrafico(magic) {
+  fetch(`https://apirobos-production.up.railway.app/historico_detalhado/${magic}`)
+    .then(res => res.json())
+    .then(data => {
+      const ctx = document.getElementById('graficoLucro').getContext('2d');
+      const labels = [];
+      const lucroAcumulado = [];
+      let acumulado = 0;
+
+      for (const item of data) {
+        let lucro = parseFloat(
+          typeof item.lucro_total === "string" ? item.lucro_total.replace(",", ".") : item.lucro_total
+        );
+        if (isNaN(lucro)) lucro = 0;
+
+        labels.push(item.data);
+        acumulado += lucro;
+        lucroAcumulado.push(acumulado);
+      }
+
+      if (window.graficoInstancia) window.graficoInstancia.destroy();
+
+      const hasDados = labels.length > 0 && lucroAcumulado.some(l => l !== 0);
+      const temaEscuro = document.body.classList.contains("tema-escuro");
+      const corTexto = temaEscuro ? "#ffffff" : "#111111";
+      const corLinha = temaEscuro ? "#00ffb3" : "#00b89c";
+
+      window.graficoInstancia = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: hasDados ? labels : ["Sem dados"],
+          datasets: [{
+            label: hasDados ? 'Lucro Acumulado' : 'Nenhum dado encontrado',
+            data: hasDados ? lucroAcumulado : [0],
+            fill: false,
+            borderColor: corLinha,
+            tension: 0.3
+          }]
+        },
+        options: {
+          plugins: {
+            legend: { labels: { color: corTexto } },
+            tooltip: { callbacks: { label: ctx => `Lucro acumulado: ${ctx.raw.toFixed(2)}` } }
+          },
+          scales: {
+            x: { ticks: { color: corTexto } },
+            y: { ticks: { color: corTexto } }
+          }
+        },
+        plugins: [
+          {
+            id: 'fundoPersonalizado',
+            beforeDraw: (chart) => {
+              const ctx = chart.canvas.getContext('2d');
+              ctx.save();
+              ctx.globalCompositeOperation = 'destination-over';
+              ctx.fillStyle = temaEscuro ? '#0e0e0e' : '#ffffff';
+              ctx.fillRect(0, 0, chart.width, chart.height);
+              ctx.restore();
+            }
+          }
+        ]
+      });
+
+      document.getElementById('tituloGrafico').innerText = `Histórico: Magic ${magic}`;
+      document.getElementById('modalGrafico').style.display = 'flex';
+    })
+    .catch(err => {
+      console.error("Erro ao carregar gráfico:", err);
+      alert("Não foi possível carregar o gráfico.");
+    });
 }
 
-.info-line {
-  display: flex;
-  align-items: center;
-  margin-bottom: 6px;
-  font-size: 14px;
+function fecharModal() {
+  document.getElementById('modalGrafico').style.display = 'none';
 }
 
-.info-line span {
-  margin-left: 8px;
-  font-weight: 500;
-}
+document.getElementById('filtro').addEventListener('input', e => {
+  const termo = e.target.value.toLowerCase();
+  const filtradas = estrategiasGlobais.filter(e =>
+    e.magic.toString().includes(termo) || (e.ativo || '').toLowerCase().includes(termo)
+  );
+  renderizar(ordenarEstrategias(filtradas));
+});
 
-button {
-  margin-top: 10px;
-  padding: 6px 12px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 600;
-}
+document.getElementById('ordenar').addEventListener('change', () => {
+  renderizar(ordenarEstrategias(estrategiasGlobais));
+});
 
-#modalGrafico {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0,0,0,0.8);
-  z-index: 999;
-  align-items: center;
-  justify-content: center;
-}
-
-#modalGrafico > div {
-  padding: 20px;
-  border-radius: 12px;
-  max-width: 90vw;
-  width: 600px;
-  position: relative;
-  background: white;
-  color: black;
-}
-
-#modalGrafico button {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  font-size: 20px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: black;
-}
-
-/* Tema escuro */
-.tema-escuro {
-  background-color: #0e0e0e;
-  color: #fff;
-}
-
-.tema-escuro .card {
-  background: linear-gradient(135deg, #1e1e1e, #2a2a2a);
-  color: #fff;
-}
-
-.tema-escuro .info-line {
-  color: #ccc;
-}
-
-.tema-escuro .card h2,
-.tema-escuro h1 {
-  color: #00ffb3;
-}
-
-.tema-escuro button {
-  background: #00ffb3;
-  color: #000;
-}
-
-.tema-escuro #modalGrafico > div {
-  background: #1e1e1e;
-  color: white;
-}
-
-.tema-escuro #modalGrafico button {
-  color: white;
-}
-
-/* Tema claro */
-.tema-claro {
-  background-color: #ffffff;
-  color: #111;
-}
-
-.tema-claro .card {
-  background: #f9f9f9;
-  border: 1px solid #e0e0e0;
-  color: #111;
-  box-shadow: 0 0 6px rgba(0, 0, 0, 0.04);
-}
-
-.tema-claro .info-line {
-  color: #444;
-}
-
-.tema-claro .card h2,
-.tema-claro h1 {
-  color: #00b89c;
-}
-
-.tema-claro button {
-  background: #00c9a7;
-  color: #000;
-}
-
-.tema-claro #modalGrafico button {
-  color: black;
-}
+carregarEstrategias();
