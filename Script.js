@@ -229,7 +229,6 @@ function fecharModalEstatisticas() {
 let zoomLevel = 1;
 let isDragging = false;
 let startX, startY, scrollLeft, scrollTop;
-let imagensEstatisticas = [];
 let imagemAtual = 0;
 const imagem = document.getElementById('imagemEstatistica');
 
