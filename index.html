@@ -11,30 +11,43 @@
   <h1>Painel de Estratégias</h1>
 
   <div class="top-bar">
-  <input type="text" id="filtro" placeholder="🔍 Magic ou Ativo...">
-  <select id="ordenar">
-    <option value="lucro_total">📈 Lucro Total</option>
-    <option value="assertividade">✅ Assertividade</option>
-    <option value="operacoes">📊 Operações</option>
-  </select>
-  <div class="toggle-wrapper">
-    <input type="checkbox" id="toggle-tema" />
-    <label class="toggle" for="toggle-tema">
-      <span class="ball"></span>
-      <span class="icon sol">☀️</span>
-      <span class="icon lua">🌙</span>
-    </label>
+    <input type="text" id="filtro" placeholder="🔍 Magic ou Ativo...">
+    <select id="ordenar">
+      <option value="lucro_total">📈 Lucro Total</option>
+      <option value="assertividade">✅ Assertividade</option>
+      <option value="operacoes">📊 Operações</option>
+    </select>
+    <div class="toggle-wrapper">
+      <input type="checkbox" id="toggle-tema" />
+      <label class="toggle" for="toggle-tema">
+        <span class="ball"></span>
+        <span class="icon sol">☀️</span>
+        <span class="icon lua">🌙</span>
+      </label>
+    </div>
   </div>
-</div>
-
 
   <div class="grid" id="painel"></div>
 
+  <!-- Modal Gráfico -->
   <div id="modalGrafico">
     <div>
       <button onclick="fecharModal()">&times;</button>
       <h2 id="tituloGrafico"></h2>
       <canvas id="graficoLucro"></canvas>
+    </div>
+  </div>
+
+  <!-- Modal Estatísticas (Imagens) -->
+  <div id="modalEstatisticas">
+    <div>
+      <button onclick="fecharModalEstatisticas()">&times;</button>
+      <h2 id="tituloEstatistica"></h2>
+      <img id="imagemEstatistica" src="" alt="Estatística" />
+      <div class="navegacao-estatistica">
+        <button onclick="imagemAnterior()">←</button>
+        <button onclick="imagemProxima()">→</button>
+      </div>
     </div>
   </div>
 
