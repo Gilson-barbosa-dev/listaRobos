@@ -175,6 +175,7 @@ button {
   display: flex;
   flex-direction: column;
   align-items: center;
+  overflow: hidden; /* Garante que a imagem fique dentro */
 }
 
 .tema-escuro .modal-content {
@@ -195,20 +196,14 @@ button {
 
 .imagem-wrapper {
   position: relative;
-  overflow: hidden; /* Oculta rolagem */
+  overflow: hidden;
   border-radius: 12px;
   max-height: 65vh;
   max-width: 100%;
+  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-.imagem-scrollable {
-  overflow: auto;
-  max-height: 65vh;
-  max-width: 100%;
-  width: 100%;
 }
 
 #imagemEstatistica {
@@ -219,8 +214,8 @@ button {
   pointer-events: all;
   cursor: grab;
   transform-origin: center center;
+  object-fit: contain; /* Mantém a imagem dentro do espaço visível */
 }
-
 
 .zoom-controls-vertical-fixed {
   position: absolute;
