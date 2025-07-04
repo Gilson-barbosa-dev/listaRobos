@@ -93,10 +93,12 @@ function renderizar(lista) {
       <div class="info-line">🎯 Assertividade: <span>${e.assertividade.toFixed(2)}%</span></div>
       <div class="info-line">💰 Lucro Total: <span>${e.lucro_total.toFixed(2)}</span></div>
       <button onclick="abrirGrafico(${e.magic})">📊 Ver Gráfico</button>
+      <button onclick="abrirEstatisticas(${e.magic})">📷 Estatísticas</button>
     `;
     painel.appendChild(card);
   });
 }
+
 
 function abrirGrafico(magic) {
   fetch(`https://apirobos-production.up.railway.app/historico_detalhado/${magic}`)
