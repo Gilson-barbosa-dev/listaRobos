@@ -229,7 +229,46 @@ function fecharModalEstatisticas() {
 let zoomLevel = 1;
 let isDragging = false;
 let startX, startY, scrollLeft, scrollTop;
+let imagensEstatisticas = [];
+let imagemAtual = 0;
 const imagem = document.getElementById('imagemEstatistica');
+
+function abrirEstatisticas(magic) {
+  imagensEstatisticas = [
+    `./img/estatisticas/${magic}_1.png`,
+    `./img/estatisticas/${magic}_2.png`,
+    `./img/estatisticas/${magic}_3.png`
+  ];
+  imagemAtual = 0;
+  atualizarImagem();
+  document.getElementById('tituloEstatistica').innerText = `Estatísticas: Magic ${magic}`;
+  document.getElementById('modalEstatisticas').style.display = 'flex';
+}
+
+function atualizarImagem() {
+  zoomLevel = 1;
+  imagem.style.transform = 'scale(1)';
+  imagem.src = imagensEstatisticas[imagemAtual];
+}
+
+function imagemAnterior() {
+  if (imagemAtual > 0) {
+    imagemAtual--;
+    atualizarImagem();
+  }
+}
+
+function imagemProxima() {
+  if (imagemAtual < imagensEstatisticas.length - 1) {
+    imagemAtual++;
+    atualizarImagem();
+  }
+}
+
+function fecharModalEstatisticas() {
+  document.getElementById('modalEstatisticas').style.display = 'none';
+  imagem.src = '';
+}
 
 imagem.addEventListener('wheel', (e) => {
   e.preventDefault();
@@ -282,16 +321,4 @@ function zoomOut() {
 function resetZoom() {
   zoomLevel = 1;
   imagem.style.transform = 'scale(1)';
-}
-
-function imagemAnterior() {
-  zoomLevel = 1;
-  imagem.style.transform = 'scale(1)';
-  // lógica de troca de imagem anterior (existente no seu JS)
-}
-
-function imagemProxima() {
-  zoomLevel = 1;
-  imagem.style.transform = 'scale(1)';
-  // lógica de troca de imagem próxima (existente no seu JS)
 }
