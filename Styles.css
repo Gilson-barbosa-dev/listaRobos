@@ -220,19 +220,18 @@ button {
 .toggle-wrapper {
   display: flex;
   align-items: center;
-  margin-top: 0;
+  gap: 8px;
 }
 
 .toggle {
   position: relative;
   display: inline-block;
-  width: 44px;
+  width: 42px;
   height: 22px;
   background-color: #ccc;
   border-radius: 999px;
   cursor: pointer;
   transition: background-color 0.3s;
-  margin-top: 2px; /* Alinha com select */
 }
 
 .toggle .ball {
@@ -249,11 +248,11 @@ button {
 
 .toggle .icon {
   position: absolute;
-  width: 14px;
-  height: 14px;
-  top: 4px;
+  width: 12px;
+  height: 12px;
+  top: 5px;
+  font-size: 12px;
   z-index: 1;
-  font-size: 14px;
   pointer-events: none;
 }
 
@@ -267,10 +266,13 @@ button {
   color: #2c3e50;
 }
 
-#toggle-tema:checked + .toggle .ball {
-  transform: translateX(22px);
+#toggle-tema {
+  display: none;
 }
 
+#toggle-tema:checked + .toggle .ball {
+  transform: translateX(20px);
+}
 
 #toggle-tema:checked + .toggle {
   background-color: #333;
