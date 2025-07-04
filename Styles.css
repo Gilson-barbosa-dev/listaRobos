@@ -283,3 +283,57 @@ button {
     transform: scale(0.9);
   }
 }
+
+/* ---------- ESTATISTICAS ---------- */
+
+#modalEstatisticas {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(0,0,0,0.8);
+  z-index: 999;
+  align-items: center;
+  justify-content: center;
+}
+
+#modalEstatisticas > div {
+  padding: 20px;
+  border-radius: 12px;
+  max-width: 90vw;
+  width: 600px;
+  background: white;
+  color: black;
+  text-align: center;
+  position: relative;
+}
+
+#modalEstatisticas button {
+  margin: 8px;
+  font-size: 16px;
+  background: #00b89c;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+}
+
+.tema-escuro #modalEstatisticas > div {
+  background: #1e1e1e;
+  color: white;
+}
+
+.tema-escuro #modalEstatisticas button {
+  background: #00ffb3;
+  color: black;
+}
+
+#imagemEstatistica {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin-top: 10px;
+}
+
+
