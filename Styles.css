@@ -164,24 +164,30 @@ button {
 }
 
 #modalEstatisticas > div {
-  padding: 20px;
+  position: relative;
+  padding: 30px 20px 60px;
   border-radius: 12px;
   max-width: 90vw;
-  width: 600px;
+  max-height: 90vh;
+  width: 800px;
+  overflow: hidden;
   background: white;
   color: black;
-  text-align: center;
-  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
 }
 
 #modalEstatisticas button {
   position: absolute;
   top: 10px;
   right: 10px;
-  font-size: 20px;
+  font-size: 24px;
   background: none;
   border: none;
   cursor: pointer;
+  z-index: 10;
   color: black;
 }
 
@@ -196,18 +202,21 @@ button {
 
 #imagemEstatistica {
   max-width: 100%;
+  max-height: 65vh;
   height: auto;
   border-radius: 8px;
-  margin-top: 10px;
+  margin-top: 20px;
   border: 2px solid #ddd;
   box-shadow: 0 0 12px rgba(0, 0, 0, 0.4);
   background-color: white;
-  padding: 8px;
+  padding: 6px;
+  object-fit: contain;
   image-rendering: auto;
+  display: block;
 }
 
 #imagemEstatistica:hover {
-  transform: scale(1.02);
+  transform: scale(1.01);
   transition: transform 0.2s ease;
 }
 
@@ -216,11 +225,12 @@ button {
   display: flex;
   justify-content: center;
   gap: 20px;
+  z-index: 5;
 }
 
 .navegacao-estatistica button {
   font-size: 22px;
-  padding: 8px 14px;
+  padding: 10px 16px;
   background: #00ffb3;
   color: black;
   border: none;
