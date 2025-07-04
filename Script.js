@@ -19,7 +19,7 @@ document.getElementById("toggleTema").addEventListener("click", () => {
         window.graficoInstancia.destroy();
         window.graficoInstancia = null;
       }
-      setTimeout(() => abrirGrafico(parseInt(magicAtual)), 10);
+      setTimeout(() => abrirGrafico(parseInt(magicAtual)), 50);
     }
   }
 });
@@ -122,9 +122,7 @@ function abrirGrafico(magic) {
       if (window.graficoInstancia) window.graficoInstancia.destroy();
 
       const hasDados = labels.length > 0 && lucroAcumulado.some(l => l !== 0);
-      const isClaro = document.body.classList.contains("tema-claro");
-      const corTexto = isClaro ? "#111" : "#fff";
-      const corLinha = isClaro ? "#00b89c" : "#00ffb3";
+      const temaEscuro = document.body.classList.contains("tema-escuro");
 
       window.graficoInstancia = new Chart(ctx, {
         type: 'line',
@@ -134,18 +132,18 @@ function abrirGrafico(magic) {
             label: hasDados ? 'Lucro Acumulado' : 'Nenhum dado encontrado',
             data: hasDados ? lucroAcumulado : [0],
             fill: false,
-            borderColor: corLinha,
+            borderColor: temaEscuro ? "#00ffb3" : "#00b89c",
             tension: 0.3
           }]
         },
         options: {
           plugins: {
-            legend: { labels: { color: corTexto } },
+            legend: { labels: { color: temaEscuro ? "#ffffff" : "#111111" } },
             tooltip: { callbacks: { label: ctx => `Lucro acumulado: ${ctx.raw.toFixed(2)}` } }
           },
           scales: {
-            x: { ticks: { color: corTexto } },
-            y: { ticks: { color: corTexto } }
+            x: { ticks: { color: temaEscuro ? "#ffffff" : "#111111" } },
+            y: { ticks: { color: temaEscuro ? "#ffffff" : "#111111" } }
           }
         }
       });
