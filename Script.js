@@ -1,11 +1,5 @@
-
 // Script.js para o Painel com toggle moderno de tema
 let estrategiasGlobais = [];
-let imagensEstatisticas = [];
-let imagemAtual = 0;
-let zoomLevel = 1;
-let isDragging = false;
-let startX, startY, scrollLeft, scrollTop;
 
 document.addEventListener('DOMContentLoaded', () => {
   const toggle = document.getElementById('toggle-tema');
@@ -179,7 +173,65 @@ function fecharModal() {
   document.getElementById('modalGrafico').style.display = 'none';
 }
 
-// Estatísticas
+document.getElementById('filtro').addEventListener('input', e => {
+  const termo = e.target.value.toLowerCase();
+  const filtradas = estrategiasGlobais.filter(e =>
+    e.magic.toString().includes(termo) || (e.ativo || '').toLowerCase().includes(termo)
+  );
+  renderizar(ordenarEstrategias(filtradas));
+});
+
+document.getElementById('ordenar').addEventListener('change', () => {
+  renderizar(ordenarEstrategias(estrategiasGlobais));
+});
+
+
+// ESTATISTICAS
+let imagensEstatisticas = [];
+let indiceAtual = 0;
+
+function abrirEstatisticas(magic) {
+  imagensEstatisticas = [
+    `./img/estatisticas/${magic}_1.png`,
+    `./img/estatisticas/${magic}_2.png`,
+    `./img/estatisticas/${magic}_3.png`
+  ];
+  indiceAtual = 0;
+  atualizarImagem();
+  document.getElementById('tituloEstatistica').innerText = `Estatísticas: Magic ${magic}`;
+  document.getElementById('modalEstatisticas').style.display = 'flex';
+}
+
+function atualizarImagem() {
+  const img = document.getElementById('imagemEstatistica');
+  img.src = imagensEstatisticas[indiceAtual];
+}
+
+function imagemAnterior() {
+  if (indiceAtual > 0) {
+    indiceAtual--;
+    atualizarImagem();
+  }
+}
+
+function imagemProxima() {
+  if (indiceAtual < imagensEstatisticas.length - 1) {
+    indiceAtual++;
+    atualizarImagem();
+  }
+}
+
+function fecharModalEstatisticas() {
+  document.getElementById('modalEstatisticas').style.display = 'none';
+}
+
+// Zoom e arraste interno da imagem
+let zoomLevel = 1;
+let isDragging = false;
+let startX, startY, scrollLeft, scrollTop;
+let imagemAtual = 0;
+const imagem = document.getElementById('imagemEstatistica');
+
 function abrirEstatisticas(magic) {
   imagensEstatisticas = [
     `./img/estatisticas/${magic}_1.png`,
@@ -193,10 +245,9 @@ function abrirEstatisticas(magic) {
 }
 
 function atualizarImagem() {
-  const img = document.getElementById('imagemEstatistica');
   zoomLevel = 1;
-  img.style.transform = 'scale(1)';
-  img.src = imagensEstatisticas[imagemAtual];
+  imagem.style.transform = 'scale(1)';
+  imagem.src = imagensEstatisticas[imagemAtual];
 }
 
 function imagemAnterior() {
@@ -215,67 +266,58 @@ function imagemProxima() {
 
 function fecharModalEstatisticas() {
   document.getElementById('modalEstatisticas').style.display = 'none';
-  document.getElementById('imagemEstatistica').src = '';
+  imagem.src = '';
 }
 
-// Zoom e arraste
-document.addEventListener('DOMContentLoaded', () => {
-  const img = document.getElementById('imagemEstatistica');
-  const wrapper = document.querySelector('.imagem-wrapper');
+imagem.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  zoomLevel += e.deltaY * -0.001;
+  zoomLevel = Math.min(Math.max(zoomLevel, 1), 3);
+  imagem.style.transform = `scale(${zoomLevel})`;
+});
 
-  img.addEventListener('wheel', (e) => {
-    e.preventDefault();
-    zoomLevel += e.deltaY * -0.001;
-    zoomLevel = Math.min(Math.max(zoomLevel, 1), 3);
-    img.style.transform = `scale(${zoomLevel})`;
-  });
+imagem.addEventListener('mousedown', (e) => {
+  if (zoomLevel === 1) return;
+  isDragging = true;
+  imagem.style.cursor = 'grabbing';
+  startX = e.pageX - imagem.offsetLeft;
+  startY = e.pageY - imagem.offsetTop;
+  scrollLeft = imagem.parentElement.scrollLeft;
+  scrollTop = imagem.parentElement.scrollTop;
+});
 
-  wrapper.addEventListener('mousedown', (e) => {
-    if (zoomLevel === 1) return;
-    isDragging = true;
-    wrapper.style.cursor = 'grabbing';
-    startX = e.pageX;
-    startY = e.pageY;
-    scrollLeft = wrapper.scrollLeft;
-    scrollTop = wrapper.scrollTop;
-  });
+imagem.addEventListener('mouseup', () => {
+  isDragging = false;
+  imagem.style.cursor = 'grab';
+});
 
-  wrapper.addEventListener('mouseleave', () => {
-    isDragging = false;
-    wrapper.style.cursor = 'grab';
-  });
+imagem.addEventListener('mouseleave', () => {
+  isDragging = false;
+  imagem.style.cursor = 'grab';
+});
 
-  wrapper.addEventListener('mouseup', () => {
-    isDragging = false;
-    wrapper.style.cursor = 'grab';
-  });
-
-  wrapper.addEventListener('mousemove', (e) => {
-    if (!isDragging) return;
-    e.preventDefault();
-    const x = e.pageX;
-    const y = e.pageY;
-    const walkX = x - startX;
-    const walkY = y - startY;
-    wrapper.scrollLeft = scrollLeft - walkX;
-    wrapper.scrollTop = scrollTop - walkY;
-  });
+imagem.addEventListener('mousemove', (e) => {
+  if (!isDragging) return;
+  e.preventDefault();
+  const x = e.pageX - imagem.offsetLeft;
+  const y = e.pageY - imagem.offsetTop;
+  const walkX = (x - startX);
+  const walkY = (y - startY);
+  imagem.parentElement.scrollLeft = scrollLeft - walkX;
+  imagem.parentElement.scrollTop = scrollTop - walkY;
 });
 
 function zoomIn() {
-  const img = document.getElementById('imagemEstatistica');
   zoomLevel = Math.min(zoomLevel + 0.2, 3);
-  img.style.transform = `scale(${zoomLevel})`;
+  imagem.style.transform = `scale(${zoomLevel})`;
 }
 
 function zoomOut() {
-  const img = document.getElementById('imagemEstatistica');
   zoomLevel = Math.max(zoomLevel - 0.2, 1);
-  img.style.transform = `scale(${zoomLevel})`;
+  imagem.style.transform = `scale(${zoomLevel})`;
 }
 
 function resetZoom() {
-  const img = document.getElementById('imagemEstatistica');
   zoomLevel = 1;
-  img.style.transform = 'scale(1)';
+  imagem.style.transform = 'scale(1)';
 }
