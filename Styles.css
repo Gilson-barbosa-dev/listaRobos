@@ -170,7 +170,7 @@ button {
   max-width: 90vw;
   max-height: 90vh;
   width: 800px;
-  overflow: hidden;
+  overflow: auto;
   background: white;
   color: black;
   display: flex;
@@ -207,17 +207,13 @@ button {
   border-radius: 8px;
   margin-top: 20px;
   border: 2px solid #ddd;
-  box-shadow: 0 0 12px rgba(0, 0, 0, 0.4);
   background-color: white;
   padding: 6px;
   object-fit: contain;
   image-rendering: auto;
   display: block;
-}
-
-#imagemEstatistica:hover {
-  transform: scale(1.01);
   transition: transform 0.2s ease;
+  cursor: grab;
 }
 
 .navegacao-estatistica {
@@ -243,7 +239,6 @@ button {
 .navegacao-estatistica button:hover {
   background-color: rgba(0, 0, 0, 0.05);
 }
-
 
 /* ---------- TEMA ESCURO ---------- */
 .tema-escuro {
