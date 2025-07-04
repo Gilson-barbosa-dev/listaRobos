@@ -185,3 +185,113 @@ document.getElementById('filtro').addEventListener('input', e => {
 document.getElementById('ordenar').addEventListener('change', () => {
   renderizar(ordenarEstrategias(estrategiasGlobais));
 });
+
+// 📷 Estatísticas com imagem e zoom
+let imagemAtual = 0;
+let imagensEstatisticas = [];
+const imagem = document.getElementById('imagemEstatistica');
+const container = document.getElementById('containerImagem');
+let zoomLevel = 1;
+let isDragging = false;
+let startX, startY, scrollLeft, scrollTop;
+
+function abrirEstatisticas(magic) {
+  imagensEstatisticas = [
+    `./img/estatisticas/${magic}_1.png`,
+    `./img/estatisticas/${magic}_2.png`,
+    `./img/estatisticas/${magic}_3.png`
+  ];
+  imagemAtual = 0;
+  atualizarImagem();
+  document.getElementById('tituloEstatistica').innerText = `Estatísticas: Magic ${magic}`;
+  document.getElementById('modalEstatisticas').style.display = 'flex';
+}
+
+function atualizarImagem() {
+  zoomLevel = 1;
+  imagem.style.transform = 'scale(1)';
+  imagem.src = imagensEstatisticas[imagemAtual];
+  container.scrollLeft = 0;
+  container.scrollTop = 0;
+  container.style.overflow = 'hidden';
+}
+
+function imagemAnterior() {
+  if (imagemAtual > 0) {
+    imagemAtual--;
+    atualizarImagem();
+  }
+}
+
+function imagemProxima() {
+  if (imagemAtual < imagensEstatisticas.length - 1) {
+    imagemAtual++;
+    atualizarImagem();
+  }
+}
+
+function fecharModalEstatisticas() {
+  document.getElementById('modalEstatisticas').style.display = 'none';
+  imagem.src = '';
+}
+
+// Zoom
+imagem.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  zoomLevel += e.deltaY * -0.001;
+  zoomLevel = Math.min(Math.max(zoomLevel, 1), 3);
+  imagem.style.transform = `scale(${zoomLevel})`;
+  container.style.overflow = zoomLevel > 1 ? 'auto' : 'hidden';
+});
+
+imagem.addEventListener('mousedown', (e) => {
+  if (zoomLevel === 1) return;
+  isDragging = true;
+  imagem.style.cursor = 'grabbing';
+  startX = e.clientX;
+  startY = e.clientY;
+  scrollLeft = container.scrollLeft;
+  scrollTop = container.scrollTop;
+});
+
+imagem.addEventListener('mouseup', () => {
+  isDragging = false;
+  imagem.style.cursor = 'grab';
+});
+
+imagem.addEventListener('mouseleave', () => {
+  isDragging = false;
+  imagem.style.cursor = 'grab';
+});
+
+imagem.addEventListener('mousemove', (e) => {
+  if (!isDragging) return;
+  e.preventDefault();
+  const x = e.clientX;
+  const y = e.clientY;
+  const walkX = (x - startX);
+  const walkY = (y - startY);
+  container.scrollLeft = scrollLeft - walkX;
+  container.scrollTop = scrollTop - walkY;
+});
+
+function zoomIn() {
+  zoomLevel = Math.min(zoomLevel + 0.2, 3);
+  imagem.style.transform = `scale(${zoomLevel})`;
+  container.style.overflow = zoomLevel > 1 ? 'auto' : 'hidden';
+}
+
+function zoomOut() {
+  zoomLevel = Math.max(zoomLevel - 0.2, 1);
+  imagem.style.transform = `scale(${zoomLevel})`;
+  container.style.overflow = zoomLevel > 1 ? 'auto' : 'hidden';
+}
+
+function resetZoom() {
+  zoomLevel = 1;
+  imagem.style.transform = 'scale(1)';
+  container.scrollLeft = 0;
+  container.scrollTop = 0;
+  container.style.overflow = 'hidden';
+}
+
