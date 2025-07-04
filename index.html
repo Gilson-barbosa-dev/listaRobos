@@ -38,18 +38,31 @@
     </div>
   </div>
 
-  <!-- Modal Estatísticas (Imagens) -->
-  <div id="modalEstatisticas">
-    <div>
-      <button class="fechar-modal" onclick="fecharModalEstatisticas()">&times;</button>
-      <h2 id="tituloEstatistica"></h2>
-      <img id="imagemEstatistica" src="" alt="Estatística"/>
-      <div class="navegacao-estatistica">
-        <button onclick="imagemAnterior()">←</button>
-        <button onclick="imagemProxima()">→</button>
+<!-- Modal Estatísticas -->
+<div id="modalEstatisticas">
+  <div class="modal-content">
+    <button class="fechar-modal" onclick="fecharModalEstatisticas()">&times;</button>
+    <h2 id="tituloEstatistica"></h2>
+
+    <div class="imagem-wrapper">
+      <img id="imagemEstatistica" src="" alt="Estatística" draggable="false" />
+
+      <!-- Controles de Zoom -->
+      <div class="zoom-controls">
+        <button onclick="zoomIn()" title="Zoom In">+</button>
+        <button onclick="zoomOut()" title="Zoom Out">-</button>
+        <button onclick="resetZoom()" title="Resetar">&#8635;</button>
       </div>
     </div>
+
+    <!-- Navegadores -->
+    <div class="navegacao-estatistica">
+      <button onclick="imagemAnterior()">&#8592;</button>
+      <button onclick="imagemProxima()">&#8594;</button>
+    </div>
   </div>
+</div>
+
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="./Script.js"></script>
