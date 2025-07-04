@@ -238,7 +238,6 @@ function fecharModalEstatisticas() {
 let scale = 1;
 let posX = 0;
 let posY = 0;
-let startX, startY;
 
 const imagem = document.getElementById("imagemEstatistica");
 const container = document.getElementById("containerImagem");
