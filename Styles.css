@@ -195,22 +195,22 @@ button {
 
 .imagem-wrapper {
   position: relative;
-  overflow: hidden;
+  overflow: auto;
   border-radius: 12px;
   max-height: 65vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  max-width: 100%;
+  display: block;
 }
 
 #imagemEstatistica {
-  max-width: 100%;
-  max-height: 65vh;
+  transform-origin: top left;
   transition: transform 0.3s ease;
   user-select: none;
   pointer-events: all;
   cursor: grab;
+  display: block;
 }
+
 
 .zoom-controls-vertical-fixed {
   position: absolute;
