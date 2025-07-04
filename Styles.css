@@ -195,10 +195,10 @@ button {
 
 .imagem-wrapper {
   position: relative;
-  overflow: hidden;  /* trocamos de auto para hidden */
+  overflow: hidden; /* Oculta rolagem */
   border-radius: 12px;
   max-height: 65vh;
-  width: 100%;
+  max-width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -212,14 +212,13 @@ button {
 }
 
 #imagemEstatistica {
-  transform-origin: top left;
+  max-width: 100%;
+  max-height: 65vh;
   transition: transform 0.3s ease;
   user-select: none;
   pointer-events: all;
   cursor: grab;
-  max-width: 100%;
-  height: auto;
-  display: block;
+  transform-origin: center center;
 }
 
 
