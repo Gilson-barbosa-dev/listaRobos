@@ -267,13 +267,25 @@ imagem.addEventListener('mouseleave', () => {
 imagem.addEventListener('mousemove', (e) => {
   if (!isDragging) return;
   e.preventDefault();
+
   const x = e.clientX;
   const y = e.clientY;
   const walkX = (x - startX);
   const walkY = (y - startY);
-  container.scrollLeft = scrollLeft - walkX;
-  container.scrollTop = scrollTop - walkY;
+
+  let nextScrollLeft = scrollLeft - walkX;
+  let nextScrollTop = scrollTop - walkY;
+
+  // Limites horizontais
+  nextScrollLeft = Math.max(0, Math.min(nextScrollLeft, container.scrollWidth - container.clientWidth));
+
+  // Limites verticais
+  nextScrollTop = Math.max(0, Math.min(nextScrollTop, container.scrollHeight - container.clientHeight));
+
+  container.scrollLeft = nextScrollLeft;
+  container.scrollTop = nextScrollTop;
 });
+
 
 function zoomIn() {
   zoomLevel = Math.min(zoomLevel + 0.2, 3);
