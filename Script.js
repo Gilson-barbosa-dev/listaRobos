@@ -242,6 +242,7 @@ imagem.addEventListener('wheel', (e) => {
   zoomLevel += e.deltaY * -0.001;
   zoomLevel = Math.min(Math.max(zoomLevel, 1), 3);
   imagem.style.transform = `scale(${zoomLevel})`;
+});
 
   if (zoomLevel > 1) {
     container.style.overflow = 'auto';
@@ -256,10 +257,10 @@ imagem.addEventListener('mousedown', (e) => {
   if (zoomLevel === 1) return;
   isDragging = true;
   imagem.style.cursor = 'grabbing';
-  startX = e.pageX;
-  startY = e.pageY;
-  scrollLeft = container.scrollLeft;
-  scrollTop = container.scrollTop;
+  startX = e.clientX;
+  startY = e.clientY;
+  scrollLeft = imagem.parentElement.scrollLeft;
+  scrollTop = imagem.parentElement.scrollTop;
 });
 
 imagem.addEventListener('mouseup', () => {
@@ -275,12 +276,15 @@ imagem.addEventListener('mouseleave', () => {
 imagem.addEventListener('mousemove', (e) => {
   if (!isDragging) return;
   e.preventDefault();
-  const x = e.pageX;
-  const y = e.pageY;
+  const x = e.clientX;
+  const y = e.clientY;
   const walkX = (x - startX);
   const walkY = (y - startY);
-  container.scrollLeft = scrollLeft - walkX;
-  container.scrollTop = scrollTop - walkY;
+  const wrapper = imagem.parentElement;
+
+  // trava o scroll para não sair do contêiner
+  wrapper.scrollLeft = scrollLeft - walkX;
+  wrapper.scrollTop = scrollTop - walkY;
 });
 
 function zoomIn() {
