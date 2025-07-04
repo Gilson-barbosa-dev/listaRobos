@@ -280,8 +280,8 @@ imagem.addEventListener('mousedown', (e) => {
   if (zoomLevel === 1) return;
   isDragging = true;
   imagem.style.cursor = 'grabbing';
-  startX = e.pageX - imagem.offsetLeft;
-  startY = e.pageY - imagem.offsetTop;
+  startX = e.pageX;
+  startY = e.pageY;
   scrollLeft = imagem.parentElement.scrollLeft;
   scrollTop = imagem.parentElement.scrollTop;
 });
@@ -299,8 +299,8 @@ imagem.addEventListener('mouseleave', () => {
 imagem.addEventListener('mousemove', (e) => {
   if (!isDragging) return;
   e.preventDefault();
-  const x = e.pageX - imagem.offsetLeft;
-  const y = e.pageY - imagem.offsetTop;
+  const x = e.pageX;
+  const y = e.pageY;
   const walkX = (x - startX);
   const walkY = (y - startY);
   imagem.parentElement.scrollLeft = scrollLeft - walkX;
