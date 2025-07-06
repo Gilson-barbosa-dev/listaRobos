@@ -1,22 +1,28 @@
 name: Deploy Vite React para GitHub Pages (estrutura /painel)
+
 on:
   push:
     branches:
       - main
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
+
       - name: Instalar Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
+
       - name: Instalar dependências e build (na pasta /painel)
         working-directory: ./painel
         run: |
           npm install
           npm run build
+
       - name: Deploy para GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
