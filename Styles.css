@@ -212,9 +212,10 @@ button {
   transition: transform 0.3s ease;
   user-select: none;
   pointer-events: all;
-  cursor: grab;
+  cursor: default;
   transform-origin: center center;
   object-fit: contain; /* Mantém a imagem dentro do espaço visível */
+  -webkit-user-drag: none;
 }
 
 .imagem-scrollable {
