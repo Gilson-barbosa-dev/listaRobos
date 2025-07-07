@@ -1,99 +1,118 @@
-// Script.js para o Painel com toggle moderno de tema e carregamento da API
+// Script.js para o Painel com toggle moderno de tema
 let estrategiasGlobais = [];
 
-// Ao carregar a página
 document.addEventListener('DOMContentLoaded', () => {
   const toggle = document.getElementById('toggle-tema');
   const temaSalvo = localStorage.getItem("temaEscolhido") || "tema-escuro";
   document.body.classList.add(temaSalvo);
-  toggle.checked = temaSalvo === "tema-escuro";
+  if (toggle) toggle.checked = temaSalvo === "tema-escuro";
 
-  toggle.addEventListener('change', () => {
-    const novoTema = toggle.checked ? "tema-escuro" : "tema-claro";
-    document.body.classList.remove("tema-claro", "tema-escuro");
-    document.body.classList.add(novoTema);
-    localStorage.setItem("temaEscolhido", novoTema);
-  });
+  if (toggle) {
+    toggle.addEventListener('change', () => {
+      const novoTema = toggle.checked ? "tema-escuro" : "tema-claro";
+      document.body.classList.remove("tema-claro", "tema-escuro");
+      document.body.classList.add(novoTema);
+      localStorage.setItem("temaEscolhido", novoTema);
+
+      if (document.getElementById("modalGrafico")?.style.display === "flex") {
+        const magicAtual = document.getElementById("tituloGrafico").innerText.split("Magic ")[1];
+        if (magicAtual) {
+          if (window.renderizarGrafico) renderizarGrafico(magicAtual);
+        }
+      }
+    });
+  }
 
   carregarEstrategias();
 });
 
 async function carregarEstrategias() {
   try {
-    const resposta = await fetch('https://apirobos-production.up.railway.app/dados');
-    const dados = await resposta.json();
-    estrategiasGlobais = dados;
-    renderizarCards(dados);
-  } catch (erro) {
-    console.error('Erro ao buscar dados da API:', erro);
+    const res = await fetch("https://apirobos-production.up.railway.app/dados");
+    const estrategias = await res.json();
+    estrategiasGlobais = estrategias;
+    renderizarCards(estrategias);
+  } catch (error) {
+    console.error("Erro ao carregar estratégias:", error);
   }
 }
 
 function renderizarCards(estrategias) {
-  const painel = document.getElementById("painel");
-  painel.innerHTML = "";
-  estrategias.forEach(estrategia => {
+  const container = document.getElementById("cards");
+  container.innerHTML = "";
+
+  estrategias.forEach(est => {
     const card = document.createElement("div");
     card.className = "card";
+
     card.innerHTML = `
-      <h3>${estrategia.estrategia}</h3>
-      <p><strong>Ativo:</strong> ${estrategia.ativo}</p>
-      <p><strong>Lucro:</strong> $${estrategia.lucro_total.toFixed(2)}</p>
-      <p><strong>Operações:</strong> ${estrategia.total_operacoes}</p>
-      <p><strong>Assertividade:</strong> ${estrategia.assertividade.toFixed(2)}%</p>
-      <p><strong>Ret/DD:</strong> ${calcRetDD(estrategia).toFixed(2)}</p>
-      <button onclick="abrirGrafico(${estrategia.magic}, '${estrategia.estrategia}')">📊 Ver gráfico</button>
+      <h2>${est.estrategia}</h2>
+      <p><strong>Magic:</strong> ${est.magic}</p>
+      <p><strong>Ativo:</strong> ${est.ativo}</p>
+      <p><strong>Lucro Total:</strong> $${est.lucro_total.toFixed(2)}</p>
+      <p><strong>Operações:</strong> ${est.total_operacoes}</p>
+      <p><strong>Assertividade:</strong> ${est.assertividade.toFixed(2)}%</p>
+      <div class="card-buttons">
+        <button onclick="abrirGrafico(${est.magic}, '${est.estrategia}')">📊 Ver gráfico</button>
+        <button onclick="copiarMagic(${est.magic})">🔗 Copiar Magic</button>
+      </div>
     `;
-    painel.appendChild(card);
+
+    container.appendChild(card);
   });
 }
 
-function calcRetDD(estrategia) {
-  // Exemplo: lucro dividido por drawdown simulado
-  return estrategia.lucro_total / (estrategia.lucro_total / (estrategia.assertividade / 100) + 1);
+function copiarMagic(magic) {
+  navigator.clipboard.writeText(magic).then(() => {
+    alert("Magic copiado: " + magic);
+  });
 }
 
-async function abrirGrafico(magic, nome) {
-  const modal = document.getElementById("modalGrafico");
-  const titulo = document.getElementById("tituloGrafico");
-  const canvas = document.getElementById("graficoEstrategia");
-
-  titulo.innerText = `Gráfico da Estratégia: Magic ${magic}`;
-  modal.style.display = "flex";
-
+async function abrirGrafico(magic, estrategia) {
   try {
-    const resposta = await fetch(`https://apirobos-production.up.railway.app/historico/${magic}`);
-    const historico = await resposta.json();
+    const res = await fetch("https://apirobos-production.up.railway.app/historico/" + magic);
+    const dados = await res.json();
 
-    const labels = historico.map(d => d.data_ordem);
-    const lucros = historico.map(d => d.lucro);
+    const labels = dados.map(item => item.data_ordem);
+    const lucros = dados.map(item => item.lucro);
+    const acumulado = lucros.reduce((acc, val, i) => {
+      acc.push((acc[i - 1] || 0) + val);
+      return acc;
+    }, []);
 
-    new Chart(canvas, {
+    const ctx = document.getElementById("graficoCanvas").getContext("2d");
+    if (window.chartInstance) window.chartInstance.destroy();
+
+    window.chartInstance = new Chart(ctx, {
       type: 'line',
       data: {
         labels,
         datasets: [{
-          label: 'Lucro por Ordem',
-          data: lucros,
+          label: 'Lucro Acumulado',
+          data: acumulado,
           borderWidth: 2,
-          fill: false
+          tension: 0.2,
+          pointRadius: 0
         }]
       },
       options: {
         responsive: true,
+        plugins: {
+          legend: { display: false }
+        },
         scales: {
-          y: {
-            beginAtZero: true
-          }
+          x: { ticks: { display: false } }
         }
       }
     });
-  } catch (erro) {
-    console.error('Erro ao carregar gráfico:', erro);
-  }
 
-  document.getElementById("fecharModal").onclick = () => {
-    modal.style.display = "none";
-    canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
-  };
+    document.getElementById("tituloGrafico").innerText = `Gráfico - Magic ${magic}`;
+    document.getElementById("modalGrafico").style.display = "flex";
+  } catch (error) {
+    console.error("Erro ao abrir gráfico:", error);
+  }
+}
+
+function fecharModal() {
+  document.getElementById("modalGrafico").style.display = "none";
 }
