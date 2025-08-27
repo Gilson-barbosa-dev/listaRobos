@@ -1,3 +1,66 @@
+/* -------- DASHBOARD CONSOLIDADO -------- */
+.dashboard-consolidado {
+  background: rgba(0,0,0,0.7);
+  border-radius: 16px;
+  margin: 24px auto 32px auto;
+  padding: 24px 16px;
+  max-width: 1200px;
+  box-shadow: 0 0 24px rgba(0,255,179,0.10);
+}
+.dashboard-consolidado .kpis {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 32px;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+.dashboard-consolidado .kpi {
+  background: rgba(0,255,179,0.08);
+  border-radius: 10px;
+  padding: 16px 24px;
+  min-width: 120px;
+  text-align: center;
+  font-size: 22px;
+  color: #00ffb3;
+  font-weight: 600;
+  box-shadow: 0 0 8px rgba(0,255,179,0.10);
+}
+.dashboard-consolidado .kpi small {
+  display: block;
+  font-size: 13px;
+  color: #b0fbe0;
+  font-weight: 400;
+}
+.graficos-dashboard {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 32px;
+  justify-content: center;
+}
+.grafico-dashboard {
+  background: rgba(0,255,179,0.04);
+  border-radius: 10px;
+  padding: 12px;
+  min-width: 320px;
+  min-height: 220px;
+  max-width: 400px;
+  flex: 1 1 320px;
+  box-shadow: 0 0 8px rgba(0,255,179,0.08);
+}
+.tema-claro .dashboard-consolidado {
+  background: #f8f8f8;
+  box-shadow: 0 0 24px rgba(0,184,156,0.10);
+}
+.tema-claro .dashboard-consolidado .kpi {
+  background: #e0fff7;
+  color: #00b89c;
+}
+.tema-claro .dashboard-consolidado .kpi small {
+  color: #00b89c;
+}
+.tema-claro .grafico-dashboard {
+  background: #f4fefb;
+}
 /* ---------- ESTILO GERAL DO PAINEL ---------- */
 body {
   font-family: 'Inter', sans-serif;

@@ -1,5 +1,6 @@
 let estrategiasGlobais = [];
 
+
 document.addEventListener('DOMContentLoaded', () => {
   const toggle = document.getElementById('toggle-tema');
   const temaSalvo = localStorage.getItem("temaEscolhido") || "tema-escuro";
@@ -22,9 +23,18 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => abrirGrafico(parseInt(magicAtual)), 50);
       }
     }
+    desenharDashboardConsolidado();
   });
 
   carregarEstrategias();
+
+  // Carregar ApexCharts dinamicamente se não estiver presente
+  if (typeof ApexCharts === 'undefined') {
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/apexcharts';
+    script.onload = desenharDashboardConsolidado;
+    document.head.appendChild(script);
+  }
 });
 
 async function carregarEstrategias() {
@@ -48,8 +58,89 @@ async function carregarEstrategias() {
     const estrategias = await resposta.json();
     localStorage.setItem(cacheKey, JSON.stringify(estrategias));
     localStorage.setItem(cacheTimeKey, now.toString());
-    estrategiasGlobais = ordenarEstrategias(estrategias);
-    renderizar(estrategiasGlobais);
+  estrategiasGlobais = ordenarEstrategias(estrategias);
+  renderizar(estrategiasGlobais);
+  desenharDashboardConsolidado();
+// DASHBOARD CONSOLIDADO
+function desenharDashboardConsolidado() {
+  if (!window.estrategiasGlobais || !Array.isArray(estrategiasGlobais) || estrategiasGlobais.length === 0) return;
+  // KPIs
+  let vencedoras = 0, perdedoras = 0, trades = 0, lucro = 0, fatorLucro = 0, retornoDD = 0;
+  let lucroTotal = 0, perdaTotal = 0, maxDrawdown = 0;
+  let assertVencedoras = 0, assertPerdedoras = 0;
+  let lucroDiario = {};
+  estrategiasGlobais.forEach(e => {
+    trades += e.total_operacoes || 0;
+    lucro += e.lucro_total || 0;
+    if (e.lucro_total > 0) vencedoras++;
+    else perdedoras++;
+    if (e.assertividade >= 50) assertVencedoras++;
+    else assertPerdedoras++;
+    // Fator de lucro e drawdown
+    lucroTotal += e.vencedoras || 0;
+    perdaTotal += Math.abs(e.perdedoras || 0);
+    if (e.max_drawdown && e.max_drawdown > maxDrawdown) maxDrawdown = e.max_drawdown;
+    // Lucro diário (simples, por data de início)
+    if (e.inicio && e.lucro_total) {
+      const dia = e.inicio.split('T')[0] || e.inicio.split(' ')[0];
+      if (!lucroDiario[dia]) lucroDiario[dia] = 0;
+      lucroDiario[dia] += e.lucro_total;
+    }
+  });
+  fatorLucro = perdaTotal > 0 ? (lucroTotal / perdaTotal).toFixed(2) : '—';
+  retornoDD = maxDrawdown > 0 ? (lucro / maxDrawdown).toFixed(2) : '—';
+
+  document.getElementById('kpi-vencedoras').innerText = vencedoras;
+  document.getElementById('kpi-perdedoras').innerText = perdedoras;
+  document.getElementById('kpi-trades').innerText = trades;
+  document.getElementById('kpi-lucro').innerText = lucro.toFixed(2);
+  document.getElementById('kpi-fator-lucro').innerText = fatorLucro;
+  document.getElementById('kpi-retorno-dd').innerText = retornoDD;
+
+  // Gráfico de lucro diário (área)
+  const dias = Object.keys(lucroDiario).sort();
+  const lucros = dias.map(d => lucroDiario[d]);
+  if (window.chartLucroDiario) window.chartLucroDiario.destroy();
+  window.chartLucroDiario = new ApexCharts(document.querySelector("#grafico-lucro-diario"), {
+    chart: { type: 'area', height: 220, toolbar: { show: false }, fontFamily: 'Inter, sans-serif', foreColor: getCorTextoDashboard() },
+    series: [{ name: 'Lucro Diário', data: lucros }],
+    xaxis: { categories: dias, labels: { rotate: -45 } },
+    colors: [getCorLinhaDashboard()],
+    dataLabels: { enabled: false },
+    fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.5, opacityTo: 0.1 } },
+    grid: { borderColor: 'rgba(0,255,179,0.10)' },
+  });
+  window.chartLucroDiario.render();
+
+  // Gráfico de rosca vencedoras x perdedoras
+  if (window.chartVencedorasPerdedoras) window.chartVencedorasPerdedoras.destroy();
+  window.chartVencedorasPerdedoras = new ApexCharts(document.querySelector("#grafico-vencedoras-perdedoras"), {
+    chart: { type: 'donut', height: 220, fontFamily: 'Inter, sans-serif', foreColor: getCorTextoDashboard() },
+    series: [vencedoras, perdedoras],
+    labels: ['Vencedoras', 'Perdedoras'],
+    colors: ['#00ffb3', '#ff4d4d'],
+    legend: { show: true, position: 'bottom' },
+  });
+  window.chartVencedorasPerdedoras.render();
+
+  // Gráfico de rosca assertividade
+  if (window.chartAssertividade) window.chartAssertividade.destroy();
+  window.chartAssertividade = new ApexCharts(document.querySelector("#grafico-assertividade"), {
+    chart: { type: 'donut', height: 220, fontFamily: 'Inter, sans-serif', foreColor: getCorTextoDashboard() },
+    series: [assertVencedoras, assertPerdedoras],
+    labels: ['Assert. >= 50%', 'Assert. < 50%'],
+    colors: ['#00b89c', '#ffb84d'],
+    legend: { show: true, position: 'bottom' },
+  });
+  window.chartAssertividade.render();
+}
+
+function getCorTextoDashboard() {
+  return document.body.classList.contains('tema-escuro') ? '#fff' : '#111';
+}
+function getCorLinhaDashboard() {
+  return document.body.classList.contains('tema-escuro') ? '#00ffb3' : '#00b89c';
+}
   } catch (erro) {
     console.error('Erro ao carregar estratégias:', erro);
   }
