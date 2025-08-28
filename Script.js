@@ -27,7 +27,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   carregarEstrategias();
 
-  // Carregar ApexCharts dinamicamente se não estiver presente
   if (typeof ApexCharts === 'undefined') {
     const script = document.createElement('script');
     script.src = 'https://cdn.jsdelivr.net/npm/apexcharts';
@@ -37,27 +36,9 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function carregarEstrategias() {
-  const cacheKey = 'estrategias_cache';
-  const cacheTimeKey = 'estrategias_cache_time';
-  const cacheTime = 60000;
-  const now = Date.now();
-  const lastFetch = parseInt(localStorage.getItem(cacheTimeKey), 10) || 0;
-  if (now - lastFetch < cacheTime) {
-    try {
-      const cached = JSON.parse(localStorage.getItem(cacheKey));
-      if (cached) {
-        estrategiasGlobais = ordenarEstrategias(cached);
-        renderizar(estrategiasGlobais);
-        desenharDashboardConsolidado();
-        return;
-      }
-    } catch (e) {}
-  }
   try {
     const resposta = await fetch('https://apirobos-production.up.railway.app/dados');
     const estrategias = await resposta.json();
-    localStorage.setItem(cacheKey, JSON.stringify(estrategias));
-    localStorage.setItem(cacheTimeKey, now.toString());
     estrategiasGlobais = ordenarEstrategias(estrategias);
     renderizar(estrategiasGlobais);
     desenharDashboardConsolidado();
@@ -68,7 +49,7 @@ async function carregarEstrategias() {
 
 // DASHBOARD CONSOLIDADO
 function desenharDashboardConsolidado() {
-  if (!estrategiasGlobais || !Array.isArray(estrategiasGlobais) || estrategiasGlobais.length === 0) return;
+  if (!estrategiasGlobais || estrategiasGlobais.length === 0) return;
 
   let vencedoras = 0, perdedoras = 0, trades = 0, lucro = 0;
   let assertVencedoras = 0, assertPerdedoras = 0;
@@ -76,26 +57,13 @@ function desenharDashboardConsolidado() {
   let lucroDiario = {};
 
   estrategiasGlobais.forEach(e => {
-    // Vencedoras / Perdedoras
     if (e.lucro_total > 0) vencedoras++; else perdedoras++;
-
-    // Assertividade
     if (e.assertividade >= 50) assertVencedoras++; else assertPerdedoras++;
-
-    // Trades
     trades += e.total_operacoes || 0;
-
-    // Lucro total
     lucro += e.lucro_total || 0;
-
-    // Para fator de lucro
     if (e.lucro_total > 0) lucroPositivo += e.lucro_total;
     if (e.lucro_total < 0) perdaNegativa += Math.abs(e.lucro_total);
-
-    // Drawdown (se existir)
     if (e.max_drawdown && e.max_drawdown > maxDrawdown) maxDrawdown = e.max_drawdown;
-
-    // Lucro diário agrupado por data
     if (e.inicio && e.lucro_total) {
       let dia = e.inicio.split('T')[0] || e.inicio.split(' ')[0];
       if (!lucroDiario[dia]) lucroDiario[dia] = 0;
@@ -103,12 +71,10 @@ function desenharDashboardConsolidado() {
     }
   });
 
-  // Fator de lucro: lucros / perdas
   let fatorLucro = (perdaNegativa > 0) ? (lucroPositivo / perdaNegativa).toFixed(2) : '—';
-  // Retorno sobre drawdown
   let retornoDD = (maxDrawdown > 0) ? (lucro / maxDrawdown).toFixed(2) : '—';
 
-  // Preencher KPIs
+  // KPIs formatados
   document.getElementById('kpi-vencedoras').innerText = vencedoras;
   document.getElementById('kpi-perdedoras').innerText = perdedoras;
   document.getElementById('kpi-trades').innerText = trades;
@@ -121,39 +87,28 @@ function desenharDashboardConsolidado() {
   const corLinha = temaEscuro ? '#00ffb3' : '#00b89c';
   const bgGrid = temaEscuro ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)';
 
-  // Gráfico de lucro diário (área)
+  // Gráfico de lucro diário em destaque
   const dias = Object.keys(lucroDiario).sort();
-  const lucros = dias.map(d => lucroDiario[d]);
+  const lucros = dias.map(d => parseFloat(lucroDiario[d].toFixed(2))); // 2 casas decimais
   if (window.chartLucroDiario) window.chartLucroDiario.destroy();
   window.chartLucroDiario = new ApexCharts(document.querySelector("#grafico-lucro-diario"), {
-    chart: { type: 'area', height: 220, toolbar: { show: false }, foreColor: corTexto, fontFamily: 'Inter, sans-serif' },
+    chart: { type: 'area', height: 420, toolbar: { show: true }, foreColor: corTexto, fontFamily: 'Inter, sans-serif' },
     series: [{ name: 'Lucro Diário', data: lucros }],
     xaxis: { categories: dias, labels: { rotate: -45 } },
+    yaxis: { labels: { formatter: val => val.toFixed(2) } },
     colors: [corLinha],
     dataLabels: { enabled: false },
-    stroke: { curve: 'smooth', width: 2 },
+    stroke: { curve: 'smooth', width: 3 },
     fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.5, opacityTo: 0.05, stops: [0, 90, 100] } },
     grid: { borderColor: bgGrid },
-    tooltip: { theme: temaEscuro ? 'dark' : 'light' }
+    tooltip: { theme: temaEscuro ? 'dark' : 'light', y: { formatter: val => val.toFixed(2) } }
   });
   window.chartLucroDiario.render();
 
-  // Gráfico de rosca vencedoras x perdedoras
-  if (window.chartVencedorasPerdedoras) window.chartVencedorasPerdedoras.destroy();
-  window.chartVencedorasPerdedoras = new ApexCharts(document.querySelector("#grafico-vencedoras-perdedoras"), {
-    chart: { type: 'donut', height: 220, foreColor: corTexto, fontFamily: 'Inter, sans-serif' },
-    series: [vencedoras, perdedoras],
-    labels: ['Vencedoras', 'Perdedoras'],
-    colors: ['#00ffb3', '#ff4d4d'],
-    legend: { show: true, position: 'bottom', labels: { colors: corTexto } },
-    tooltip: { theme: temaEscuro ? 'dark' : 'light' }
-  });
-  window.chartVencedorasPerdedoras.render();
-
-  // Gráfico de rosca assertividade
+  // Apenas gráfico de assertividade continua
   if (window.chartAssertividade) window.chartAssertividade.destroy();
   window.chartAssertividade = new ApexCharts(document.querySelector("#grafico-assertividade"), {
-    chart: { type: 'donut', height: 220, foreColor: corTexto, fontFamily: 'Inter, sans-serif' },
+    chart: { type: 'donut', height: 280, foreColor: corTexto, fontFamily: 'Inter, sans-serif' },
     series: [assertVencedoras, assertPerdedoras],
     labels: ['Assert. ≥ 50%', 'Assert. < 50%'],
     colors: ['#00b89c', '#ffb84d'],
@@ -206,193 +161,3 @@ function renderizar(lista) {
     painel.appendChild(card);
   });
 }
-
-// ---------------- GRÁFICO DETALHADO POR ESTRATÉGIA ----------------
-function abrirGrafico(magic) {
-  fetch(`https://apirobos-production.up.railway.app/historico_detalhado/${magic}`)
-    .then(res => res.json())
-    .then(data => {
-      const ctx = document.getElementById('graficoLucro').getContext('2d');
-      const labels = [];
-      const lucroAcumulado = [];
-      let acumulado = 0;
-
-      for (const item of data) {
-        let lucro = parseFloat(
-          typeof item.lucro_total === "string" ? item.lucro_total.replace(",", ".") : item.lucro_total
-        );
-        if (isNaN(lucro)) lucro = 0;
-        labels.push(item.data);
-        acumulado += lucro;
-        lucroAcumulado.push(acumulado);
-      }
-
-      if (window.graficoInstancia) window.graficoInstancia.destroy();
-
-      const temaEscuro = document.body.classList.contains("tema-escuro");
-      const corTexto = temaEscuro ? "#ffffff" : "#111111";
-      const corLinha = temaEscuro ? "#00ffb3" : "#00b89c";
-      const hasDados = labels.length > 0 && lucroAcumulado.some(l => l !== 0);
-
-      window.graficoInstancia = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: hasDados ? labels : ["Sem dados"],
-          datasets: [{
-            label: hasDados ? 'Lucro Acumulado' : 'Nenhum dado encontrado',
-            data: hasDados ? lucroAcumulado : [0],
-            fill: false,
-            borderColor: corLinha,
-            tension: 0.3
-          }]
-        },
-        options: {
-          plugins: {
-            legend: { labels: { color: corTexto } },
-            tooltip: { callbacks: { label: ctx => `Lucro acumulado: ${ctx.raw.toFixed(2)}` } }
-          },
-          scales: {
-            x: { ticks: { color: corTexto } },
-            y: { ticks: { color: corTexto } }
-          }
-        },
-        plugins: [{
-          id: 'fundoPersonalizado',
-          beforeDraw: (chart) => {
-            const ctx = chart.canvas.getContext('2d');
-            ctx.save();
-            ctx.globalCompositeOperation = 'destination-over';
-            ctx.fillStyle = temaEscuro ? '#0e0e0e' : '#ffffff';
-            ctx.fillRect(0, 0, chart.width, chart.height);
-            ctx.restore();
-          }
-        }]
-      });
-
-      document.getElementById('tituloGrafico').innerText = `Histórico: Magic ${magic}`;
-      document.getElementById('modalGrafico').style.display = 'flex';
-    })
-    .catch(err => {
-      console.error("Erro ao carregar gráfico:", err);
-      alert("Não foi possível carregar o gráfico.");
-    });
-}
-
-function fecharModal() {
-  document.getElementById('modalGrafico').style.display = 'none';
-}
-
-// ---------------- FILTRO E ORDENAÇÃO ----------------
-document.getElementById('filtro').addEventListener('input', e => {
-  const termo = e.target.value.toLowerCase();
-  const filtradas = estrategiasGlobais.filter(e =>
-    e.magic.toString().includes(termo) || (e.ativo || '').toLowerCase().includes(termo)
-  );
-  renderizar(ordenarEstrategias(filtradas));
-});
-
-document.getElementById('ordenar').addEventListener('change', () => {
-  renderizar(ordenarEstrategias(estrategiasGlobais));
-});
-
-// ---------------- MODAL ESTATÍSTICAS ----------------
-let imagemAtual = 0;
-let imagensEstatisticas = [];
-let scale = 1;
-let isDragging = false;
-let startX, startY, posX = 0, posY = 0;
-
-const imagem = document.getElementById('imagemEstatistica');
-const container = document.getElementById('containerImagem');
-
-window.abrirEstatisticas = function(magic) {
-  imagensEstatisticas = [
-    `./img/estatisticas/${magic}_1.png`,
-    `./img/estatisticas/${magic}_2.png`,
-    `./img/estatisticas/${magic}_3.png`
-  ];
-  imagemAtual = 0;
-  atualizarImagem();
-  document.getElementById('tituloEstatistica').innerText = `Estatísticas: Magic ${magic}`;
-  document.getElementById('modalEstatisticas').style.display = 'flex';
-};
-
-function atualizarImagem() {
-  scale = 1;
-  posX = 0;
-  posY = 0;
-  imagem.style.transform = 'scale(1)';
-  imagem.src = imagensEstatisticas[imagemAtual];
-  container.scrollLeft = 0;
-  container.scrollTop = 0;
-}
-
-function imagemAnterior() {
-  if (imagemAtual > 0) {
-    imagemAtual--;
-    atualizarImagem();
-  }
-}
-
-function imagemProxima() {
-  if (imagemAtual < imagensEstatisticas.length - 1) {
-    imagemAtual++;
-    atualizarImagem();
-  }
-}
-
-function fecharModalEstatisticas() {
-  document.getElementById('modalEstatisticas').style.display = 'none';
-  imagem.src = '';
-}
-
-function applyTransform() {
-  imagem.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
-}
-
-function zoomIn() {
-  scale += 0.2;
-  applyTransform();
-}
-
-function zoomOut() {
-  scale = Math.max(1, scale - 0.2);
-  posX = 0;
-  posY = 0;
-  applyTransform();
-}
-
-function resetZoom() {
-  scale = 1;
-  posX = 0;
-  posY = 0;
-  applyTransform();
-}
-
-// Arrastar imagem no modal
-imagem.addEventListener("mousedown", (e) => {
-  if (scale <= 1) return;
-  isDragging = true;
-  startX = e.clientX - posX;
-  startY = e.clientY - posY;
-  imagem.style.cursor = "grabbing";
-});
-
-document.addEventListener("mouseup", () => {
-  isDragging = false;
-  imagem.style.cursor = "grab";
-});
-
-document.addEventListener("mousemove", (e) => {
-  if (!isDragging || scale <= 1) return;
-  let newX = e.clientX - startX;
-  let newY = e.clientY - startY;
-
-  const boundsX = (imagem.clientWidth * scale - container.clientWidth) / 2;
-  const boundsY = (imagem.clientHeight * scale - container.clientHeight) / 2;
-
-  posX = Math.max(-boundsX, Math.min(boundsX, newX));
-  posY = Math.max(-boundsY, Math.min(boundsY, newY));
-
-  applyTransform();
-});
