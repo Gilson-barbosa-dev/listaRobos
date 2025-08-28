@@ -62,33 +62,40 @@ async function carregarEstrategias() {
   renderizar(estrategiasGlobais);
   desenharDashboardConsolidado();
 // DASHBOARD CONSOLIDADO
+
 function desenharDashboardConsolidado() {
   if (!window.estrategiasGlobais || !Array.isArray(estrategiasGlobais) || estrategiasGlobais.length === 0) return;
   // KPIs
-  let vencedoras = 0, perdedoras = 0, trades = 0, lucro = 0, fatorLucro = 0, retornoDD = 0;
-  let lucroTotal = 0, perdaTotal = 0, maxDrawdown = 0;
+  let vencedoras = 0, perdedoras = 0, trades = 0, lucro = 0, lucroTotal = 0, perdaTotal = 0, maxDrawdown = 0;
   let assertVencedoras = 0, assertPerdedoras = 0;
   let lucroDiario = {};
-  estrategiasGlobais.forEach(e => {
-    trades += e.total_operacoes || 0;
-    lucro += e.lucro_total || 0;
+  window.estrategiasGlobais.forEach(e => {
+    // Estratégia vencedora: lucro_total > 0
     if (e.lucro_total > 0) vencedoras++;
     else perdedoras++;
+    // Assertividade
     if (e.assertividade >= 50) assertVencedoras++;
     else assertPerdedoras++;
-    // Fator de lucro e drawdown
+    // Trades
+    trades += e.total_operacoes || 0;
+    // Lucro
+    lucro += e.lucro_total || 0;
+    // Para fator de lucro
     lucroTotal += e.vencedoras || 0;
-    perdaTotal += Math.abs(e.perdedoras || 0);
+    perdaTotal += e.perdedoras || 0;
+    // Drawdown
     if (e.max_drawdown && e.max_drawdown > maxDrawdown) maxDrawdown = e.max_drawdown;
-    // Lucro diário (simples, por data de início)
+    // Lucro diário (por data de início)
     if (e.inicio && e.lucro_total) {
-      const dia = e.inicio.split('T')[0] || e.inicio.split(' ')[0];
+      let dia = e.inicio.split('T')[0] || e.inicio.split(' ')[0];
       if (!lucroDiario[dia]) lucroDiario[dia] = 0;
       lucroDiario[dia] += e.lucro_total;
     }
   });
-  fatorLucro = perdaTotal > 0 ? (lucroTotal / perdaTotal).toFixed(2) : '—';
-  retornoDD = maxDrawdown > 0 ? (lucro / maxDrawdown).toFixed(2) : '—';
+  // Fator de lucro: soma das trades vencedoras / trades perdedoras
+  let fatorLucro = (perdaTotal > 0) ? (lucroTotal / perdaTotal).toFixed(2) : '—';
+  // Retorno sobre drawdown: lucro total / maior drawdown
+  let retornoDD = (maxDrawdown > 0) ? (lucro / maxDrawdown).toFixed(2) : '—';
 
   document.getElementById('kpi-vencedoras').innerText = vencedoras;
   document.getElementById('kpi-perdedoras').innerText = perdedoras;
