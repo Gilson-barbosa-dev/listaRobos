@@ -1,6 +1,5 @@
 let estrategiasGlobais = [];
 
-
 document.addEventListener('DOMContentLoaded', () => {
   const toggle = document.getElementById('toggle-tema');
   const temaSalvo = localStorage.getItem("temaEscolhido") || "tema-escuro";
@@ -58,43 +57,38 @@ async function carregarEstrategias() {
     const estrategias = await resposta.json();
     localStorage.setItem(cacheKey, JSON.stringify(estrategias));
     localStorage.setItem(cacheTimeKey, now.toString());
-  estrategiasGlobais = ordenarEstrategias(estrategias);
-  renderizar(estrategiasGlobais);
-  desenharDashboardConsolidado();
-// DASHBOARD CONSOLIDADO
+    estrategiasGlobais = ordenarEstrategias(estrategias);
+    renderizar(estrategiasGlobais);
+    desenharDashboardConsolidado();
+  } catch (erro) {
+    console.error('Erro ao carregar estratégias:', erro);
+  }
+}
 
+// DASHBOARD CONSOLIDADO - ESTILO DARK
 function desenharDashboardConsolidado() {
   if (!window.estrategiasGlobais || !Array.isArray(estrategiasGlobais) || estrategiasGlobais.length === 0) return;
-  // KPIs
+
   let vencedoras = 0, perdedoras = 0, trades = 0, lucro = 0, lucroTotal = 0, perdaTotal = 0, maxDrawdown = 0;
   let assertVencedoras = 0, assertPerdedoras = 0;
   let lucroDiario = {};
+
   window.estrategiasGlobais.forEach(e => {
-    // Estratégia vencedora: lucro_total > 0
-    if (e.lucro_total > 0) vencedoras++;
-    else perdedoras++;
-    // Assertividade
-    if (e.assertividade >= 50) assertVencedoras++;
-    else assertPerdedoras++;
-    // Trades
+    if (e.lucro_total > 0) vencedoras++; else perdedoras++;
+    if (e.assertividade >= 50) assertVencedoras++; else assertPerdedoras++;
     trades += e.total_operacoes || 0;
-    // Lucro
     lucro += e.lucro_total || 0;
-    // Para fator de lucro
     lucroTotal += e.vencedoras || 0;
     perdaTotal += e.perdedoras || 0;
-    // Drawdown
     if (e.max_drawdown && e.max_drawdown > maxDrawdown) maxDrawdown = e.max_drawdown;
-    // Lucro diário (por data de início)
     if (e.inicio && e.lucro_total) {
       let dia = e.inicio.split('T')[0] || e.inicio.split(' ')[0];
       if (!lucroDiario[dia]) lucroDiario[dia] = 0;
       lucroDiario[dia] += e.lucro_total;
     }
   });
-  // Fator de lucro: soma das trades vencedoras / trades perdedoras
+
   let fatorLucro = (perdaTotal > 0) ? (lucroTotal / perdaTotal).toFixed(2) : '—';
-  // Retorno sobre drawdown: lucro total / maior drawdown
   let retornoDD = (maxDrawdown > 0) ? (lucro / maxDrawdown).toFixed(2) : '—';
 
   document.getElementById('kpi-vencedoras').innerText = vencedoras;
@@ -104,55 +98,54 @@ function desenharDashboardConsolidado() {
   document.getElementById('kpi-fator-lucro').innerText = fatorLucro;
   document.getElementById('kpi-retorno-dd').innerText = retornoDD;
 
-  // Gráfico de lucro diário (área)
+  const temaEscuro = document.body.classList.contains('tema-escuro');
+  const corTexto = temaEscuro ? '#f8f9fa' : '#111';
+  const corLinha = temaEscuro ? '#00ffb3' : '#00b89c';
+  const bgGrid = temaEscuro ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)';
+
+  // Gráfico de lucro diário
   const dias = Object.keys(lucroDiario).sort();
   const lucros = dias.map(d => lucroDiario[d]);
   if (window.chartLucroDiario) window.chartLucroDiario.destroy();
   window.chartLucroDiario = new ApexCharts(document.querySelector("#grafico-lucro-diario"), {
-    chart: { type: 'area', height: 220, toolbar: { show: false }, fontFamily: 'Inter, sans-serif', foreColor: getCorTextoDashboard() },
+    chart: { type: 'area', height: 220, toolbar: { show: false }, foreColor: corTexto, fontFamily: 'Inter, sans-serif' },
     series: [{ name: 'Lucro Diário', data: lucros }],
     xaxis: { categories: dias, labels: { rotate: -45 } },
-    colors: [getCorLinhaDashboard()],
+    colors: [corLinha],
     dataLabels: { enabled: false },
-    fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.5, opacityTo: 0.1 } },
-    grid: { borderColor: 'rgba(0,255,179,0.10)' },
+    stroke: { curve: 'smooth', width: 2 },
+    fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.5, opacityTo: 0.05, stops: [0, 90, 100] } },
+    grid: { borderColor: bgGrid },
+    tooltip: { theme: temaEscuro ? 'dark' : 'light' }
   });
   window.chartLucroDiario.render();
 
   // Gráfico de rosca vencedoras x perdedoras
   if (window.chartVencedorasPerdedoras) window.chartVencedorasPerdedoras.destroy();
   window.chartVencedorasPerdedoras = new ApexCharts(document.querySelector("#grafico-vencedoras-perdedoras"), {
-    chart: { type: 'donut', height: 220, fontFamily: 'Inter, sans-serif', foreColor: getCorTextoDashboard() },
+    chart: { type: 'donut', height: 220, foreColor: corTexto, fontFamily: 'Inter, sans-serif' },
     series: [vencedoras, perdedoras],
     labels: ['Vencedoras', 'Perdedoras'],
     colors: ['#00ffb3', '#ff4d4d'],
-    legend: { show: true, position: 'bottom' },
+    legend: { show: true, position: 'bottom', labels: { colors: corTexto } },
+    tooltip: { theme: temaEscuro ? 'dark' : 'light' }
   });
   window.chartVencedorasPerdedoras.render();
 
   // Gráfico de rosca assertividade
   if (window.chartAssertividade) window.chartAssertividade.destroy();
   window.chartAssertividade = new ApexCharts(document.querySelector("#grafico-assertividade"), {
-    chart: { type: 'donut', height: 220, fontFamily: 'Inter, sans-serif', foreColor: getCorTextoDashboard() },
+    chart: { type: 'donut', height: 220, foreColor: corTexto, fontFamily: 'Inter, sans-serif' },
     series: [assertVencedoras, assertPerdedoras],
-    labels: ['Assert. >= 50%', 'Assert. < 50%'],
+    labels: ['Assert. ≥ 50%', 'Assert. < 50%'],
     colors: ['#00b89c', '#ffb84d'],
-    legend: { show: true, position: 'bottom' },
+    legend: { show: true, position: 'bottom', labels: { colors: corTexto } },
+    tooltip: { theme: temaEscuro ? 'dark' : 'light' }
   });
   window.chartAssertividade.render();
 }
 
-function getCorTextoDashboard() {
-  return document.body.classList.contains('tema-escuro') ? '#fff' : '#111';
-}
-function getCorLinhaDashboard() {
-  return document.body.classList.contains('tema-escuro') ? '#00ffb3' : '#00b89c';
-}
-  } catch (erro) {
-    console.error('Erro ao carregar estratégias:', erro);
-  }
-}
-
+// ---------------- FUNÇÕES DE SUPORTE ----------------
 function ordenarEstrategias(lista) {
   const criterio = document.getElementById('ordenar')?.value || 'lucro';
   const copia = [...lista];
@@ -196,6 +189,7 @@ function renderizar(lista) {
   });
 }
 
+// ---------------- GRÁFICO DETALHADO POR ESTRATÉGIA ----------------
 function abrirGrafico(magic) {
   fetch(`https://apirobos-production.up.railway.app/historico_detalhado/${magic}`)
     .then(res => res.json())
@@ -270,6 +264,7 @@ function fecharModal() {
   document.getElementById('modalGrafico').style.display = 'none';
 }
 
+// ---------------- FILTRO E ORDENAÇÃO ----------------
 document.getElementById('filtro').addEventListener('input', e => {
   const termo = e.target.value.toLowerCase();
   const filtradas = estrategiasGlobais.filter(e =>
@@ -282,10 +277,10 @@ document.getElementById('ordenar').addEventListener('change', () => {
   renderizar(ordenarEstrategias(estrategiasGlobais));
 });
 
-// Estatísticas com zoom e navegação
+// ---------------- MODAL ESTATÍSTICAS ----------------
 let imagemAtual = 0;
 let imagensEstatisticas = [];
-let zoomLevel = 1;
+let scale = 1;
 let isDragging = false;
 let startX, startY, posX = 0, posY = 0;
 
@@ -305,7 +300,6 @@ window.abrirEstatisticas = function(magic) {
 };
 
 function atualizarImagem() {
-  zoomLevel = 1;
   scale = 1;
   posX = 0;
   posY = 0;
@@ -313,7 +307,6 @@ function atualizarImagem() {
   imagem.src = imagensEstatisticas[imagemAtual];
   container.scrollLeft = 0;
   container.scrollTop = 0;
-  container.style.overflow = 'hidden';
 }
 
 function imagemAnterior() {
@@ -358,7 +351,7 @@ function resetZoom() {
   applyTransform();
 }
 
-// Arrastar imagem
+// Arrastar imagem no modal
 imagem.addEventListener("mousedown", (e) => {
   if (scale <= 1) return;
   isDragging = true;

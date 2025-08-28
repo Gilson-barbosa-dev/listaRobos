@@ -2,7 +2,7 @@
 .dashboard-consolidado {
   background: rgba(0,0,0,0.7);
   border-radius: 16px;
-  margin: 24px auto 32px auto;
+  margin: 32px auto; /* 🔹 mais espaçamento */
   padding: 24px 16px;
   max-width: 1200px;
   box-shadow: 0 0 24px rgba(0,255,179,0.10);
@@ -47,6 +47,8 @@
   flex: 1 1 320px;
   box-shadow: 0 0 8px rgba(0,255,179,0.08);
 }
+
+/* Tema claro para o dashboard */
 .tema-claro .dashboard-consolidado {
   background: #f8f8f8;
   box-shadow: 0 0 24px rgba(0,184,156,0.10);
@@ -61,6 +63,7 @@
 .tema-claro .grafico-dashboard {
   background: #f4fefb;
 }
+
 /* ---------- ESTILO GERAL DO PAINEL ---------- */
 body {
   font-family: 'Inter', sans-serif;
@@ -82,7 +85,7 @@ h1 {
   flex-direction: column;
   align-items: center;
   gap: 12px;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .top-bar input,
@@ -125,7 +128,6 @@ h1 {
     justify-content: center;
     gap: 16px;
   }
-
   .top-bar input,
   .top-bar select {
     width: 260px;
@@ -138,7 +140,7 @@ h1 {
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 24px;
   max-width: 1200px;
-  margin: 0 auto;
+  margin: 32px auto; /* 🔹 espaçamento entre dashboard e cards */
 }
 
 .card {
@@ -238,7 +240,7 @@ button {
   display: flex;
   flex-direction: column;
   align-items: center;
-  overflow: hidden; /* Garante que a imagem fique dentro */
+  overflow: hidden;
 }
 
 .tema-escuro .modal-content {
@@ -277,11 +279,11 @@ button {
   pointer-events: all;
   cursor: grab;
   transform-origin: center center;
-  object-fit: contain; /* Mantém a imagem dentro do espaço visível */
+  object-fit: contain;
 }
 
 .imagem-scrollable {
-  overflow: hidden; /* evita scroll */
+  overflow: hidden;
   position: relative;
   width: 100%;
   max-height: 65vh;
@@ -289,7 +291,6 @@ button {
   justify-content: center;
   align-items: center;
 }
-
 
 .zoom-controls-vertical-fixed {
   position: absolute;
