@@ -104,13 +104,18 @@ function desenharDashboardConsolidado() {
   const corLinha = temaEscuro ? '#00ffb3' : '#00b89c';
   const bgGrid = temaEscuro ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)';
 
-  // Gráfico de lucro diário maior
+  // 🔹 Lucro diário acumulado
   const dias = Object.keys(lucroDiario).sort();
-  const lucros = dias.map(d => parseFloat(lucroDiario[d].toFixed(2)));
+  let acumulado = 0;
+  const lucros = dias.map(d => {
+    acumulado += lucroDiario[d];
+    return parseFloat(acumulado.toFixed(2));
+  });
+
   if (window.chartLucroDiario) window.chartLucroDiario.destroy();
   window.chartLucroDiario = new ApexCharts(document.querySelector("#grafico-lucro-diario"), {
     chart: { type: 'area', height: 420, toolbar: { show: true }, foreColor: corTexto, fontFamily: 'Inter, sans-serif' },
-    series: [{ name: 'Lucro Diário', data: lucros }],
+    series: [{ name: 'Lucro Acumulado', data: lucros }],
     xaxis: { categories: dias, labels: { rotate: -45 } },
     yaxis: { labels: { formatter: val => val.toFixed(2) } },
     colors: [corLinha],
@@ -122,12 +127,10 @@ function desenharDashboardConsolidado() {
   });
   window.chartLucroDiario.render();
 
-  // ❌ removido gráfico de vencedoras/perdedoras
-
-  // Apenas gráfico de assertividade
+  // 🔹 Gráfico de assertividade
   if (window.chartAssertividade) window.chartAssertividade.destroy();
   window.chartAssertividade = new ApexCharts(document.querySelector("#grafico-assertividade"), {
-    chart: { type: 'donut', height: 220, foreColor: corTexto, fontFamily: 'Inter, sans-serif' },
+    chart: { type: 'donut', height: 280, foreColor: corTexto, fontFamily: 'Inter, sans-serif' },
     series: [assertVencedoras, assertPerdedoras],
     labels: ['Assert. ≥ 50%', 'Assert. < 50%'],
     colors: ['#00b89c', '#ffb84d'],
