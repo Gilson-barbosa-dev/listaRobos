@@ -48,6 +48,13 @@
   box-shadow: 0 0 8px rgba(0,255,179,0.08);
 }
 
+/* 🔹 Lucro diário ocupa toda a largura */
+.grafico-dashboard.grafico-full {
+  flex: 1 1 100%;
+  min-height: 420px;
+  max-width: 100%;
+}
+
 /* Tema claro para o dashboard */
 .tema-claro .dashboard-consolidado {
   background: #f8f8f8;

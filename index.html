@@ -30,6 +30,7 @@
 
   <!-- DASHBOARD CONSOLIDADO -->
   <div id="dashboard-consolidado" class="dashboard-consolidado">
+    <!-- KPIs -->
     <div class="kpis">
       <div class="kpi"><span id="kpi-vencedoras">0</span><br><small>Estratégias Vencedoras</small></div>
       <div class="kpi"><span id="kpi-perdedoras">0</span><br><small>Estratégias Perdedoras</small></div>
@@ -38,9 +39,13 @@
       <div class="kpi"><span id="kpi-fator-lucro">0</span><br><small>Fator de Lucro</small></div>
       <div class="kpi"><span id="kpi-retorno-dd">0</span><br><small>Retorno/Drawdown</small></div>
     </div>
+
+    <!-- Gráficos -->
     <div class="graficos-dashboard">
-      <div id="grafico-lucro-diario" class="grafico-dashboard"></div>
-      <div id="grafico-vencedoras-perdedoras" class="grafico-dashboard"></div>
+      <!-- 🔹 Gráfico de Lucro Diário ocupa toda a largura -->
+      <div id="grafico-lucro-diario" class="grafico-dashboard grafico-full"></div>
+
+      <!-- 🔹 Apenas gráfico de assertividade abaixo -->
       <div id="grafico-assertividade" class="grafico-dashboard"></div>
     </div>
   </div>
