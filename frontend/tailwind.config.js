@@ -1,7 +1,10 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    "./frontend/**/*.{html,js,ts}"
+    "./index.html",             // arquivo principal
+    "./*.{js,ts}",              // scripts na raiz
+    "./components/**/*.{js,ts}",// caso crie componentes
+    "./**/*.html"               // todos HTMLs dentro do frontend
   ],
   theme: {
     extend: {
@@ -13,7 +16,7 @@ module.exports = {
         },
       },
       dropShadow: {
-        quant: "0 0 20px rgba(0,255,179,0.6)", // igual ao logo
+        quant: "0 0 20px rgba(0,255,179,0.6)",
       },
     },
   },
