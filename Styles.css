@@ -1,11 +1,11 @@
 /* -------- DASHBOARD CONSOLIDADO -------- */
 .dashboard-consolidado {
-  background: rgba(0,0,0,0.7);
+  background: rgba(20,20,20,0.8);
   border-radius: 16px;
   margin: 32px auto; /* 🔹 mais espaçamento */
   padding: 24px 16px;
   max-width: 1200px;
-  box-shadow: 0 0 24px rgba(0,255,179,0.10);
+  box-shadow: 0 0 25px rgba(0, 245, 212, 0.2);
 }
 .dashboard-consolidado .kpis {
   display: flex;
@@ -15,20 +15,26 @@
   margin-bottom: 24px;
 }
 .dashboard-consolidado .kpi {
-  background: rgba(0,255,179,0.08);
+  background: linear-gradient(145deg, rgba(0,245,212,0.15), rgba(122,92,255,0.15), rgba(255,0,200,0.15));
   border-radius: 10px;
   padding: 16px 24px;
   min-width: 120px;
   text-align: center;
   font-size: 22px;
-  color: #00ffb3;
   font-weight: 600;
-  box-shadow: 0 0 8px rgba(0,255,179,0.10);
+  border: 1px solid rgba(0,245,212,0.25);
+  box-shadow: 0 0 8px rgba(0,245,212,0.15);
+  color: #00F5D4; /* fallback */
+}
+.dashboard-consolidado .kpi span {
+  background: linear-gradient(90deg, #00F5D4, #7A5CFF, #FF00C8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 .dashboard-consolidado .kpi small {
   display: block;
   font-size: 13px;
-  color: #b0fbe0;
+  color: #bbb;
   font-weight: 400;
 }
 .graficos-dashboard {
@@ -38,14 +44,14 @@
   justify-content: center;
 }
 .grafico-dashboard {
-  background: rgba(0,255,179,0.04);
+  background: rgba(255,255,255,0.02);
   border-radius: 10px;
   padding: 12px;
   min-width: 320px;
   min-height: 220px;
   max-width: 400px;
   flex: 1 1 320px;
-  box-shadow: 0 0 8px rgba(0,255,179,0.08);
+  box-shadow: 0 0 8px rgba(122,92,255,0.15);
 }
 
 /* 🔹 Lucro diário ocupa toda a largura */
@@ -55,29 +61,14 @@
   max-width: 100%;
 }
 
-/* Tema claro para o dashboard */
-.tema-claro .dashboard-consolidado {
-  background: #f8f8f8;
-  box-shadow: 0 0 24px rgba(0,184,156,0.10);
-}
-.tema-claro .dashboard-consolidado .kpi {
-  background: #e0fff7;
-  color: #00b89c;
-}
-.tema-claro .dashboard-consolidado .kpi small {
-  color: #00b89c;
-}
-.tema-claro .grafico-dashboard {
-  background: #f4fefb;
-}
-
 /* ---------- ESTILO GERAL DO PAINEL ---------- */
 body {
   font-family: 'Inter', sans-serif;
   margin: 0;
   padding: 20px;
   overflow-x: hidden;
-  transition: background-color 0.3s, color 0.3s;
+  background: linear-gradient(135deg, #0e0e0e, #141414, #1a1a1a);
+  color: #fff;
 }
 
 h1 {
@@ -85,6 +76,9 @@ h1 {
   margin-bottom: 20px;
   font-weight: 700;
   font-size: 28px;
+  background: linear-gradient(90deg, #00F5D4, #7A5CFF, #FF00C8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .top-bar {
@@ -103,7 +97,9 @@ h1 {
   border-radius: 12px;
   font-size: 16px;
   box-sizing: border-box;
-  background-color: white;
+  border: none;
+  background-color: #1f1f1f;
+  color: white;
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -115,18 +111,6 @@ h1 {
   background-repeat: no-repeat;
   background-size: 16px;
   padding-right: 36px;
-}
-
-.tema-claro .top-bar input,
-.tema-claro .top-bar select {
-  border: 1px solid #ccc;
-}
-
-.tema-escuro .top-bar input,
-.tema-escuro .top-bar select {
-  border: none;
-  background-color: #1f1f1f;
-  color: white;
 }
 
 @media (min-width: 768px) {
@@ -153,7 +137,9 @@ h1 {
 .card {
   border-radius: 12px;
   padding: 20px;
-  box-shadow: 0 0 15px rgba(0, 255, 179, 0.15);
+  background: linear-gradient(135deg, #1e1e1e, #2a2a2a);
+  color: #fff;
+  box-shadow: 0 0 15px rgba(122, 92, 255, 0.25);
   transition: transform 0.3s ease;
 }
 
@@ -165,6 +151,9 @@ h1 {
   font-size: 22px;
   margin-bottom: 12px;
   font-weight: 600;
+  background: linear-gradient(90deg, #00F5D4, #7A5CFF, #FF00C8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .info-line {
@@ -172,6 +161,7 @@ h1 {
   align-items: center;
   margin-bottom: 6px;
   font-size: 14px;
+  color: #ccc;
 }
 
 .info-line span {
@@ -186,6 +176,8 @@ button {
   border-radius: 6px;
   cursor: pointer;
   font-weight: 600;
+  background: linear-gradient(90deg, #00F5D4, #7A5CFF, #FF00C8);
+  color: #000;
 }
 
 /* ---------- MODAL GRÁFICO ---------- */
@@ -208,8 +200,8 @@ button {
   max-width: 90vw;
   width: 600px;
   position: relative;
-  background: white;
-  color: black;
+  background: #1e1e1e;
+  color: white;
 }
 
 #modalGrafico button {
@@ -220,7 +212,7 @@ button {
   background: none;
   border: none;
   cursor: pointer;
-  color: black;
+  color: white;
 }
 
 /* ---------- MODAL ESTATÍSTICAS ---------- */
@@ -238,8 +230,8 @@ button {
 .modal-content {
   position: relative;
   border-radius: 16px;
-  background: white;
-  color: black;
+  background: #1e1e1e;
+  color: white;
   padding: 20px;
   width: 90vw;
   max-width: 800px;
@@ -248,11 +240,6 @@ button {
   flex-direction: column;
   align-items: center;
   overflow: hidden;
-}
-
-.tema-escuro .modal-content {
-  background: #1e1e1e;
-  color: white;
 }
 
 .fechar-modal {
@@ -339,135 +326,16 @@ button {
   color: inherit;
 }
 
-/* ---------- TEMA ESCURO ---------- */
-.tema-escuro {
-  background-color: #0e0e0e;
-  color: #fff;
-}
-
-.tema-escuro .card {
-  background: linear-gradient(135deg, #1e1e1e, #2a2a2a);
-  color: #fff;
-}
-
-.tema-escuro .info-line {
-  color: #ccc;
-}
-
-.tema-escuro .card h2,
-.tema-escuro h1 {
-  color: #00ffb3;
-}
-
-.tema-escuro button {
-  background: #00ffb3;
-  color: #000;
-}
-
-.tema-escuro #modalGrafico > div {
-  background: #1e1e1e;
-  color: white;
-}
-
-.tema-escuro #modalGrafico button {
-  color: white;
-}
-
-/* ---------- TEMA CLARO ---------- */
-.tema-claro {
-  background-color: #ffffff;
-  color: #111;
-}
-
-.tema-claro .card {
-  background: #f9f9f9;
-  border: 1px solid #e0e0e0;
-  color: #111;
-  box-shadow: 0 0 6px rgba(0, 0, 0, 0.04);
-}
-
-.tema-claro .info-line {
-  color: #444;
-}
-
-.tema-claro .card h2,
-.tema-claro h1 {
-  color: #00b89c;
-}
-
-.tema-claro button {
-  background: #00c9a7;
-  color: #000;
-}
-
-.tema-claro #modalGrafico button {
-  color: black;
-}
-
-/* ---------- TOGGLE DE TEMA MODERNO ---------- */
-.toggle-wrapper {
+/* ---------- LOGO ---------- */
+.logo-container {
   display: flex;
+  justify-content: center;
   align-items: center;
-  gap: 8px;
+  margin: 20px 0;
 }
 
-.toggle {
-  position: relative;
-  display: inline-block;
-  width: 42px;
-  height: 22px;
-  background-color: #ccc;
-  border-radius: 999px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.toggle .ball {
-  position: absolute;
-  top: 1px;
-  left: 1px;
-  width: 20px;
-  height: 20px;
-  background-color: white;
-  border-radius: 50%;
-  transition: transform 0.3s;
-  z-index: 2;
-}
-
-.toggle .icon {
-  position: absolute;
-  width: 12px;
-  height: 12px;
-  top: 5px;
-  font-size: 12px;
-  z-index: 1;
-  pointer-events: none;
-}
-
-.toggle .sol {
-  left: 5px;
-  color: #f39c12;
-}
-
-.toggle .lua {
-  right: 5px;
-  color: #2c3e50;
-}
-
-#toggle-tema {
-  display: none;
-}
-
-#toggle-tema:checked + .toggle .ball {
-  transform: translateX(20px);
-}
-
-#toggle-tema:checked + .toggle {
-  background-color: #333;
-}
-
-@media (max-width: 600px) {
-  .toggle {
-    transform: scale(0.9);
-  }
+.logo {
+  max-width: 220px;
+  height: auto;
+  filter: drop-shadow(0 0 18px rgba(122, 92, 255, 0.6));
 }

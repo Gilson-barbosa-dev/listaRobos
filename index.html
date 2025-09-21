@@ -2,15 +2,19 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <title>Painel de Estratégias</title>
+  <title>Painel de Estratégias - Clube Quant</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="./Styles.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
 </head>
 <body>
-  <h1>Painel de Estratégias</h1>
+  
+  <!-- Logo -->
+  <div class="logo-container">
+    <img src="img/logo_clube_quant.png" alt="Clube Quant" class="logo">
+  </div>
 
-  <!-- Barra de filtro, ordenação e tema -->
+  <!-- Barra de filtro e ordenação -->
   <div class="top-bar">
     <input type="text" id="filtro" placeholder="🔍 Magic ou Ativo...">
     <select id="ordenar">
@@ -18,14 +22,6 @@
       <option value="assertividade">✅ Assertividade</option>
       <option value="operacoes">📊 Operações</option>
     </select>
-    <div class="toggle-wrapper">
-      <input type="checkbox" id="toggle-tema" />
-      <label class="toggle" for="toggle-tema">
-        <span class="ball"></span>
-        <span class="icon sol">☀️</span>
-        <span class="icon lua">🌙</span>
-      </label>
-    </div>
   </div> <!-- 🔹 Fecha top-bar -->
 
   <!-- DASHBOARD CONSOLIDADO -->
@@ -37,16 +33,12 @@
       <div class="kpi"><span id="kpi-trades">0</span><br><small>Total de Trades</small></div>
       <div class="kpi"><span id="kpi-lucro">0</span><br><small>Lucro Total</small></div>
       <div class="kpi"><span id="kpi-fator-lucro">0</span><br><small>Fator de Lucro</small></div>
-      <div class="kpi"><span id="kpi-retorno-dd">0</span><br><small>Retorno/Drawdown</small></div>
     </div>
 
     <!-- Gráficos -->
     <div class="graficos-dashboard">
       <!-- 🔹 Gráfico de Lucro Diário ocupa toda a largura -->
       <div id="grafico-lucro-diario" class="grafico-dashboard grafico-full"></div>
-
-      <!-- 🔹 Apenas gráfico de assertividade abaixo -->
-      <div id="grafico-assertividade" class="grafico-dashboard"></div>
     </div>
   </div>
 
