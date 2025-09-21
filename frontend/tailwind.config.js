@@ -1,10 +1,19 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    "./index.html",             // arquivo principal
-    "./*.{js,ts}",              // scripts na raiz
-    "./components/**/*.{js,ts}",// caso crie componentes
-    "./**/*.html"               // todos HTMLs dentro do frontend
+    "./index.html",
+    "./*.{js,ts}",
+    "./**/*.html"
+  ],
+  safelist: [
+    'bg-gradient-to-br',
+    'from-black',
+    'via-gray-900',
+    'to-black',
+    'text-white',
+    'text-quant-green',
+    'text-quant-purple',
+    'text-quant-pink'
   ],
   theme: {
     extend: {
