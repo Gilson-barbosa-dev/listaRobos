@@ -6,6 +6,10 @@
     "dev": "tailwindcss -i ./frontend/styles.css -o ./frontend/output.css --watch",
     "build": "tailwindcss -i ./frontend/styles.css -o ./frontend/output.css --minify"
   },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
   "devDependencies": {
     "autoprefixer": "^10.4.21",
     "postcss": "^8.5.6",
