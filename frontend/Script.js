@@ -78,35 +78,38 @@ function renderizarEstrategias(estrategias) {
     else perdedoras++;
 
     const card = document.createElement("div");
-    card.className =
-      "bg-gray-800 border border-gray-700 rounded-xl shadow-md hover:shadow-lg transition p-5 flex flex-col justify-between";
+      card.className =
+        "bg-gray-900 border border-gray-800 rounded-2xl shadow-md p-5 flex flex-col justify-between hover:scale-105 transform transition";
 
-    card.innerHTML = `
-      <div class="flex items-center justify-between mb-4">
-        <div class="flex items-center gap-2">
-          <i data-lucide="layers" class="w-4 h-4 text-blue-400"></i>
-          <h2 class="text-md font-bold text-blue-400">Magic ${e.magic}</h2>
+      card.innerHTML = `
+        <div class="flex items-center justify-between mb-2">
+          <h2 class="text-md font-bold text-green-400">Magic ${e.magic}</h2>
+          <span class="text-sm text-gray-400">${e.ativo}</span>
         </div>
-      </div>
 
-      <dl class="space-y-2 text-sm text-gray-300">
-        <div class="flex justify-between"><dt>Ativo</dt><dd class="font-medium">${e.ativo}</dd></div>
-        <div class="flex justify-between"><dt>Lucro Total</dt>
-          <dd class="font-bold ${lucro >= 0 ? "text-emerald-400" : "text-red-400"}">
-            ${lucro.toFixed(2)} USD
-          </dd>
+        <dl class="space-y-1 text-sm text-gray-300">
+          <div class="flex justify-between"><dt>Lucro Total</dt>
+            <dd class="font-bold ${lucro >= 0 ? "text-emerald-400" : "text-red-400"}">
+              ${lucro.toFixed(2)} USD
+            </dd>
+          </div>
+          <div class="flex justify-between"><dt>Trades</dt><dd>${trades}</dd></div>
+          <div class="flex justify-between"><dt>Assertividade</dt><dd class="text-blue-400">${e.assertividade || 0}%</dd></div>
+        </dl>
+
+        <div class="flex justify-between items-center mt-4 pt-3 border-t border-gray-800 text-sm">
+          <button class="flex items-center gap-1 text-gray-400 hover:text-white">
+            <i data-lucide="clock" class="w-4 h-4"></i> Histórico
+          </button>
+          <button class="flex items-center gap-1 text-gray-400 hover:text-white">
+            <i data-lucide="bar-chart-2" class="w-4 h-4"></i> Estatística
+          </button>
+          <button class="flex items-center gap-1 text-gray-400 hover:text-white">
+            <i data-lucide="download" class="w-4 h-4"></i> Download
+          </button>
         </div>
-        <div class="flex justify-between"><dt>Trades</dt><dd>${trades}</dd></div>
-        <div class="flex justify-between"><dt>Assertividade</dt><dd class="text-blue-400">${e.assertividade || 0}%</dd></div>
-      </dl>
-
-      <div class="flex justify-center mt-4 pt-3 border-t border-gray-700 text-sm">
-        <button class="flex items-center gap-1 text-blue-400 hover:text-white btn-historico" data-magic="${e.magic}">
-          <i data-lucide="clock" class="w-4 h-4"></i> 📊 Ver Gráfico
-        </button>
-      </div>
-    `;
-
+      `;
+      
     painel.appendChild(card);
   });
 
