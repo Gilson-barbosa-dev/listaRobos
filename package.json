@@ -1,10 +1,11 @@
 {
   "name": "listarobos",
   "version": "1.0.0",
-  "main": "Script.js",
+  "main": "server.js",
   "scripts": {
     "dev": "tailwindcss -i ./styles.css -o ./output.css --watch",
-    "build": "tailwindcss -i ./styles.css -o ./output.css"
+    "build": "tailwindcss -i ./styles.css -o ./output.css",
+    "start": "node server.js"
   },
   "repository": {
     "type": "git",
@@ -19,13 +20,12 @@
   "homepage": "https://github.com/Gilson-barbosa-dev/listaRobos#readme",
   "description": "",
   "dependencies": {
+    "autoprefixer": "^10.4.21",
     "cors": "^2.8.5",
     "dotenv": "^17.2.2",
     "express": "^5.1.0",
     "pg": "^8.16.3",
-    "tailwindcss": "^4.1.13",
-    "autoprefixer": "^10.4.21",
-    "postcss": "^8.5.6"
-  },
-  "devDependencies": {}
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.17"
+  }
 }
