@@ -3,26 +3,36 @@ module.exports = {
   content: [
     "./index.html",
     "./*.{js,ts}",
-    "./**/*.html"
+    "./**/*.{html,js,ts}"
   ],
   safelist: [
+    // Fundo principal
     'bg-gradient-to-br',
     'from-black',
     'via-gray-900',
     'to-black',
     'text-white',
-    'text-gray-300',
-    'text-gray-400',
-    'text-gray-500',
+
+    // Inputs / textos
+    'bg-gray-800',
+    'border-gray-700',
+    'placeholder-gray-400',
+
+    // Cards / métricas
+    'bg-gray-900',
+    'bg-gray-900/40',
+    'bg-gradient-to-r',
+    'from-quant-green/20',
+    'to-quant-purple/20',
+    'border-quant-green/30',
+    'border-quant-purple/30',
+
+    // Textos dinâmicos
     'text-quant-green',
     'text-quant-purple',
     'text-quant-pink',
-    'bg-gray-800',
-    'bg-gray-900',
-    'border-gray-700',
-    'border-quant-green',
-    'border-quant-purple',
-    'border-quant-pink'
+    'text-gray-300',
+    'text-gray-400'
   ],
   theme: {
     extend: {
