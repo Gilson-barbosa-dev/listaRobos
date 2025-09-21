@@ -11,9 +11,18 @@ module.exports = {
     'via-gray-900',
     'to-black',
     'text-white',
+    'text-gray-300',
+    'text-gray-400',
+    'text-gray-500',
     'text-quant-green',
     'text-quant-purple',
-    'text-quant-pink'
+    'text-quant-pink',
+    'bg-gray-800',
+    'bg-gray-900',
+    'border-gray-700',
+    'border-quant-green',
+    'border-quant-purple',
+    'border-quant-pink'
   ],
   theme: {
     extend: {
