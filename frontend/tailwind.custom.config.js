@@ -2,8 +2,7 @@
 module.exports = {
   content: [
     "./index.html",
-    "./{index,Script}.js",         // arquivos da raiz do frontend
-    "./**/*.{html,js,ts}"          // qualquer outro HTML/JS/TS dentro de subpastas
+    "./**/*.{html,js,ts}"
   ],
   safelist: [
     'bg-gradient-to-br',

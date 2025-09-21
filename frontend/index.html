@@ -18,10 +18,10 @@
     <input 
       type="text" 
       placeholder="🔍 Magic ou Ativo..."
-      class="w-full md:w-64 px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 text-white placeholder-gray-400 focus:ring-2 focus:ring-quant-purple focus:outline-none"
+      class="w-full md:w-64 px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:outline-none"
     >
     <select 
-      class="w-full md:w-40 px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 text-white focus:ring-2 focus:ring-quant-green focus:outline-none"
+      class="w-full md:w-40 px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 text-white focus:ring-2 focus:ring-blue-400 focus:outline-none"
     >
       <option value="lucro_total">📈 Lucro Total</option>
       <option value="assertividade">✅ Assertividade</option>
@@ -30,31 +30,31 @@
   </div>
 
   <!-- Dashboard consolidado -->
-  <div class="p-6 bg-gray-900/40 rounded-xl shadow-md max-w-6xl mx-auto">
+  <div class="p-6 bg-gray-800 rounded-xl shadow-md max-w-6xl mx-auto">
     <canvas id="graficoDiario" height="120"></canvas>
   </div>
     
   <!-- KPIs -->
   <div class="grid grid-cols-2 md:grid-cols-5 gap-4 max-w-6xl mx-auto mt-6">
-    <div class="bg-gradient-to-r from-quant-green/20 to-quant-purple/20 border border-quant-green/30 text-center rounded-xl p-4 shadow-md">
-      <span id="kpi-vencedoras" class="block text-2xl font-bold text-quant-green">0</span>
-      <small class="text-gray-300">Estratégias Vencedoras</small>
+    <div class="bg-gray-800 text-center rounded-xl p-4 shadow-md">
+      <span id="kpi-vencedoras" class="block text-2xl font-bold text-white">0</span>
+      <small class="text-gray-400">Estratégias Vencedoras</small>
     </div>
-    <div class="bg-gradient-to-r from-quant-green/20 to-quant-purple/20 border border-quant-green/30 text-center rounded-xl p-4 shadow-md">
-      <span id="kpi-perdedoras" class="block text-2xl font-bold text-quant-green">0</span>
-      <small class="text-gray-300">Estratégias Perdedoras</small>
+    <div class="bg-gray-800 text-center rounded-xl p-4 shadow-md">
+      <span id="kpi-perdedoras" class="block text-2xl font-bold text-white">0</span>
+      <small class="text-gray-400">Estratégias Perdedoras</small>
     </div>
-    <div class="bg-gradient-to-r from-quant-green/20 to-quant-purple/20 border border-quant-green/30 text-center rounded-xl p-4 shadow-md">
-      <span id="kpi-trades" class="block text-2xl font-bold text-quant-green">0</span>
-      <small class="text-gray-300">Total de Trades</small>
+    <div class="bg-gray-800 text-center rounded-xl p-4 shadow-md">
+      <span id="kpi-trades" class="block text-2xl font-bold text-white">0</span>
+      <small class="text-gray-400">Total de Trades</small>
     </div>
-    <div class="bg-gradient-to-r from-quant-green/20 to-quant-purple/20 border border-quant-green/30 text-center rounded-xl p-4 shadow-md">
-      <span id="kpi-lucro" class="block text-2xl font-bold text-quant-green">0</span>
-      <small class="text-gray-300">Lucro Total</small>
+    <div class="bg-gray-800 text-center rounded-xl p-4 shadow-md">
+      <span id="kpi-lucro" class="block text-2xl font-bold text-white">0</span>
+      <small class="text-gray-400">Lucro Total</small>
     </div>
-    <div class="bg-gradient-to-r from-quant-green/20 to-quant-purple/20 border border-quant-green/30 text-center rounded-xl p-4 shadow-md">
-      <span id="kpi-fator-lucro" class="block text-2xl font-bold text-quant-green">0</span>
-      <small class="text-gray-300">Fator de Lucro</small>
+    <div class="bg-gray-800 text-center rounded-xl p-4 shadow-md">
+      <span id="kpi-fator-lucro" class="block text-2xl font-bold text-white">0</span>
+      <small class="text-gray-400">Fator de Lucro</small>
     </div>
   </div>
 
@@ -62,18 +62,18 @@
   <div id="painel" class="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-10">
 
     <!-- Modelo de card -->
-    <div class="bg-gradient-to-br from-gray-800 to-gray-900 border border-quant-purple/30 rounded-2xl p-5 shadow-md hover:scale-105 transform transition">
-      <h2 class="text-lg font-bold bg-gradient-to-r from-quant-green via-quant-purple to-quant-pink bg-clip-text text-transparent">Estratégia XAUUSD</h2>
+    <div class="bg-gray-800 border border-gray-700 rounded-2xl p-5 shadow-md hover:scale-105 transform transition">
+      <h2 class="text-lg font-bold text-white">Estratégia XAUUSD</h2>
       
       <div class="mt-3 space-y-2 text-sm text-gray-300">
         <div class="flex justify-between"><span>Magic:</span> <span>123456</span></div>
         <div class="flex justify-between"><span>Ativo:</span> <span>XAUUSD</span></div>
-        <div class="flex justify-between"><span>Lucro Total:</span> <span class="text-quant-green">+250 USD</span></div>
+        <div class="flex justify-between"><span>Lucro Total:</span> <span class="text-blue-400">+250 USD</span></div>
         <div class="flex justify-between"><span>Trades:</span> <span>180</span></div>
-        <div class="flex justify-between"><span>Assertividade:</span> <span class="text-quant-purple">65%</span></div>
+        <div class="flex justify-between"><span>Assertividade:</span> <span class="text-blue-500">65%</span></div>
       </div>
 
-      <button class="mt-4 w-full py-2 rounded-lg bg-gradient-to-r from-quant-green to-quant-purple font-semibold text-white hover:opacity-90">
+      <button class="mt-4 w-full py-2 rounded-lg bg-blue-600 font-semibold text-white hover:bg-blue-500">
         📊 Ver Gráfico
       </button>
     </div>
@@ -82,12 +82,11 @@
 
   <!-- Modal Histórico -->
   <div id="modalHistorico" class="hidden fixed inset-0 z-[9999] items-center justify-center bg-black/70">
-    <div class="bg-gray-900 rounded-xl p-6 shadow-lg w-full max-w-3xl relative flex flex-col">
+    <div class="bg-gray-800 rounded-xl p-6 shadow-lg w-full max-w-3xl relative flex flex-col">
       <button onclick="fecharModalHistorico()" class="absolute top-3 right-3 text-gray-400 hover:text-white">
         ✖
       </button>
-      <h2 class="text-lg font-bold mb-4 text-quant-purple">Histórico da Estratégia</h2>
-      <!-- canvas com largura/altura fixadas -->
+      <h2 class="text-lg font-bold mb-4 text-white">Histórico da Estratégia</h2>
       <canvas id="graficoHistorico" class="w-full h-[300px]"></canvas>
     </div>
   </div>
