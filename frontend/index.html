@@ -10,7 +10,7 @@
 
   <!-- Logo -->
   <div class="flex justify-center py-6">
-    <img src="/img/logo_clube_quant.png" alt="Clube Quant" class="w-48 drop-shadow-quant">
+    <img src="/img/logo_clube_quant.png" alt="Clube Quant" class="w-48">
   </div>
 
   <!-- Top bar -->
@@ -37,23 +37,23 @@
   <!-- KPIs -->
   <div class="grid grid-cols-2 md:grid-cols-5 gap-4 max-w-6xl mx-auto mt-6">
     <div class="bg-gray-900 rounded-xl shadow-md p-5 text-center">
-      <span id="kpi-vencedoras" class="block text-3xl font-bold text-white">0</span>
+      <span id="kpi-vencedoras" class="block text-5xl font-bold text-white">0</span>
       <small class="text-gray-400">Estratégias Vencedoras</small>
     </div>
     <div class="bg-gray-900 rounded-xl shadow-md p-5 text-center">
-      <span id="kpi-perdedoras" class="block text-3xl font-bold text-white">0</span>
+      <span id="kpi-perdedoras" class="block text-5xl font-bold text-white">0</span>
       <small class="text-gray-400">Estratégias Perdedoras</small>
     </div>
     <div class="bg-gray-900 rounded-xl shadow-md p-5 text-center">
-      <span id="kpi-trades" class="block text-3xl font-bold text-white">0</span>
+      <span id="kpi-trades" class="block text-5xl font-bold text-white">0</span>
       <small class="text-gray-400">Total de Trades</small>
     </div>
     <div class="bg-gray-900 rounded-xl shadow-md p-5 text-center">
-      <span id="kpi-lucro" class="block text-3xl font-bold text-white">0</span>
+      <span id="kpi-lucro" class="block text-5xl font-bold text-white">0</span>
       <small class="text-gray-400">Lucro Total</small>
     </div>
     <div class="bg-gray-900 rounded-xl shadow-md p-5 text-center">
-      <span id="kpi-fator-lucro" class="block text-3xl font-bold text-white">0</span>
+      <span id="kpi-fator-lucro" class="block text-5xl font-bold text-white">0</span>
       <small class="text-gray-400">Fator de Lucro</small>
     </div>
   </div>
@@ -89,12 +89,12 @@
       
       <!-- Botão Fechar -->
       <button onclick="fecharModalHistorico()" 
-        class="absolute top-3 right-3 text-gray-400 hover:text-white text-xl font-bold">
-        ✖
+        class="absolute top-3 right-3 text-gray-400 hover:text-white">
+        <i data-lucide="x" class="w-6 h-6"></i>
       </button>
 
       <!-- Título -->
-      <h2 class="text-lg font-bold mb-4 bg-gradient-to-r from-quant-green via-quant-purple to-quant-pink bg-clip-text text-transparent">
+      <h2 class="text-lg font-bold mb-4 text-white">
         Histórico da Estratégia
       </h2>
 
