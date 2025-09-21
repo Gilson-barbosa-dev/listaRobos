@@ -24,9 +24,9 @@ async function carregarEstrategias() {
 // ==========================
 function aplicarFiltros() {
   const busca = document.querySelector('input[type="text"]').value.toLowerCase();
-  const ordenarPor = document.querySelector('select').value;
+  const ordenarPor = document.querySelector("select").value;
 
-  let filtradas = estrategiasGlobais.filter(e => {
+  let filtradas = estrategiasGlobais.filter((e) => {
     const magic = String(e.magic || "").toLowerCase();
     const ativo = String(e.ativo || "").toLowerCase();
     return magic.includes(busca) || ativo.includes(busca);
@@ -46,8 +46,10 @@ function aplicarFiltros() {
 // 🔹 Renderizar cards + KPIs
 // ==========================
 function renderizarEstrategias(estrategias) {
-  let vencedoras = 0, perdedoras = 0, totalTrades = 0, lucroTotal = 0;
-  let fatorLucro = 0;
+  let vencedoras = 0,
+    perdedoras = 0,
+    totalTrades = 0,
+    lucroTotal = 0;
 
   const painel = document.getElementById("painel");
   painel.innerHTML = "";
@@ -72,21 +74,19 @@ function renderizarEstrategias(estrategias) {
 
     totalTrades += trades;
     lucroTotal += lucro;
-    if (lucro > 0) vencedoras++; else perdedoras++;
+    if (lucro > 0) vencedoras++;
+    else perdedoras++;
 
     const card = document.createElement("div");
     card.className =
-      "bg-gray-900 border border-gray-700 rounded-xl shadow-md hover:shadow-lg transition p-5 flex flex-col justify-between";
+      "bg-gray-800 border border-gray-700 rounded-xl shadow-md hover:shadow-lg transition p-5 flex flex-col justify-between";
 
     card.innerHTML = `
       <div class="flex items-center justify-between mb-4">
         <div class="flex items-center gap-2">
-          <i data-lucide="layers" class="w-4 h-4 text-emerald-400"></i>
-          <h2 class="text-md font-bold text-emerald-400">Magic ${e.magic}</h2>
+          <i data-lucide="layers" class="w-4 h-4 text-blue-400"></i>
+          <h2 class="text-md font-bold text-blue-400">Magic ${e.magic}</h2>
         </div>
-        <button class="text-gray-400 hover:text-white">
-          <i data-lucide="more-horizontal" class="w-5 h-5"></i>
-        </button>
       </div>
 
       <dl class="space-y-2 text-sm text-gray-300">
@@ -100,15 +100,9 @@ function renderizarEstrategias(estrategias) {
         <div class="flex justify-between"><dt>Assertividade</dt><dd class="text-blue-400">${e.assertividade || 0}%</dd></div>
       </dl>
 
-      <div class="flex justify-around mt-4 pt-3 border-t border-gray-700 text-sm">
-        <button class="flex items-center gap-1 text-gray-400 hover:text-white btn-historico" data-magic="${e.magic}">
-          <i data-lucide="clock" class="w-4 h-4"></i> Histórico
-        </button>
-        <button class="flex items-center gap-1 text-gray-400 hover:text-white">
-          <i data-lucide="bar-chart-2" class="w-4 h-4"></i> Estatística
-        </button>
-        <button class="flex items-center gap-1 text-gray-400 hover:text-white">
-          <i data-lucide="download" class="w-4 h-4"></i> Download
+      <div class="flex justify-center mt-4 pt-3 border-t border-gray-700 text-sm">
+        <button class="flex items-center gap-1 text-blue-400 hover:text-white btn-historico" data-magic="${e.magic}">
+          <i data-lucide="clock" class="w-4 h-4"></i> 📊 Ver Gráfico
         </button>
       </div>
     `;
@@ -116,7 +110,7 @@ function renderizarEstrategias(estrategias) {
     painel.appendChild(card);
   });
 
-  fatorLucro = perdedoras > 0 ? (vencedoras / perdedoras).toFixed(2) : vencedoras;
+  const fatorLucro = perdedoras > 0 ? (vencedoras / perdedoras).toFixed(2) : vencedoras;
   document.getElementById("kpi-vencedoras").textContent = vencedoras;
   document.getElementById("kpi-perdedoras").textContent = perdedoras;
   document.getElementById("kpi-trades").textContent = totalTrades;
@@ -137,33 +131,35 @@ async function carregarGraficoDiario() {
     let dados = await res.json();
     dados = dados.sort((a, b) => new Date(a.dia) - new Date(b.dia));
 
-    const labels = dados.map(d => new Date(d.dia).toLocaleDateString("pt-BR"));
+    const labels = dados.map((d) => new Date(d.dia).toLocaleDateString("pt-BR"));
     let acumulado = 0;
-    const valores = dados.map(d => (acumulado += parseFloat(d.lucro_total)));
+    const valores = dados.map((d) => (acumulado += parseFloat(d.lucro_total)));
 
     const ctx = document.getElementById("graficoDiario").getContext("2d");
     new Chart(ctx, {
       type: "line",
       data: {
         labels,
-        datasets: [{
-          label: "Evolução Acumulada",
-          data: valores,
-          borderColor: "#10b981",
-          backgroundColor: "rgba(16,185,129,0.15)",
-          borderWidth: 2,
-          tension: 0.3,
-          fill: true,
-        }]
+        datasets: [
+          {
+            label: "Evolução Acumulada",
+            data: valores,
+            borderColor: "#3b82f6",
+            backgroundColor: "rgba(59,130,246,0.2)",
+            borderWidth: 2,
+            tension: 0.3,
+            fill: true,
+          },
+        ],
       },
       options: {
         responsive: true,
         plugins: { legend: { display: false } },
         scales: {
           x: { ticks: { color: "#9ca3af" } },
-          y: { ticks: { color: "#9ca3af" }, position: "right", beginAtZero: true }
-        }
-      }
+          y: { ticks: { color: "#9ca3af" }, position: "right", beginAtZero: true },
+        },
+      },
     });
   } catch (err) {
     console.error("Erro ao carregar gráfico diário:", err);
@@ -188,9 +184,9 @@ async function abrirHistorico(magic) {
 
     dados = dados.sort((a, b) => new Date(a.data_ordem) - new Date(b.data_ordem));
 
-    const labels = dados.map(d => new Date(d.data_ordem).toLocaleDateString("pt-BR"));
+    const labels = dados.map((d) => new Date(d.data_ordem).toLocaleDateString("pt-BR"));
     let acumulado = 0;
-    const valores = dados.map(d => {
+    const valores = dados.map((d) => {
       acumulado += parseFloat(d.lucro);
       return acumulado;
     });
@@ -200,9 +196,9 @@ async function abrirHistorico(magic) {
     modal.classList.remove("hidden");
     modal.classList.add("flex");
 
-    // Resetar canvas
-    const container = modal.querySelector("div.bg-gray-900");
-    container.querySelector("canvas")?.remove();
+    const container = modal.querySelector(".grafico-container");
+    container.innerHTML = ""; // limpa o conteúdo
+
     const novoCanvas = document.createElement("canvas");
     novoCanvas.id = "graficoHistorico";
     novoCanvas.height = 200;
@@ -218,26 +214,27 @@ async function abrirHistorico(magic) {
       type: "line",
       data: {
         labels,
-        datasets: [{
-          label: `Histórico Magic ${magic}`,
-          data: valores,
-          borderColor: "#10b981",
-          backgroundColor: "rgba(16,185,129,0.15)",
-          borderWidth: 2,
-          tension: 0.3,
-          fill: true,
-        }]
+        datasets: [
+          {
+            label: `Histórico Magic ${magic}`,
+            data: valores,
+            borderColor: "#10b981",
+            backgroundColor: "rgba(16,185,129,0.15)",
+            borderWidth: 2,
+            tension: 0.3,
+            fill: true,
+          },
+        ],
       },
       options: {
         responsive: true,
         plugins: { legend: { display: false } },
         scales: {
           x: { ticks: { color: "#9ca3af" } },
-          y: { ticks: { color: "#9ca3af" }, beginAtZero: true }
-        }
-      }
+          y: { ticks: { color: "#9ca3af" }, beginAtZero: true },
+        },
+      },
     });
-
   } catch (err) {
     console.error("❌ Erro ao carregar histórico da estratégia:", err);
     alert("Erro ao carregar gráfico. Veja o console.");
@@ -246,8 +243,15 @@ async function abrirHistorico(magic) {
 
 function fecharModalHistorico() {
   const modal = document.getElementById("modalHistorico");
+  if (!modal) return;
+
   modal.classList.add("hidden");
   modal.classList.remove("flex");
+
+  if (window.graficoHistoricoInstancia) {
+    window.graficoHistoricoInstancia.destroy();
+    window.graficoHistoricoInstancia = null;
+  }
 }
 
 // ==========================
@@ -258,7 +262,7 @@ document.addEventListener("DOMContentLoaded", () => {
   carregarGraficoDiario();
 
   document.querySelector('input[type="text"]').addEventListener("input", aplicarFiltros);
-  document.querySelector('select').addEventListener("change", aplicarFiltros);
+  document.querySelector("select").addEventListener("change", aplicarFiltros);
 
   document.addEventListener("click", (e) => {
     if (e.target.closest(".btn-historico")) {
