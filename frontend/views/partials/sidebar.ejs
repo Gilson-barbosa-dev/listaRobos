@@ -1,0 +1,35 @@
+<aside class="w-64 bg-gray-900 border-r border-gray-800 p-6 flex flex-col justify-between fixed inset-y-0 left-0">
+  <div>
+    <!-- Logo menor -->
+    <img src="/img/logo_clube_quant.png" alt="Clube Quant" class="w-36 mb-8 mx-auto">
+
+    <!-- Menu -->
+    <nav class="space-y-2">
+      <a href="/" 
+         class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-800 transition <%= page === 'index' ? 'bg-gray-800' : '' %>">
+        <i data-lucide="layers" class="w-5 h-5 text-blue-400"></i>
+        <span>Todos os algoritmos</span>
+      </a>
+
+      <a href="/meus-algoritmos" 
+         class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-800 transition <%= page === 'meus-algoritmos' ? 'bg-gray-800' : '' %>">
+        <i data-lucide="folder" class="w-5 h-5 text-purple-400"></i>
+        <span>Meus algoritmos</span>
+      </a>
+
+      <a href="/planos" 
+         class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-800 transition <%= page === 'planos' ? 'bg-gray-800' : '' %>">
+        <i data-lucide="credit-card" class="w-5 h-5 text-green-400"></i>
+        <span>Planos</span>
+      </a>
+    </nav>
+  </div>
+
+  <!-- Botão sair -->
+  <div>
+    <button class="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-red-600 bg-red-500 text-white transition">
+      <i data-lucide="log-out" class="w-5 h-5"></i>
+      <span>Sair</span>
+    </button>
+  </div>
+</aside>

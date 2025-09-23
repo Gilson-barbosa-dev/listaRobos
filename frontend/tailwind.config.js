@@ -1,9 +1,9 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    "./index.html",
-    "./{index,Script}.js",         // arquivos da raiz do frontend
-    "./**/*.{html,js,ts}"          // qualquer outro HTML/JS/TS dentro de subpastas
+    "./frontend/**/*.{html,js,ejs}", // pega todos os arquivos do frontend
+    "./backend/**/*.{js}",           // se tiver classes em arquivos backend
+    "./**/*.{ejs,html,js,ts}"        // pega tudo no projeto (segurança extra)
   ],
   safelist: [
     'bg-gradient-to-br',

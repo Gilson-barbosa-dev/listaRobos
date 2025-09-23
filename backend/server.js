@@ -13,16 +13,28 @@ const PORT = process.env.PORT || 3001;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// ==========================
+// 🔹 Configuração do EJS
+// ==========================
+app.set("views", path.join(__dirname, "../frontend/views"));
+app.set("view engine", "ejs");
+
 // Middleware para JSON
 app.use(express.json());
 
-// Servir arquivos estáticos (frontend)
+// Servir arquivos estáticos (CSS, JS, imagens)
 app.use(express.static(path.join(__dirname, "../frontend")));
 
-// Rota principal → carrega index.html
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/index.html"));
-});
+// ==========================
+// 🔹 Rotas de páginas (com sidebar partial)
+// ==========================
+app.get("/", (req, res) => res.render("index", { page: "index" }));
+app.get("/meus-algoritmos", (req, res) =>
+  res.render("meus-algoritmos", { page: "meus-algoritmos" })
+);
+app.get("/planos", (req, res) =>
+  res.render("planos", { page: "planos" })
+);
 
 // ==========================
 // 🔹 API - pegar estratégias
