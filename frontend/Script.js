@@ -3,14 +3,14 @@
 let estrategiasGlobais = [];
 
 // ==========================
-// 🔹 Favoritos (localStorage)
+// 🔹 Favoritos (LocalStorage)
 // ==========================
 function getFavoritos() {
-  return JSON.parse(localStorage.getItem("favoritos") || "[]");
+  return JSON.parse(localStorage.getItem("favoritos")) || [];
 }
 
-function salvarFavoritos(favoritos) {
-  localStorage.setItem("favoritos", JSON.stringify(favoritos));
+function salvarFavoritos(lista) {
+  localStorage.setItem("favoritos", JSON.stringify(lista));
 }
 
 function toggleFavorito(magic) {
@@ -30,18 +30,14 @@ function toggleFavorito(magic) {
     const icon = btn.querySelector("i, svg");
     if (icon) {
       if (jaFavorito) {
-        // desfavoritou → vira contorno
-        icon.setAttribute("data-lucide", "star-off");
+        // desfavoritou → cinza, sem preenchimento
         icon.className = "w-6 h-6 text-gray-500 transition-colors duration-300";
-        icon.removeAttribute("fill");
+        icon.setAttribute("fill", "none");
       } else {
-        // favoritou → vira estrela cheia com brilho + animação
-        icon.setAttribute("data-lucide", "star");
+        // favoritou → amarela, preenchida, com animação
         icon.className =
           "w-6 h-6 text-yellow-400 drop-shadow-glow transition-colors duration-300 animate-pulse-star";
         icon.setAttribute("fill", "currentColor");
-
-        // remove a animação após terminar (evita loop)
         setTimeout(() => {
           icon.classList.remove("animate-pulse-star");
         }, 500);
@@ -72,8 +68,8 @@ async function carregarEstrategias() {
 // 🔹 Filtros e renderização
 // ==========================
 function aplicarFiltros() {
-  const busca = document.querySelector('input[type="text"]')?.value.toLowerCase() || "";
-  const ordenarPor = document.querySelector("select")?.value;
+  const busca = document.querySelector('input[type="text"]').value.toLowerCase();
+  const ordenarPor = document.querySelector("select").value;
 
   let filtradas = estrategiasGlobais.filter((e) => {
     const magic = String(e.magic || "").toLowerCase();
@@ -100,9 +96,10 @@ function renderizarEstrategias(estrategias) {
     totalTrades = 0,
     lucroTotal = 0;
 
-  const favoritos = getFavoritos();
   const painel = document.getElementById("painel");
   painel.innerHTML = "";
+
+  const favoritos = getFavoritos();
 
   if (!estrategias || estrategias.length === 0) {
     painel.innerHTML = `
@@ -121,13 +118,12 @@ function renderizarEstrategias(estrategias) {
   estrategias.forEach((e) => {
     const trades = e.total_operacoes || 0;
     const lucro = Number(e.lucro_total) || 0;
+    const isFavorito = favoritos.includes(e.magic);
 
     totalTrades += trades;
     lucroTotal += lucro;
     if (lucro > 0) vencedoras++;
     else perdedoras++;
-
-    const isFavorito = favoritos.includes(e.magic);
 
     const card = document.createElement("div");
     card.className =
@@ -142,9 +138,9 @@ function renderizarEstrategias(estrategias) {
         <div class="flex items-center gap-2">
           <span class="text-sm text-gray-400">${e.ativo}</span>
           <button class="btn-favorito ml-2 p-1 rounded transition transform hover:scale-110" data-magic="${e.magic}">
-            <i data-lucide="${isFavorito ? "star" : "star-off"}"
+            <i data-lucide="star"
                class="w-6 h-6 transition-colors duration-300 ${isFavorito ? "text-yellow-400 drop-shadow-glow" : "text-gray-500"}"
-               ${isFavorito ? 'fill="currentColor"' : ""}></i>
+               ${isFavorito ? 'fill="currentColor"' : 'fill="none"'}></i>
           </button>
         </div>
       </div>
@@ -328,22 +324,17 @@ document.addEventListener("DOMContentLoaded", () => {
   carregarEstrategias();
   carregarGraficoDiario();
 
-  document.querySelector('input[type="text"]')?.addEventListener("input", aplicarFiltros);
-  document.querySelector("select")?.addEventListener("change", aplicarFiltros);
+  document.querySelector('input[type="text"]').addEventListener("input", aplicarFiltros);
+  document.querySelector("select").addEventListener("change", aplicarFiltros);
 
-  // Histórico
   document.addEventListener("click", (e) => {
     if (e.target.closest(".btn-historico")) {
       const magic = e.target.closest(".btn-historico").dataset.magic;
       abrirHistorico(magic);
     }
-  });
 
-  // Favoritos
-  document.addEventListener("click", (e) => {
-    const btn = e.target.closest(".btn-favorito");
-    if (btn) {
-      const magic = parseInt(btn.dataset.magic);
+    if (e.target.closest(".btn-favorito")) {
+      const magic = e.target.closest(".btn-favorito").dataset.magic;
       toggleFavorito(magic);
     }
   });

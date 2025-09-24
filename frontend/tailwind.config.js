@@ -6,15 +6,17 @@ module.exports = {
     "./**/*.{ejs,html,js,ts}"        // pega tudo no projeto (segurança extra)
   ],
   safelist: [
-    'bg-gradient-to-br',
-    'from-black',
-    'via-gray-900',
-    'to-black',
-    'text-white',
-    'text-quant-green',
-    'text-quant-purple',
-    'text-quant-pink',
-    'animate-pulse-star' // garante que a animação da estrela nunca é purgada
+    "bg-gradient-to-br",
+    "from-black",
+    "via-gray-900",
+    "to-black",
+    "text-white",
+    "text-quant-green",
+    "text-quant-purple",
+    "text-quant-pink",
+    "animate-pulse-star", // garante que a animação da estrela nunca é purgada
+    "fill-transparent",   // garante que o Tailwind gere essa classe
+    "fill-yellow-400"     // garante que o Tailwind gere essa classe
   ],
   theme: {
     extend: {
@@ -40,5 +42,13 @@ module.exports = {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    // Ativa utilitários de fill/stroke nativos do Tailwind
+    function ({ addUtilities }) {
+      addUtilities({
+        ".fill-transparent": { fill: "transparent" },
+        ".fill-yellow-400": { fill: "#facc15" }, // mesma cor do text-yellow-400
+      });
+    },
+  ],
 };
