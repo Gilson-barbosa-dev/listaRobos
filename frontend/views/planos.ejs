@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Meus Planos - Clube Quant</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="/output.css" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => { lucide.createIcons(); });
+  </script>
+</head>
+<body class="bg-gradient-to-br from-black via-gray-900 to-black text-white min-h-screen font-sans">
+
+  <!-- Sidebar -->
+  <%- include("partials/sidebar", { page: "planos" }) %>
+
+  <!-- Conteúdo -->
+  <main class="ml-64 p-6 flex-1">
+    <div class="max-w-6xl mx-auto">
+
+      <!-- Título -->
+      <h1 class="text-2xl font-bold mb-6">Gerenciamento de Planos</h1>
+
+      <!-- Plano atual -->
+      <div class="bg-gray-800 rounded-xl shadow-md p-6 mb-8 border border-quant-purple/30">
+        <h2 class="text-xl font-semibold text-quant-purple">Seu Plano Atual</h2>
+        <p class="mt-2 text-gray-300">Você está no plano <strong>Premium</strong>, válido até <span class="text-quant-green">30/09/2025</span>.</p>
+        
+        <div class="mt-4 flex gap-3">
+          <button class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 transition font-semibold">Fazer Upgrade</button>
+          <button class="px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-500 transition font-semibold">Fazer Downgrade</button>
+          <button class="ml-auto px-4 py-2 rounded-lg bg-red-600 hover:bg-red-500 transition font-semibold">Cancelar Plano</button>
+        </div>
+      </div>
+
+      <!-- Outros planos -->
+      <h2 class="text-lg font-bold mb-4">Outros Planos Disponíveis</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        
+        <!-- Card Starter -->
+        <div class="bg-gray-900 border border-gray-700 rounded-xl shadow-md p-6 flex flex-col justify-between">
+          <div>
+            <h3 class="text-xl font-semibold text-white">Starter</h3>
+            <p class="text-gray-400 mt-2">Plano básico para começar</p>
+            <p class="text-2xl font-bold text-quant-green mt-4">R$ 49/mês</p>
+          </div>
+          <button class="mt-6 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 transition font-semibold">Assinar</button>
+        </div>
+
+        <!-- Card Plus -->
+        <div class="bg-gray-900 border border-gray-700 rounded-xl shadow-md p-6 flex flex-col justify-between">
+          <div>
+            <h3 class="text-xl font-semibold text-white">Plus</h3>
+            <p class="text-gray-400 mt-2">Mais recursos e limites maiores</p>
+            <p class="text-2xl font-bold text-quant-green mt-4">R$ 97/mês</p>
+          </div>
+          <button class="mt-6 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 transition font-semibold">Assinar</button>
+        </div>
+
+        <!-- Card Diamond -->
+        <div class="bg-gray-900 border border-gray-700 rounded-xl shadow-md p-6 flex flex-col justify-between">
+          <div>
+            <h3 class="text-xl font-semibold text-white">Diamond</h3>
+            <p class="text-gray-400 mt-2">Plano completo para profissionais</p>
+            <p class="text-2xl font-bold text-quant-green mt-4">R$ 197/mês</p>
+          </div>
+          <button class="mt-6 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 transition font-semibold">Assinar</button>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+</body>
+</html>

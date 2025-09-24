@@ -13,7 +13,8 @@ module.exports = {
     'text-white',
     'text-quant-green',
     'text-quant-purple',
-    'text-quant-pink'
+    'text-quant-pink',
+    'animate-pulse-star' // garante que a animação da estrela nunca é purgada
   ],
   theme: {
     extend: {
@@ -26,6 +27,16 @@ module.exports = {
       },
       dropShadow: {
         quant: "0 0 20px rgba(0,255,179,0.6)",
+        glow: "0 0 8px rgba(250, 204, 21, 0.8)", // ⭐ brilho amarelo
+      },
+      keyframes: {
+        pulseStar: {
+          "0%, 100%": { transform: "scale(1)", opacity: "1" },
+          "50%": { transform: "scale(1.3)", opacity: "0.8" },
+        },
+      },
+      animation: {
+        "pulse-star": "pulseStar 0.4s ease-in-out",
       },
     },
   },
