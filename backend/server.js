@@ -83,11 +83,21 @@ app.get("/api/estatistica-detalhada", async (req, res) => {
   }
 
   try {
-    // suporta 1 magic ou lista separada por vírgula
-    const magics = magic
-      .split(",")
-      .map((m) => parseInt(m.trim()))
-      .filter((m) => !isNaN(m));
+    // Se vier como array (ex: ?magic=1&magic=2)
+    let magics = [];
+    if (Array.isArray(magic)) {
+      magics = magic.map((m) => parseInt(m, 10)).filter(Number.isInteger);
+    } else {
+      // Se vier como string (ex: "1,2,3")
+      magics = String(magic)
+        .split(",")
+        .map((m) => parseInt(m, 10))
+        .filter(Number.isInteger);
+    }
+
+    if (magics.length === 0) {
+      return res.status(400).json({ erro: "Nenhum magic válido informado" });
+    }
 
     const { rows } = await pool.query(
       `SELECT magic, data_ordem, lucro
