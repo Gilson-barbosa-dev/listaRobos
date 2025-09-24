@@ -73,22 +73,28 @@ app.get("/api/consolidado-diario", async (req, res) => {
 });
 
 // ==========================
-// 🔹 API - histórico detalhado por estratégia (Magic)
+// 🔹 API - histórico detalhado por estratégia (1 ou vários magics)
 // ==========================
 app.get("/api/estatistica-detalhada", async (req, res) => {
-  const { magic } = req.query;
+  let { magic } = req.query;
 
   if (!magic) {
     return res.status(400).json({ erro: "Parâmetro 'magic' é obrigatório" });
   }
 
   try {
+    // suporta 1 magic ou lista separada por vírgula
+    const magics = magic
+      .split(",")
+      .map((m) => parseInt(m.trim()))
+      .filter((m) => !isNaN(m));
+
     const { rows } = await pool.query(
-      `SELECT data_ordem, lucro
+      `SELECT magic, data_ordem, lucro
        FROM estatistica_detalhada
-       WHERE magic = $1
+       WHERE magic = ANY($1::int[])
        ORDER BY data_ordem ASC`,
-      [magic]
+      [magics]
     );
 
     return res.json(rows || []);

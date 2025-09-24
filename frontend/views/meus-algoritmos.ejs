@@ -12,42 +12,51 @@
 </head>
 <body class="bg-gradient-to-br from-black via-gray-900 to-black text-white min-h-screen font-sans">
 
-  <!-- Sidebar -->
+  <!-- Sidebar fixo -->
   <%- include("partials/sidebar", { page: "meus-algoritmos" }) %>
 
-  <!-- Conteúdo -->
+  <!-- Conteúdo principal -->
   <main class="ml-64 p-6 flex-1">
     <div class="max-w-6xl mx-auto">
 
       <!-- Título -->
-      <h1 class="text-2xl font-bold mb-6">Meus Algoritmos</h1>
+      <h1 class="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+        <i data-lucide="star" class="w-6 h-6 text-yellow-400"></i>
+        Meus Algoritmos Favoritos
+      </h1>
 
-      <!-- KPIs -->
-      <div class="grid grid-cols-2 md:grid-cols-5 gap-4 max-w-6xl mx-auto mt-6">
+      <!-- Gráfico consolidado dos favoritos -->
+      <div class="p-6 bg-gray-800 rounded-xl shadow-md mb-8">
+        <canvas id="graficoFavoritos" height="120"></canvas>
+      </div>
+
+      <!-- KPIs dos favoritos -->
+      <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
         <div class="bg-gray-900 rounded-xl shadow-md p-5 text-center">
-          <span id="kpi-vencedoras" class="block text-5xl font-bold text-white">0</span>
+          <span id="fav-vencedoras" class="block text-5xl font-bold text-white">0</span>
           <small class="text-gray-400">Estratégias Vencedoras</small>
         </div>
         <div class="bg-gray-900 rounded-xl shadow-md p-5 text-center">
-          <span id="kpi-perdedoras" class="block text-5xl font-bold text-white">0</span>
+          <span id="fav-perdedoras" class="block text-5xl font-bold text-white">0</span>
           <small class="text-gray-400">Estratégias Perdedoras</small>
         </div>
         <div class="bg-gray-900 rounded-xl shadow-md p-5 text-center">
-          <span id="kpi-trades" class="block text-5xl font-bold text-white">0</span>
+          <span id="fav-trades" class="block text-5xl font-bold text-white">0</span>
           <small class="text-gray-400">Total de Trades</small>
         </div>
         <div class="bg-gray-900 rounded-xl shadow-md p-5 text-center">
-          <span id="kpi-lucro" class="block text-5xl font-bold text-white">0</span>
+          <span id="fav-lucro" class="block text-5xl font-bold text-white">0</span>
           <small class="text-gray-400">Lucro Total</small>
         </div>
         <div class="bg-gray-900 rounded-xl shadow-md p-5 text-center">
-          <span id="kpi-fator-lucro" class="block text-5xl font-bold text-white">0</span>
+          <span id="fav-fator-lucro" class="block text-5xl font-bold text-white">0</span>
           <small class="text-gray-400">Fator de Lucro</small>
         </div>
       </div>
 
-      <!-- Cards -->
-      <div id="painel" class="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-10"></div>
+      <!-- Cards favoritos -->
+      <div id="painel-favoritos" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-10"></div>
+
     </div>
   </main>
 
@@ -68,23 +77,14 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="/Script.js"></script>
   <script>
-    document.addEventListener("DOMContentLoaded", async () => {
-      await carregarEstrategias();
-      atualizarFavoritos();
-    });
-
-    // 🔹 Atualizar a tela só com os favoritos
-    function atualizarFavoritos() {
+    document.addEventListener("DOMContentLoaded", () => {
+      // Reaproveita a função que já renderiza estratégias
       const favoritos = getFavoritos();
-      const filtrados = estrategiasGlobais.filter(e => favoritos.includes(e.magic));
-      renderizarEstrategias(filtrados);
-    }
+      const filtradas = estrategiasGlobais.filter(e => favoritos.includes(e.magic));
+      renderizarEstrategiasFavoritos(filtradas);
 
-    // 🔹 Intercepta cliques no toggleFavorito para atualizar a página em tempo real
-    document.addEventListener("click", (e) => {
-      if (e.target.closest("button[onclick^='toggleFavorito']")) {
-        setTimeout(atualizarFavoritos, 100); // delay curto para atualizar lista
-      }
+      // Gráfico consolidado só dos favoritos
+      carregarGraficoFavoritos();
     });
   </script>
 </body>

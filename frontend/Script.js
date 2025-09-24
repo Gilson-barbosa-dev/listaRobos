@@ -24,25 +24,20 @@ function toggleFavorito(magic) {
   }
   salvarFavoritos(favoritos);
 
-  // Atualiza só o botão clicado
   const btn = document.querySelector(`.btn-favorito[data-magic="${magic}"]`);
   if (btn) {
     const icon = btn.querySelector("i, svg");
     if (icon) {
       if (jaFavorito) {
-        // desfavoritou → cinza, sem preenchimento
-        icon.className = "w-6 h-6 text-gray-500 transition-colors duration-300";
-        icon.setAttribute("fill", "none");
+        icon.className = "w-6 h-6 text-gray-500 fill-transparent transition duration-300";
       } else {
-        // favoritou → amarela, preenchida, com animação
         icon.className =
-          "w-6 h-6 text-yellow-400 drop-shadow-glow transition-colors duration-300 animate-pulse-star";
-        icon.setAttribute("fill", "currentColor");
+          "w-6 h-6 text-yellow-400 drop-shadow-glow fill-yellow-400 transition duration-300 animate-pulse-star";
         setTimeout(() => {
           icon.classList.remove("animate-pulse-star");
         }, 500);
       }
-      lucide.createIcons(); // redesenha só esse ícone
+      lucide.createIcons();
     }
   }
 }
@@ -56,20 +51,18 @@ async function carregarEstrategias() {
     if (!res.ok) throw new Error("Erro ao buscar estratégias");
 
     estrategiasGlobais = await res.json();
-    console.log("✅ Estratégias recebidas:", estrategiasGlobais);
-
-    aplicarFiltros(); // já aplica filtros/ordenação ao carregar
+    aplicarFiltros();
   } catch (err) {
     console.error("❌ Erro ao carregar estratégias:", err);
   }
 }
 
 // ==========================
-// 🔹 Filtros e renderização
+// 🔹 Filtros (Página principal)
 // ==========================
 function aplicarFiltros() {
-  const busca = document.querySelector('input[type="text"]').value.toLowerCase();
-  const ordenarPor = document.querySelector("select").value;
+  const busca = document.querySelector('input[type="text"]')?.value?.toLowerCase() || "";
+  const ordenarPor = document.querySelector("select")?.value || "lucro_total";
 
   let filtradas = estrategiasGlobais.filter((e) => {
     const magic = String(e.magic || "").toLowerCase();
@@ -88,30 +81,21 @@ function aplicarFiltros() {
 }
 
 // ==========================
-// 🔹 Renderizar cards + KPIs
+// 🔹 Renderizar cards (Página Principal)
 // ==========================
 function renderizarEstrategias(estrategias) {
-  let vencedoras = 0,
-    perdedoras = 0,
-    totalTrades = 0,
-    lucroTotal = 0;
-
   const painel = document.getElementById("painel");
+  if (!painel) return;
+
+  let vencedoras = 0, perdedoras = 0, totalTrades = 0, lucroTotal = 0;
+  const favoritos = getFavoritos();
   painel.innerHTML = "";
 
-  const favoritos = getFavoritos();
-
   if (!estrategias || estrategias.length === 0) {
-    painel.innerHTML = `
-      <div class="bg-gray-800 text-gray-300 rounded-xl p-6 shadow-md">
-        Nenhuma estratégia encontrada 🚫
-      </div>
-    `;
-    document.getElementById("kpi-vencedoras").textContent = 0;
-    document.getElementById("kpi-perdedoras").textContent = 0;
-    document.getElementById("kpi-trades").textContent = 0;
-    document.getElementById("kpi-lucro").textContent = "0.00";
-    document.getElementById("kpi-fator-lucro").textContent = 0;
+    painel.innerHTML = `<div class="bg-gray-800 text-gray-300 rounded-xl p-6 shadow-md">
+      Nenhuma estratégia encontrada 🚫
+    </div>`;
+    atualizarKPIs("kpi", { vencedoras: 0, perdedoras: 0, trades: 0, lucro: 0, fator: 0 });
     return;
   }
 
@@ -122,69 +106,117 @@ function renderizarEstrategias(estrategias) {
 
     totalTrades += trades;
     lucroTotal += lucro;
-    if (lucro > 0) vencedoras++;
-    else perdedoras++;
+    lucro > 0 ? vencedoras++ : perdedoras++;
 
-    const card = document.createElement("div");
-    card.className =
-      "bg-gray-900 border border-gray-800 rounded-2xl shadow-md p-5 flex flex-col justify-between hover:scale-105 transform transition";
-
-    card.innerHTML = `
-      <div class="flex items-center justify-between mb-2">
-        <div class="flex items-center gap-2">
-          <i data-lucide="layers" class="w-4 h-4 text-blue-400"></i>
-          <h2 class="text-md font-bold text-blue-400">Magic ${e.magic}</h2>
-        </div>
-        <div class="flex items-center gap-2">
-          <span class="text-sm text-gray-400">${e.ativo}</span>
-          <button class="btn-favorito ml-2 p-1 rounded transition transform hover:scale-110" data-magic="${e.magic}">
-            <i data-lucide="star"
-               class="w-6 h-6 transition-colors duration-300 ${isFavorito ? "text-yellow-400 drop-shadow-glow" : "text-gray-500"}"
-               ${isFavorito ? 'fill="currentColor"' : 'fill="none"'}></i>
-          </button>
-        </div>
-      </div>
-
-      <dl class="space-y-1 text-sm text-gray-300">
-        <div class="flex justify-between"><dt>Lucro Total</dt>
-          <dd class="font-bold ${lucro >= 0 ? "text-emerald-400" : "text-red-400"}">
-            ${lucro.toFixed(2)} USD
-          </dd>
-        </div>
-        <div class="flex justify-between"><dt>Trades</dt><dd>${trades}</dd></div>
-        <div class="flex justify-between"><dt>Assertividade</dt><dd class="text-blue-400">${e.assertividade || 0}%</dd></div>
-      </dl>
-
-      <div class="flex justify-between items-center mt-4 pt-3 border-t border-gray-800 text-sm">
-        <button 
-          class="btn-historico flex items-center gap-1 text-gray-400 hover:text-white"
-          data-magic="${e.magic}">
-          <i data-lucide="clock" class="w-4 h-4"></i> Histórico
-        </button>
-        <button class="flex items-center gap-1 text-gray-400 hover:text-white">
-          <i data-lucide="bar-chart-2" class="w-4 h-4"></i> Estatística
-        </button>
-        <button class="flex items-center gap-1 text-gray-400 hover:text-white">
-          <i data-lucide="download" class="w-4 h-4"></i> Download
-        </button>
-      </div>
-    `;
-
+    const card = criarCardEstrategia(e, isFavorito);
     painel.appendChild(card);
   });
 
   const fatorLucro = perdedoras > 0 ? (vencedoras / perdedoras).toFixed(2) : vencedoras;
-  document.getElementById("kpi-vencedoras").textContent = vencedoras;
-  document.getElementById("kpi-perdedoras").textContent = perdedoras;
-  document.getElementById("kpi-trades").textContent = totalTrades;
-  document.getElementById("kpi-lucro").textContent = lucroTotal.toFixed(2);
-  document.getElementById("kpi-fator-lucro").textContent = fatorLucro;
-
+  atualizarKPIs("kpi", { vencedoras, perdedoras, trades: totalTrades, lucro: lucroTotal, fator: fatorLucro });
   lucide.createIcons();
 }
 
 // ==========================
-// 🔹 Gráfico consolidado diário
+// 🔹 Renderizar Favoritos (Meus Algoritmos)
+// ==========================
+function renderizarEstrategiasFavoritos() {
+  const painel = document.getElementById("painel-favoritos");
+  if (!painel) return;
+
+  const favoritos = getFavoritos();
+  const filtradas = estrategiasGlobais.filter(e => favoritos.includes(e.magic));
+
+  let vencedoras = 0, perdedoras = 0, totalTrades = 0, lucroTotal = 0;
+  painel.innerHTML = "";
+
+  if (!filtradas || filtradas.length === 0) {
+    painel.innerHTML = `<div class="bg-gray-800 text-gray-300 rounded-xl p-6 shadow-md">
+      Nenhum algoritmo favoritado ⭐
+    </div>`;
+    atualizarKPIs("fav", { vencedoras: 0, perdedoras: 0, trades: 0, lucro: 0, fator: 0 });
+    return;
+  }
+
+  filtradas.forEach((e) => {
+    const trades = e.total_operacoes || 0;
+    const lucro = Number(e.lucro_total) || 0;
+    const isFavorito = favoritos.includes(e.magic);
+
+    totalTrades += trades;
+    lucroTotal += lucro;
+    lucro > 0 ? vencedoras++ : perdedoras++;
+
+    const card = criarCardEstrategia(e, isFavorito);
+    painel.appendChild(card);
+  });
+
+  const fatorLucro = perdedoras > 0 ? (vencedoras / perdedoras).toFixed(2) : vencedoras;
+  atualizarKPIs("fav", { vencedoras, perdedoras, trades: totalTrades, lucro: lucroTotal, fator: fatorLucro });
+  lucide.createIcons();
+}
+
+// ==========================
+// 🔹 Criar Card (usado nos dois painéis)
+// ==========================
+function criarCardEstrategia(e, isFavorito) {
+  const card = document.createElement("div");
+  card.className = "bg-gray-900 border border-gray-800 rounded-2xl shadow-md p-5 flex flex-col justify-between hover:scale-105 transform transition";
+
+  card.innerHTML = `
+    <div class="flex items-center justify-between mb-2">
+      <div class="flex items-center gap-2">
+        <i data-lucide="layers" class="w-4 h-4 text-blue-400"></i>
+        <h2 class="text-md font-bold text-blue-400">Magic ${e.magic}</h2>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="text-sm text-gray-400">${e.ativo}</span>
+        <button class="btn-favorito ml-2 p-1 rounded transition transform hover:scale-110" data-magic="${e.magic}">
+          <i data-lucide="star"
+             class="w-6 h-6 transition duration-300 ${isFavorito ? "text-yellow-400 drop-shadow-glow fill-yellow-400" : "text-gray-500 fill-transparent"}"></i>
+        </button>
+      </div>
+    </div>
+
+    <dl class="space-y-1 text-sm text-gray-300">
+      <div class="flex justify-between"><dt>Lucro Total</dt>
+        <dd class="font-bold ${e.lucro_total >= 0 ? "text-emerald-400" : "text-red-400"}">
+          ${Number(e.lucro_total).toFixed(2)} USD
+        </dd>
+      </div>
+      <div class="flex justify-between"><dt>Trades</dt><dd>${e.total_operacoes || 0}</dd></div>
+      <div class="flex justify-between"><dt>Assertividade</dt><dd class="text-blue-400">${e.assertividade || 0}%</dd></div>
+    </dl>
+
+    <div class="flex justify-between items-center mt-4 pt-3 border-t border-gray-800 text-sm">
+      <button class="btn-historico flex items-center gap-1 text-gray-400 hover:text-white" data-magic="${e.magic}">
+        <i data-lucide="clock" class="w-4 h-4"></i> Histórico
+      </button>
+      <button class="flex items-center gap-1 text-gray-400 hover:text-white">
+        <i data-lucide="bar-chart-2" class="w-4 h-4"></i> Estatística
+      </button>
+      <button class="flex items-center gap-1 text-gray-400 hover:text-white">
+        <i data-lucide="download" class="w-4 h-4"></i> Download
+      </button>
+    </div>
+  `;
+
+  return card;
+}
+
+// ==========================
+// 🔹 Atualizar KPIs
+// ==========================
+function atualizarKPIs(prefixo, { vencedoras, perdedoras, trades, lucro, fator }) {
+  document.getElementById(`${prefixo}-vencedoras`).textContent = vencedoras;
+  document.getElementById(`${prefixo}-perdedoras`).textContent = perdedoras;
+  document.getElementById(`${prefixo}-trades`).textContent = trades;
+  document.getElementById(`${prefixo}-lucro`).textContent = lucro.toFixed(2);
+  document.getElementById(`${prefixo}-fator-lucro`).textContent = fator;
+}
+
+// ==========================
+// 🔹 Gráfico consolidado diário (todos)
 // ==========================
 async function carregarGraficoDiario() {
   try {
@@ -198,7 +230,9 @@ async function carregarGraficoDiario() {
     let acumulado = 0;
     const valores = dados.map((d) => (acumulado += parseFloat(d.lucro_total)));
 
-    const ctx = document.getElementById("graficoDiario").getContext("2d");
+    const ctx = document.getElementById("graficoDiario")?.getContext("2d");
+    if (!ctx) return;
+
     new Chart(ctx, {
       type: "line",
       data: {
@@ -230,12 +264,74 @@ async function carregarGraficoDiario() {
 }
 
 // ==========================
+// 🔹 Gráfico consolidado dos Favoritos
+// ==========================
+let graficoFavoritosInstancia = null;
+
+async function carregarGraficoFavoritos() {
+  try {
+    const favoritos = getFavoritos();
+    if (!favoritos.length) return;
+
+    const res = await fetch("/api/estatistica-detalhada?magic=" + favoritos.join(","));
+    if (!res.ok) throw new Error("Erro ao buscar dados dos favoritos");
+
+    let dados = await res.json();
+
+    // Agrupa por data e soma o lucro
+    const mapa = {};
+    dados.forEach((d) => {
+      const dia = new Date(d.data_ordem).toISOString().split("T")[0];
+      mapa[dia] = (mapa[dia] || 0) + parseFloat(d.lucro);
+    });
+
+    const labels = Object.keys(mapa).sort((a, b) => new Date(a) - new Date(b));
+    let acumulado = 0;
+    const valores = labels.map((dia) => (acumulado += mapa[dia]));
+
+    const ctx = document.getElementById("graficoFavoritos")?.getContext("2d");
+    if (!ctx) return;
+
+    // destruir gráfico antigo se já existir
+    if (graficoFavoritosInstancia) {
+      graficoFavoritosInstancia.destroy();
+    }
+
+    graficoFavoritosInstancia = new Chart(ctx, {
+      type: "line",
+      data: {
+        labels: labels.map((d) => new Date(d).toLocaleDateString("pt-BR")),
+        datasets: [
+          {
+            label: "Evolução dos Favoritos",
+            data: valores,
+            borderColor: "#facc15",
+            backgroundColor: "rgba(250, 204, 21, 0.2)",
+            borderWidth: 2,
+            tension: 0.3,
+            fill: true,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { ticks: { color: "#9ca3af" } },
+          y: { ticks: { color: "#9ca3af" }, position: "right", beginAtZero: true },
+        },
+      },
+    });
+  } catch (err) {
+    console.error("❌ Erro ao carregar gráfico dos favoritos:", err);
+  }
+}
+
+// ==========================
 // 🔹 Modal Histórico
 // ==========================
 async function abrirHistorico(magic) {
   try {
-    console.log("🟢 Abrindo modal do Magic:", magic);
-
     const res = await fetch(`/api/estatistica-detalhada?magic=${magic}`);
     if (!res.ok) throw new Error("Erro ao buscar histórico da estratégia");
 
@@ -249,18 +345,14 @@ async function abrirHistorico(magic) {
 
     const labels = dados.map((d) => new Date(d.data_ordem).toLocaleDateString("pt-BR"));
     let acumulado = 0;
-    const valores = dados.map((d) => {
-      acumulado += parseFloat(d.lucro);
-      return acumulado;
-    });
+    const valores = dados.map((d) => (acumulado += parseFloat(d.lucro)));
 
-    // Abrir modal
     const modal = document.getElementById("modalHistorico");
     modal.classList.remove("hidden");
     modal.classList.add("flex");
 
     const container = modal.querySelector(".grafico-container");
-    container.innerHTML = ""; // limpa o conteúdo
+    container.innerHTML = "";
 
     const novoCanvas = document.createElement("canvas");
     novoCanvas.id = "graficoHistorico";
@@ -268,10 +360,7 @@ async function abrirHistorico(magic) {
     container.appendChild(novoCanvas);
 
     const ctx = novoCanvas.getContext("2d");
-
-    if (window.graficoHistoricoInstancia) {
-      window.graficoHistoricoInstancia.destroy();
-    }
+    if (window.graficoHistoricoInstancia) window.graficoHistoricoInstancia.destroy();
 
     window.graficoHistoricoInstancia = new Chart(ctx, {
       type: "line",
@@ -300,17 +389,14 @@ async function abrirHistorico(magic) {
     });
   } catch (err) {
     console.error("❌ Erro ao carregar histórico da estratégia:", err);
-    alert("Erro ao carregar gráfico. Veja o console.");
   }
 }
 
 function fecharModalHistorico() {
   const modal = document.getElementById("modalHistorico");
   if (!modal) return;
-
   modal.classList.add("hidden");
   modal.classList.remove("flex");
-
   if (window.graficoHistoricoInstancia) {
     window.graficoHistoricoInstancia.destroy();
     window.graficoHistoricoInstancia = null;
@@ -320,22 +406,31 @@ function fecharModalHistorico() {
 // ==========================
 // 🔹 Inicialização
 // ==========================
-document.addEventListener("DOMContentLoaded", () => {
-  carregarEstrategias();
+document.addEventListener("DOMContentLoaded", async () => {
+  await carregarEstrategias();
   carregarGraficoDiario();
 
-  document.querySelector('input[type="text"]').addEventListener("input", aplicarFiltros);
-  document.querySelector("select").addEventListener("change", aplicarFiltros);
+  if (window.location.pathname.includes("meus-algoritmos")) {
+    renderizarEstrategiasFavoritos();
+    carregarGraficoFavoritos();
+  }
+
+  document.querySelector('input[type="text"]')?.addEventListener("input", aplicarFiltros);
+  document.querySelector("select")?.addEventListener("change", aplicarFiltros);
 
   document.addEventListener("click", (e) => {
     if (e.target.closest(".btn-historico")) {
       const magic = e.target.closest(".btn-historico").dataset.magic;
       abrirHistorico(magic);
     }
-
     if (e.target.closest(".btn-favorito")) {
       const magic = e.target.closest(".btn-favorito").dataset.magic;
       toggleFavorito(magic);
+      renderizarEstrategias(estrategiasGlobais);
+      if (window.location.pathname.includes("meus-algoritmos")) {
+        renderizarEstrategiasFavoritos();
+        carregarGraficoFavoritos();
+      }
     }
   });
 });
