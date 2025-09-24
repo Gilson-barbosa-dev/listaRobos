@@ -273,7 +273,9 @@ async function carregarGraficoFavoritos() {
     const favoritos = getFavoritos();
     if (!favoritos.length) return;
 
-    const res = await fetch("/api/estatistica-detalhada?magic=" + favoritos.join(","));
+    // monta query string múltipla: ?magic=3007&magic=3006...
+    const params = favoritos.map(m => "magic=" + encodeURIComponent(m)).join("&");
+    const res = await fetch("/api/estatistica-detalhada?" + params);
     if (!res.ok) throw new Error("Erro ao buscar dados dos favoritos");
 
     let dados = await res.json();
@@ -292,7 +294,6 @@ async function carregarGraficoFavoritos() {
     const ctx = document.getElementById("graficoFavoritos")?.getContext("2d");
     if (!ctx) return;
 
-    // destruir gráfico antigo se já existir
     if (graficoFavoritosInstancia) {
       graficoFavoritosInstancia.destroy();
     }
@@ -426,7 +427,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (e.target.closest(".btn-favorito")) {
       const magic = e.target.closest(".btn-favorito").dataset.magic;
       toggleFavorito(magic);
-      renderizarEstrategias(estrategiasGlobais);
+
+      aplicarFiltros(); // mantém filtro aplicado
+
       if (window.location.pathname.includes("meus-algoritmos")) {
         renderizarEstrategiasFavoritos();
         carregarGraficoFavoritos();
