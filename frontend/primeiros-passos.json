@@ -1,0 +1,28 @@
+[
+  {
+    "modulo": "Introdução",
+    "videos": [
+      {
+        "titulo": "Bem-vindo ao Clube Quant",
+        "descricao": "Explicação inicial sobre o uso da plataforma.",
+        "url": "https://www.youtube.com/embed/xxxxxxxx",
+        "material": "https://drive.google.com/file/d/xxxxxxx/view"
+      },
+      {
+        "titulo": "Como instalar o algoritmo",
+        "descricao": "Tutorial completo de instalação do EA.",
+        "url": "https://www.youtube.com/embed/yyyyyyyy"
+      }
+    ]
+  },
+  {
+    "modulo": "Configuração",
+    "videos": [
+      {
+        "titulo": "Configurando o MetaTrader",
+        "descricao": "Passo a passo para configurar a plataforma MetaTrader 5.",
+        "url": "https://www.youtube.com/embed/zzzzzzzz"
+      }
+    ]
+  }
+]

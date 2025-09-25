@@ -2,6 +2,7 @@ import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
 import dotenv from "dotenv";
+import fs from "fs";
 import pool from "./db.js"; // conexão com o banco
 
 dotenv.config();
@@ -35,6 +36,20 @@ app.get("/meus-algoritmos", (req, res) =>
 app.get("/planos", (req, res) =>
   res.render("planos", { page: "planos" })
 );
+
+// ==========================
+// 🔹 Página Primeiros Passos
+// ==========================
+app.get("/primeiros-passos", (req, res) => {
+  fs.readFile(path.join(__dirname, "../frontend/primeiros-passos.json"), "utf8", (err, data) => {
+    if (err) {
+      console.error("❌ Erro ao carregar primeiros-passos.json:", err);
+      return res.status(500).send("Erro ao carregar Primeiros Passos");
+    }
+    const modulos = JSON.parse(data);
+    res.render("primeiros-passos", { page: "primeiros-passos", modulos });
+  });
+});
 
 // ==========================
 // 🔹 API - pegar estratégias
@@ -83,7 +98,7 @@ app.get("/api/estatistica-detalhada", async (req, res) => {
   }
 
   try {
-    // Se vier como array (ex: ?magic=1&magic=2)
+    // Se vier como array (?magic=1&magic=2)
     let magics = [];
     if (Array.isArray(magic)) {
       magics = magic.map((m) => parseInt(m, 10)).filter(Number.isInteger);
