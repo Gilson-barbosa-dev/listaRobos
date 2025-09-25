@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Primeiros Passos - Clube Quant</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="/output.css" rel="stylesheet">
+</head>
+<body class="bg-gradient-to-br from-black via-gray-900 to-black text-white min-h-screen font-sans">
+
+  <!-- Sidebar -->
+  <%- include("partials/sidebar") %>
+
+  <div class="ml-64 p-6">
+    <div class="max-w-6xl mx-auto">
+      <!-- Título -->
+      <h1 class="text-2xl font-bold mb-6 flex items-center gap-2">
+        <i data-lucide="book-open" class="w-6 h-6 text-yellow-400"></i>
+        <span class="text-white">Primeiros Passos</span>
+      </h1>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Player de vídeo -->
+        <div class="lg:col-span-2 bg-gray-900 rounded-xl shadow-md p-4 relative">
+          <div id="player-container" class="aspect-w-16 aspect-h-9">
+            <iframe id="video-player" 
+              src="<%= modulos[0].videos[0].url %>" 
+              class="w-full h-[500px] rounded-lg" 
+              frameborder="0" allowfullscreen>
+            </iframe>
+          </div>
+
+          <div id="video-info" class="mt-4 pr-28"> <!-- padding-right para não colidir com botão -->
+            <h2 class="text-xl font-bold text-blue-400">
+              <%= modulos[0].videos[0].titulo %>
+            </h2>
+            <% if (modulos[0].videos[0].descricao) { %>
+              <p class="text-gray-400 mt-1"><%= modulos[0].videos[0].descricao %></p>
+            <% } %>
+            <% if (modulos[0].videos[0].material) { %>
+              <a href="<%= modulos[0].videos[0].material %>" target="_blank"
+                class="inline-block mt-3 px-4 py-2 bg-blue-600 rounded-lg text-white text-sm hover:bg-blue-500">
+                📂 Material de Apoio
+              </a>
+            <% } %>
+          </div>
+
+          <!-- Botão concluir no canto inferior direito -->
+          <button id="btn-concluir" 
+            class="absolute bottom-4 right-4 flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-800 hover:bg-blue-600 text-gray-300 hover:text-white font-medium transition">
+            <i id="btn-concluir-icon" data-lucide="square" class="w-5 h-5"></i>
+            <span id="btn-concluir-text">Concluir</span>
+          </button>
+        </div>
+
+        <!-- Lista de módulos -->
+        <div class="bg-gray-900 rounded-xl shadow-md p-4">
+          <h2 class="text-lg font-semibold text-white mb-4">Conteúdo</h2>
+          <div class="space-y-4">
+            <% modulos.forEach((modulo, mi) => { %>
+              <div class="bg-gray-800 rounded-lg p-3">
+                <h3 class="font-bold text-blue-400 mb-2"><%= (mi+1) %>. <%= modulo.modulo %></h3>
+                <ul class="space-y-2">
+                  <% modulo.videos.forEach((v, vi) => { %>
+                    <li>
+                      <button 
+                        id="video-<%= mi %>-<%= vi %>"
+                        class="btn-video w-full text-left px-3 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 transition text-sm flex items-center justify-between"
+                        onclick="trocarVideo('<%= v.url %>', '<%= v.titulo %>', '<%= v.descricao || '' %>', '<%= v.material || '' %>', '<%= mi %>', '<%= vi %>')">
+                        <span>🎬 <%= v.titulo %></span>
+                        <span class="checkbox text-gray-400 text-sm">
+                          <i data-lucide="square" class="w-4 h-4"></i>
+                        </span>
+                      </button>
+                    </li>
+                  <% }) %>
+                </ul>
+              </div>
+            <% }) %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    lucide.createIcons();
+
+    let videoAtual = { mi: 0, vi: 0 };
+    const progresso = JSON.parse(localStorage.getItem("progressoVideos") || "{}");
+
+    // Atualiza estado da lista ao carregar
+    document.querySelectorAll(".btn-video").forEach(btn => {
+      const id = btn.id;
+      if (progresso[id]) {
+        const checkbox = btn.querySelector(".checkbox");
+        checkbox.innerHTML = `<i data-lucide="check-square" class="w-4 h-4 text-green-400"></i>`;
+      }
+    });
+    lucide.createIcons();
+
+    function trocarVideo(url, titulo, descricao, material, mi, vi) {
+      document.getElementById("video-player").src = url;
+      document.querySelector("#video-info h2").textContent = titulo;
+      
+      const descEl = document.querySelector("#video-info p");
+      if (descricao) {
+        if (descEl) {
+          descEl.textContent = descricao;
+        } else {
+          const p = document.createElement("p");
+          p.className = "text-gray-400 mt-1";
+          p.textContent = descricao;
+          document.getElementById("video-info").appendChild(p);
+        }
+      } else if (descEl) {
+        descEl.remove();
+      }
+
+      const btnAntigo = document.querySelector("#video-info a");
+      if (material) {
+        if (btnAntigo) {
+          btnAntigo.href = material;
+        } else {
+          const a = document.createElement("a");
+          a.href = material;
+          a.target = "_blank";
+          a.className = "inline-block mt-3 px-4 py-2 bg-blue-600 rounded-lg text-white text-sm hover:bg-blue-500";
+          a.textContent = "📂 Material de Apoio";
+          document.getElementById("video-info").appendChild(a);
+        }
+      } else if (btnAntigo) {
+        btnAntigo.remove();
+      }
+
+      // Atualiza vídeo atual
+      videoAtual = { mi, vi };
+
+      // Verifica se já concluído
+      const id = `video-${mi}-${vi}`;
+      const concluirBtn = document.getElementById("btn-concluir");
+
+      if (progresso[id]) {
+        document.getElementById("btn-concluir-icon").setAttribute("data-lucide", "check-square");
+        document.getElementById("btn-concluir-text").textContent = "Concluído";
+        concluirBtn.classList.remove("bg-gray-800", "text-gray-300");
+        concluirBtn.classList.add("bg-green-600", "text-white");
+      } else {
+        document.getElementById("btn-concluir-icon").setAttribute("data-lucide", "square");
+        document.getElementById("btn-concluir-text").textContent = "Concluir";
+        concluirBtn.classList.remove("bg-green-600", "text-white");
+        concluirBtn.classList.add("bg-gray-800", "text-gray-300");
+      }
+      lucide.createIcons();
+    }
+
+    // Marca ou desmarca como concluído
+    document.getElementById("btn-concluir").addEventListener("click", () => {
+      const id = `video-${videoAtual.mi}-${videoAtual.vi}`;
+      const btn = document.getElementById(id);
+      const checkbox = btn.querySelector(".checkbox");
+      const concluirBtn = document.getElementById("btn-concluir");
+
+      if (progresso[id]) {
+        // Desmarcar
+        delete progresso[id];
+        checkbox.innerHTML = `<i data-lucide="square" class="w-4 h-4"></i>`;
+        document.getElementById("btn-concluir-icon").setAttribute("data-lucide", "square");
+        document.getElementById("btn-concluir-text").textContent = "Concluir";
+        concluirBtn.classList.remove("bg-green-600", "text-white");
+        concluirBtn.classList.add("bg-gray-800", "text-gray-300");
+      } else {
+        // Marcar
+        progresso[id] = true;
+        checkbox.innerHTML = `<i data-lucide="check-square" class="w-4 h-4 text-green-400"></i>`;
+        document.getElementById("btn-concluir-icon").setAttribute("data-lucide", "check-square");
+        document.getElementById("btn-concluir-text").textContent = "Concluído";
+        concluirBtn.classList.remove("bg-gray-800", "text-gray-300");
+        concluirBtn.classList.add("bg-green-600", "text-white");
+      }
+
+      // Salva no localStorage
+      localStorage.setItem("progressoVideos", JSON.stringify(progresso));
+      lucide.createIcons();
+    });
+  </script>
+</body>
+</html>
