@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <title>Meus Planos - Clube Quant</title>
+  <title>Planos - Clube Quant</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link href="/output.css" rel="stylesheet">
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -17,58 +17,106 @@
 
   <!-- Conteúdo -->
   <main class="ml-64 p-6 flex-1">
-    <div class="max-w-6xl mx-auto">
+    <div class="max-w-7xl mx-auto">
 
       <!-- Título -->
-      <h1 class="text-2xl font-bold mb-6">Gerenciamento de Planos</h1>
+      <h1 class="text-2xl font-bold mb-10 flex items-center gap-2">
+        <i data-lucide="credit-card" class="w-6 h-6 text-yellow-400"></i>
+        <span>Gerenciamento de Planos</span>
+      </h1>
 
       <!-- Plano atual -->
-      <div class="bg-gray-800 rounded-xl shadow-md p-6 mb-8 border border-quant-purple/30">
-        <h2 class="text-xl font-semibold text-quant-purple">Seu Plano Atual</h2>
-        <p class="mt-2 text-gray-300">Você está no plano <strong>Premium</strong>, válido até <span class="text-quant-green">30/09/2025</span>.</p>
-        
-        <div class="mt-4 flex gap-3">
-          <button class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 transition font-semibold">Fazer Upgrade</button>
-          <button class="px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-500 transition font-semibold">Fazer Downgrade</button>
-          <button class="ml-auto px-4 py-2 rounded-lg bg-red-600 hover:bg-red-500 transition font-semibold">Cancelar Plano</button>
+      <% if (usuario.plano) { 
+        const detalhesPlano = {
+          starter: { preco: "R$ 97/mês", limite: "Até 4 algoritmos" },
+          plus: { preco: "R$ 197/mês", limite: "Até 8 algoritmos" },
+          premium: { preco: "R$ 297/mês", limite: "Até 12 algoritmos" },
+          diamond: { preco: "Consulte", limite: "Acesso ilimitado" }
+        }[usuario.plano.toLowerCase()] || { preco: "N/D", limite: "N/D" };
+      %>
+        <div class="bg-gray-800 rounded-xl shadow-md p-6 mb-12 border border-quant-purple/30">
+          <h2 class="text-xl font-semibold text-quant-purple">Seu Plano Atual</h2>
+          <p class="mt-2 text-gray-300">
+            Você está no plano <strong><%= usuario.plano.toLowerCase() %></strong>, válido até
+            <span class="text-quant-green">
+              <%= usuario.vencimento ? new Date(usuario.vencimento).toLocaleDateString("pt-BR") : "N/D" %>
+            </span>.
+          </p>
+          <p class="mt-2 text-gray-300">
+            <span class="font-semibold text-white">Preço:</span> <%= detalhesPlano.preco %><br>
+            <span class="font-semibold text-white">Limite:</span> <%= detalhesPlano.limite %>
+          </p>
+          <div class="mt-4 flex justify-end">
+            <button class="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-500 transition font-semibold">
+              Cancelar Plano
+            </button>
+          </div>
         </div>
+      <% } %>
+
+      <!-- Planos disponíveis -->
+      <h2 class="text-lg font-bold mb-6 px-1">Planos Disponíveis</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 px-1">
+        <% 
+          const planos = [
+            { nome: "Starter", preco: "R$ 97/mês", desc: "Ideal para começar", limite: "Até 4 algoritmos", link: "https://pay.zouti.com.br/checkout?poi=prod_offer_rw4arkjywwtvst66qb6f35" },
+            { nome: "Plus", preco: "R$ 197/mês", desc: "Mais recursos e flexibilidade", limite: "Até 8 algoritmos", link: "https://pay.zouti.com.br/checkout?poi=prod_offer_u86x1k92h6v8gu8nenhc5k" },
+            { nome: "Premium", preco: "R$ 297/mês", desc: "Para traders avançados", limite: "Até 12 algoritmos", link: "https://pay.zouti.com.br/checkout?poi=prod_offer_ad7lhtpltf4l7lecmuiccx" },
+            { nome: "Diamond", preco: "Consulte", desc: "Plano exclusivo para profissionais", limite: "Acesso ilimitado", link: "#" }
+          ];
+
+          const ordemPlanos = ["starter", "plus", "premium", "diamond"];
+          const indiceAtual = ordemPlanos.indexOf((usuario.plano || "").toLowerCase());
+
+          planos
+            .filter(plano => plano.nome.toLowerCase() !== (usuario.plano || "").toLowerCase())
+            .forEach(plano => {
+              const indicePlano = ordemPlanos.indexOf(plano.nome.toLowerCase());
+              let acao = "Upgrade";
+              if (plano.nome.toLowerCase() === "diamond") {
+                acao = "Consultar";
+              } else if (indicePlano < indiceAtual) {
+                acao = "Downgrade";
+              }
+        %>
+        <div class="flex flex-col justify-between bg-gray-900 border border-gray-700 rounded-xl p-6 shadow-md">
+          <div>
+            <h3 class="text-lg font-semibold text-white"><%= plano.nome %></h3>
+            <p class="text-gray-400 mt-1"><%= plano.desc %></p>
+            <p class="text-xl font-bold text-quant-green mt-4"><%= plano.preco %></p>
+            <ul class="mt-4 space-y-2 text-left">
+              <li class="flex items-center gap-2 text-gray-300">
+                <i data-lucide="check-circle" class="w-4 h-4 text-green-400"></i>
+                <span><%= plano.limite %></span>
+              </li>
+              <li class="flex items-center gap-2 text-gray-300">
+                <i data-lucide="check-circle" class="w-4 h-4 text-green-400"></i>
+                <span>Acesso completo às estratégias</span>
+              </li>
+              <li class="flex items-center gap-2 text-gray-300">
+                <i data-lucide="check-circle" class="w-4 h-4 text-green-400"></i>
+                <span>Suporte dedicado</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="flex justify-end mt-6">
+            <% if (acao === "Consultar") { %>
+              <a href="<%= plano.link %>" target="_blank"
+                class="flex items-center gap-2 px-3 py-1.5 rounded-md bg-gray-800 hover:bg-gray-700 text-sm text-purple-400 font-medium transition">
+                <i data-lucide="message-square" class="w-4 h-4"></i> Consultar
+              </a>
+            <% } else { %>
+              <a href="<%= plano.link %>" target="_blank"
+                class="flex items-center gap-2 px-3 py-1.5 rounded-md bg-gray-800 hover:bg-gray-700 text-sm text-gray-300 font-medium transition">
+                <i data-lucide="<%= acao === 'Upgrade' ? 'arrow-up-circle' : 'arrow-down-circle' %>" class="w-4 h-4"></i> <%= acao %>
+              </a>
+            <% } %>
+          </div>
+        </div>
+        <% }) %>
       </div>
 
-      <!-- Outros planos -->
-      <h2 class="text-lg font-bold mb-4">Outros Planos Disponíveis</h2>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        
-        <!-- Card Starter -->
-        <div class="bg-gray-900 border border-gray-700 rounded-xl shadow-md p-6 flex flex-col justify-between">
-          <div>
-            <h3 class="text-xl font-semibold text-white">Starter</h3>
-            <p class="text-gray-400 mt-2">Plano básico para começar</p>
-            <p class="text-2xl font-bold text-quant-green mt-4">R$ 49/mês</p>
-          </div>
-          <button class="mt-6 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 transition font-semibold">Assinar</button>
-        </div>
-
-        <!-- Card Plus -->
-        <div class="bg-gray-900 border border-gray-700 rounded-xl shadow-md p-6 flex flex-col justify-between">
-          <div>
-            <h3 class="text-xl font-semibold text-white">Plus</h3>
-            <p class="text-gray-400 mt-2">Mais recursos e limites maiores</p>
-            <p class="text-2xl font-bold text-quant-green mt-4">R$ 97/mês</p>
-          </div>
-          <button class="mt-6 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 transition font-semibold">Assinar</button>
-        </div>
-
-        <!-- Card Diamond -->
-        <div class="bg-gray-900 border border-gray-700 rounded-xl shadow-md p-6 flex flex-col justify-between">
-          <div>
-            <h3 class="text-xl font-semibold text-white">Diamond</h3>
-            <p class="text-gray-400 mt-2">Plano completo para profissionais</p>
-            <p class="text-2xl font-bold text-quant-green mt-4">R$ 197/mês</p>
-          </div>
-          <button class="mt-6 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 transition font-semibold">Assinar</button>
-        </div>
-
-      </div>
     </div>
   </main>
 
