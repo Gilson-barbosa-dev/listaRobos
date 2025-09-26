@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Cadastro - Clube Quant</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="/output.css" rel="stylesheet">
+</head>
+<body class="bg-gradient-to-br from-black via-gray-900 to-black text-white min-h-screen flex items-center justify-center font-sans">
+
+  <div class="bg-gray-900 p-8 rounded-2xl shadow-lg w-full max-w-md">
+    <!-- Logo -->
+    <div class="flex justify-center mb-6">
+      <img src="/img/logo_clube_quant2.png" alt="Clube Quant" class="w-40">
+    </div>
+
+    <h1 class="text-2xl font-bold text-center mb-6 flex items-center justify-center gap-2">
+      <i data-lucide="user-plus" class="w-6 h-6 text-green-400"></i>
+      <span class="text-white">Criar Conta</span>
+    </h1>
+
+    <% if (erro) { %>
+      <p class="text-red-500 text-center mb-4"><%= erro %></p>
+    <% } %>
+
+    <% if (sucesso) { %>
+      <p class="text-green-500 text-center mb-4"><%= sucesso %></p>
+    <% } %>
+
+    <form action="/register" method="POST" class="space-y-4">
+      <input 
+        type="text" 
+        name="nome" 
+        placeholder="Digite seu nome completo" 
+        required
+        class="w-full px-4 py-2 rounded-lg bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-green-500 placeholder-gray-400"
+      >
+
+      <input 
+        type="email" 
+        name="email" 
+        placeholder="Digite seu e-mail" 
+        required
+        class="w-full px-4 py-2 rounded-lg bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-green-500 placeholder-gray-400"
+      >
+
+      <input 
+        type="password" 
+        name="senha" 
+        placeholder="Crie uma senha" 
+        required
+        class="w-full px-4 py-2 rounded-lg bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-green-500 placeholder-gray-400"
+      >
+
+      <button type="submit" 
+        class="w-full flex items-center justify-center gap-2 bg-green-600 hover:bg-green-500 text-white py-2 rounded-lg font-semibold transition">
+        <i data-lucide="check-circle" class="w-5 h-5"></i>
+        Cadastrar
+      </button>
+    </form>
+
+    <p class="text-gray-400 text-sm text-center mt-6">
+      Já tem conta? <a href="/login" class="text-blue-400 hover:underline">Entrar</a>
+    </p>
+  </div>
+
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    lucide.createIcons();
+  </script>
+</body>
+</html>
