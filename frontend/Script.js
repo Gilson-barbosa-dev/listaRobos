@@ -384,7 +384,7 @@ async function abrirHistorico(magic) {
         plugins: { legend: { display: false } },
         scales: {
           x: { ticks: { color: "#9ca3af" } },
-          y: { ticks: { color: "#9ca3af" }, beginAtZero: true },
+          y: { ticks: { color: "#9ca3af" }, position: "right", beginAtZero: true },
         },
       },
     });
