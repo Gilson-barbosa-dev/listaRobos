@@ -3,44 +3,63 @@
 let estrategiasGlobais = [];
 
 // ==========================
-// 🔹 Favoritos (LocalStorage)
+// 🔹 Favoritos (Banco via API)
 // ==========================
-function getFavoritos() {
-  return JSON.parse(localStorage.getItem("favoritos")) || [];
-}
+async function toggleFavorito(magic) {
+  try {
+    const btn = document.querySelector(`.btn-favorito[data-magic="${magic}"]`);
+    const icon = btn?.querySelector("i, svg");
 
-function salvarFavoritos(lista) {
-  localStorage.setItem("favoritos", JSON.stringify(lista));
-}
+    const jaFavorito = icon?.classList.contains("text-yellow-400");
 
-function toggleFavorito(magic) {
-  let favoritos = getFavoritos();
-  const jaFavorito = favoritos.includes(magic);
+    if (jaFavorito) {
+      // Remove do banco
+      await fetch(`/api/favoritos/${magic}`, { method: "DELETE" });
 
-  if (jaFavorito) {
-    favoritos = favoritos.filter((m) => m !== magic);
-  } else {
-    favoritos.push(magic);
-  }
-  salvarFavoritos(favoritos);
+      // Atualiza estilo (estrela apagada)
+      if (icon) {
+        icon.classList.remove(
+          "text-yellow-400",
+          "drop-shadow-glow",
+          "fill-yellow-400"
+        );
+        icon.classList.add("text-gray-500", "fill-transparent");
+      }
+    } else {
+      // Adiciona no banco
+      await fetch(`/api/favoritos`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ magic }),
+      });
 
-  const btn = document.querySelector(`.btn-favorito[data-magic="${magic}"]`);
-  if (btn) {
-    const icon = btn.querySelector("i, svg");
-    if (icon) {
-      if (jaFavorito) {
-        icon.className = "w-6 h-6 text-gray-500 fill-transparent transition duration-300";
-      } else {
-        icon.className =
-          "w-6 h-6 text-yellow-400 drop-shadow-glow fill-yellow-400 transition duration-300 animate-pulse-star";
+      // Atualiza estilo (estrela acesa)
+      if (icon) {
+        icon.classList.remove("text-gray-500", "fill-transparent");
+        icon.classList.add(
+          "text-yellow-400",
+          "drop-shadow-glow",
+          "fill-yellow-400",
+          "animate-pulse-star"
+        );
         setTimeout(() => {
           icon.classList.remove("animate-pulse-star");
         }, 500);
       }
-      lucide.createIcons();
     }
+
+    lucide.createIcons();
+
+    // Atualiza gráficos/listas apenas se estiver na aba de favoritos
+    if (window.location.pathname.includes("meus-algoritmos")) {
+      carregarFavoritos();
+      carregarGraficoFavoritos();
+    }
+  } catch (err) {
+    console.error("❌ Erro ao alternar favorito:", err);
   }
 }
+
 
 // ==========================
 // 🔹 Carregar dados do backend
@@ -61,7 +80,8 @@ async function carregarEstrategias() {
 // 🔹 Filtros (Página principal)
 // ==========================
 function aplicarFiltros() {
-  const busca = document.querySelector('input[type="text"]')?.value?.toLowerCase() || "";
+  const busca =
+    document.querySelector('input[type="text"]')?.value?.toLowerCase() || "";
   const ordenarPor = document.querySelector("select")?.value || "lucro_total";
 
   let filtradas = estrategiasGlobais.filter((e) => {
@@ -87,81 +107,138 @@ function renderizarEstrategias(estrategias) {
   const painel = document.getElementById("painel");
   if (!painel) return;
 
-  let vencedoras = 0, perdedoras = 0, totalTrades = 0, lucroTotal = 0;
-  const favoritos = getFavoritos();
+  let vencedoras = 0,
+    perdedoras = 0,
+    totalTrades = 0,
+    lucroTotal = 0;
   painel.innerHTML = "";
 
   if (!estrategias || estrategias.length === 0) {
     painel.innerHTML = `<div class="bg-gray-800 text-gray-300 rounded-xl p-6 shadow-md">
       Nenhuma estratégia encontrada 🚫
     </div>`;
-    atualizarKPIs("kpi", { vencedoras: 0, perdedoras: 0, trades: 0, lucro: 0, fator: 0 });
+    atualizarKPIs("kpi", {
+      vencedoras: 0,
+      perdedoras: 0,
+      trades: 0,
+      lucro: 0,
+      fator: 0,
+    });
     return;
   }
 
   estrategias.forEach((e) => {
     const trades = e.total_operacoes || 0;
     const lucro = Number(e.lucro_total) || 0;
-    const isFavorito = favoritos.includes(e.magic);
 
     totalTrades += trades;
     lucroTotal += lucro;
     lucro > 0 ? vencedoras++ : perdedoras++;
 
-    const card = criarCardEstrategia(e, isFavorito);
+    const card = criarCardEstrategia(e, false);
     painel.appendChild(card);
   });
 
-  const fatorLucro = perdedoras > 0 ? (vencedoras / perdedoras).toFixed(2) : vencedoras;
-  atualizarKPIs("kpi", { vencedoras, perdedoras, trades: totalTrades, lucro: lucroTotal, fator: fatorLucro });
+  const fatorLucro =
+    perdedoras > 0 ? (vencedoras / perdedoras).toFixed(2) : vencedoras;
+  atualizarKPIs("kpi", {
+    vencedoras,
+    perdedoras,
+    trades: totalTrades,
+    lucro: lucroTotal,
+    fator: fatorLucro,
+  });
   lucide.createIcons();
 }
 
 // ==========================
 // 🔹 Renderizar Favoritos (Meus Algoritmos)
 // ==========================
-function renderizarEstrategiasFavoritos() {
+async function carregarFavoritos() {
+  try {
+    const resp = await fetch("/api/favoritos");
+    if (!resp.ok) throw new Error("Erro ao buscar favoritos");
+    const favoritos = await resp.json();
+
+    const unicos = [];
+    const vistos = new Set();
+    favoritos.forEach((f) => {
+      if (!vistos.has(f.magic)) {
+        vistos.add(f.magic);
+        unicos.push(f);
+      }
+    });
+
+    renderizarEstrategiasFavoritos(unicos);
+  } catch (err) {
+    console.error("❌ Erro ao carregar favoritos:", err);
+    const painel = document.getElementById("painel-favoritos");
+    if (painel) {
+      painel.innerHTML = `<div class="bg-gray-800 text-gray-300 rounded-xl p-6 shadow-md">
+        Erro ao carregar favoritos ⚠️
+      </div>`;
+    }
+  }
+}
+
+function renderizarEstrategiasFavoritos(listaFavoritos) {
   const painel = document.getElementById("painel-favoritos");
   if (!painel) return;
 
-  const favoritos = getFavoritos();
-  const filtradas = estrategiasGlobais.filter(e => favoritos.includes(e.magic));
-
-  let vencedoras = 0, perdedoras = 0, totalTrades = 0, lucroTotal = 0;
+  let vencedoras = 0,
+    perdedoras = 0,
+    totalTrades = 0,
+    lucroTotal = 0;
   painel.innerHTML = "";
 
-  if (!filtradas || filtradas.length === 0) {
+  if (!listaFavoritos || listaFavoritos.length === 0) {
     painel.innerHTML = `<div class="bg-gray-800 text-gray-300 rounded-xl p-6 shadow-md">
       Nenhum algoritmo favoritado ⭐
     </div>`;
-    atualizarKPIs("fav", { vencedoras: 0, perdedoras: 0, trades: 0, lucro: 0, fator: 0 });
+    atualizarKPIs("fav", {
+      vencedoras: 0,
+      perdedoras: 0,
+      trades: 0,
+      lucro: 0,
+      fator: 0,
+    });
     return;
   }
 
-  filtradas.forEach((e) => {
-    const trades = e.total_operacoes || 0;
-    const lucro = Number(e.lucro_total) || 0;
-    const isFavorito = favoritos.includes(e.magic);
+  listaFavoritos.forEach((fav) => {
+    const estrategia = estrategiasGlobais.find((e) => e.magic == fav.magic);
+    if (!estrategia) return;
+
+    const trades = estrategia.total_operacoes || 0;
+    const lucro = Number(estrategia.lucro_total) || 0;
 
     totalTrades += trades;
     lucroTotal += lucro;
     lucro > 0 ? vencedoras++ : perdedoras++;
 
-    const card = criarCardEstrategia(e, isFavorito);
+    const card = criarCardEstrategia({ ...estrategia, isFavorito: true }, true);
     painel.appendChild(card);
   });
 
-  const fatorLucro = perdedoras > 0 ? (vencedoras / perdedoras).toFixed(2) : vencedoras;
-  atualizarKPIs("fav", { vencedoras, perdedoras, trades: totalTrades, lucro: lucroTotal, fator: fatorLucro });
+  const fatorLucro =
+    perdedoras > 0 ? (vencedoras / perdedoras).toFixed(2) : vencedoras;
+  atualizarKPIs("fav", {
+    vencedoras,
+    perdedoras,
+    trades: totalTrades,
+    lucro: lucroTotal,
+    fator: fatorLucro,
+  });
   lucide.createIcons();
 }
 
 // ==========================
-// 🔹 Criar Card (usado nos dois painéis)
+// 🔹 Criar Card
 // ==========================
 function criarCardEstrategia(e, isFavorito) {
   const card = document.createElement("div");
-  card.className = "bg-gray-900 border border-gray-800 rounded-2xl shadow-md p-5 flex flex-col justify-between hover:scale-105 transform transition";
+  card.className =
+    "bg-gray-900 border border-gray-800 rounded-2xl shadow-md p-5 flex flex-col justify-between hover:scale-105 transform transition";
 
   card.innerHTML = `
     <div class="flex items-center justify-between mb-2">
@@ -173,23 +250,35 @@ function criarCardEstrategia(e, isFavorito) {
         <span class="text-sm text-gray-400">${e.ativo}</span>
         <button class="btn-favorito ml-2 p-1 rounded transition transform hover:scale-110" data-magic="${e.magic}">
           <i data-lucide="star"
-             class="w-6 h-6 transition duration-300 ${isFavorito ? "text-yellow-400 drop-shadow-glow fill-yellow-400" : "text-gray-500 fill-transparent"}"></i>
+             class="w-6 h-6 transition duration-300 ${
+               e.isFavorito
+                 ? "text-yellow-400 drop-shadow-glow fill-yellow-400"
+                 : "text-gray-500 fill-transparent"
+             }"></i>
         </button>
       </div>
     </div>
 
     <dl class="space-y-1 text-sm text-gray-300">
       <div class="flex justify-between"><dt>Lucro Total</dt>
-        <dd class="font-bold ${e.lucro_total >= 0 ? "text-emerald-400" : "text-red-400"}">
+        <dd class="font-bold ${
+          e.lucro_total >= 0 ? "text-emerald-400" : "text-red-400"
+        }">
           ${Number(e.lucro_total).toFixed(2)} USD
         </dd>
       </div>
-      <div class="flex justify-between"><dt>Trades</dt><dd>${e.total_operacoes || 0}</dd></div>
-      <div class="flex justify-between"><dt>Assertividade</dt><dd class="text-blue-400">${e.assertividade || 0}%</dd></div>
+      <div class="flex justify-between"><dt>Trades</dt><dd>${
+        e.total_operacoes || 0
+      }</dd></div>
+      <div class="flex justify-between"><dt>Assertividade</dt><dd class="text-blue-400">${
+        e.assertividade || 0
+      }%</dd></div>
     </dl>
 
     <div class="flex justify-between items-center mt-4 pt-3 border-t border-gray-800 text-sm">
-      <button class="btn-historico flex items-center gap-1 text-gray-400 hover:text-white" data-magic="${e.magic}">
+      <button class="btn-historico flex items-center gap-1 text-gray-400 hover:text-white" data-magic="${
+        e.magic
+      }">
         <i data-lucide="clock" class="w-4 h-4"></i> Histórico
       </button>
       <button class="flex items-center gap-1 text-gray-400 hover:text-white">
@@ -216,7 +305,7 @@ function atualizarKPIs(prefixo, { vencedoras, perdedoras, trades, lucro, fator }
 }
 
 // ==========================
-// 🔹 Gráfico consolidado diário (todos)
+// 🔹 Gráficos
 // ==========================
 async function carregarGraficoDiario() {
   try {
@@ -226,7 +315,9 @@ async function carregarGraficoDiario() {
     let dados = await res.json();
     dados = dados.sort((a, b) => new Date(a.dia) - new Date(b.dia));
 
-    const labels = dados.map((d) => new Date(d.dia).toLocaleDateString("pt-BR"));
+    const labels = dados.map((d) =>
+      new Date(d.dia).toLocaleDateString("pt-BR")
+    );
     let acumulado = 0;
     const valores = dados.map((d) => (acumulado += parseFloat(d.lucro_total)));
 
@@ -254,7 +345,11 @@ async function carregarGraficoDiario() {
         plugins: { legend: { display: false } },
         scales: {
           x: { ticks: { color: "#9ca3af" } },
-          y: { ticks: { color: "#9ca3af" }, position: "right", beginAtZero: true },
+          y: {
+            ticks: { color: "#9ca3af" },
+            position: "right",
+            beginAtZero: true,
+          },
         },
       },
     });
@@ -263,45 +358,47 @@ async function carregarGraficoDiario() {
   }
 }
 
-// ==========================
-// 🔹 Gráfico consolidado dos Favoritos
-// ==========================
 let graficoFavoritosInstancia = null;
 
 async function carregarGraficoFavoritos() {
   try {
-    const favoritos = getFavoritos();
+    const res = await fetch("/api/favoritos");
+    if (!res.ok) throw new Error("Erro ao buscar favoritos");
+    const favoritos = await res.json();
+
     if (!favoritos.length) return;
 
-    // monta query string múltipla: ?magic=3007&magic=3006...
-    const params = favoritos.map(m => "magic=" + encodeURIComponent(m)).join("&");
-    const res = await fetch("/api/estatistica-detalhada?" + params);
-    if (!res.ok) throw new Error("Erro ao buscar dados dos favoritos");
+    const params = favoritos
+      .map((m) => "magic=" + encodeURIComponent(m.magic))
+      .join("&");
+    const resp = await fetch("/api/estatistica-detalhada?" + params);
+    if (!resp.ok) throw new Error("Erro ao buscar dados dos favoritos");
 
-    let dados = await res.json();
+    let dados = await resp.json();
 
-    // Agrupa por data e soma o lucro
     const mapa = {};
     dados.forEach((d) => {
       const dia = new Date(d.data_ordem).toISOString().split("T")[0];
       mapa[dia] = (mapa[dia] || 0) + parseFloat(d.lucro);
     });
 
-    const labels = Object.keys(mapa).sort((a, b) => new Date(a) - new Date(b));
+    const labels = Object.keys(mapa).sort(
+      (a, b) => new Date(a) - new Date(b)
+    );
     let acumulado = 0;
     const valores = labels.map((dia) => (acumulado += mapa[dia]));
 
     const ctx = document.getElementById("graficoFavoritos")?.getContext("2d");
     if (!ctx) return;
 
-    if (graficoFavoritosInstancia) {
-      graficoFavoritosInstancia.destroy();
-    }
+    if (graficoFavoritosInstancia) graficoFavoritosInstancia.destroy();
 
     graficoFavoritosInstancia = new Chart(ctx, {
       type: "line",
       data: {
-        labels: labels.map((d) => new Date(d).toLocaleDateString("pt-BR")),
+        labels: labels.map((d) =>
+          new Date(d).toLocaleDateString("pt-BR")
+        ),
         datasets: [
           {
             label: "Evolução dos Favoritos",
@@ -319,7 +416,11 @@ async function carregarGraficoFavoritos() {
         plugins: { legend: { display: false } },
         scales: {
           x: { ticks: { color: "#9ca3af" } },
-          y: { ticks: { color: "#9ca3af" }, position: "right", beginAtZero: true },
+          y: {
+            ticks: { color: "#9ca3af" },
+            position: "right",
+            beginAtZero: true,
+          },
         },
       },
     });
@@ -344,7 +445,9 @@ async function abrirHistorico(magic) {
 
     dados = dados.sort((a, b) => new Date(a.data_ordem) - new Date(b.data_ordem));
 
-    const labels = dados.map((d) => new Date(d.data_ordem).toLocaleDateString("pt-BR"));
+    const labels = dados.map((d) =>
+      new Date(d.data_ordem).toLocaleDateString("pt-BR")
+    );
     let acumulado = 0;
     const valores = dados.map((d) => (acumulado += parseFloat(d.lucro)));
 
@@ -361,7 +464,8 @@ async function abrirHistorico(magic) {
     container.appendChild(novoCanvas);
 
     const ctx = novoCanvas.getContext("2d");
-    if (window.graficoHistoricoInstancia) window.graficoHistoricoInstancia.destroy();
+    if (window.graficoHistoricoInstancia)
+      window.graficoHistoricoInstancia.destroy();
 
     window.graficoHistoricoInstancia = new Chart(ctx, {
       type: "line",
@@ -384,7 +488,11 @@ async function abrirHistorico(magic) {
         plugins: { legend: { display: false } },
         scales: {
           x: { ticks: { color: "#9ca3af" } },
-          y: { ticks: { color: "#9ca3af" }, position: "right", beginAtZero: true },
+          y: {
+            ticks: { color: "#9ca3af" },
+            position: "right",
+            beginAtZero: true,
+          },
         },
       },
     });
@@ -412,28 +520,27 @@ document.addEventListener("DOMContentLoaded", async () => {
   carregarGraficoDiario();
 
   if (window.location.pathname.includes("meus-algoritmos")) {
-    renderizarEstrategiasFavoritos();
+    carregarFavoritos();
     carregarGraficoFavoritos();
   }
 
-  document.querySelector('input[type="text"]')?.addEventListener("input", aplicarFiltros);
-  document.querySelector("select")?.addEventListener("change", aplicarFiltros);
+  document
+    .querySelector('input[type="text"]')
+    ?.addEventListener("input", aplicarFiltros);
+  document
+    .querySelector("select")
+    ?.addEventListener("change", aplicarFiltros);
 
   document.addEventListener("click", (e) => {
     if (e.target.closest(".btn-historico")) {
+      e.stopImmediatePropagation();
       const magic = e.target.closest(".btn-historico").dataset.magic;
       abrirHistorico(magic);
     }
     if (e.target.closest(".btn-favorito")) {
+      e.stopImmediatePropagation();
       const magic = e.target.closest(".btn-favorito").dataset.magic;
       toggleFavorito(magic);
-
-      aplicarFiltros(); // mantém filtro aplicado
-
-      if (window.location.pathname.includes("meus-algoritmos")) {
-        renderizarEstrategiasFavoritos();
-        carregarGraficoFavoritos();
-      }
     }
   });
 });

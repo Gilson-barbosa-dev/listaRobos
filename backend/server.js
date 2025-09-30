@@ -47,7 +47,6 @@ function autenticar(req, res, next) {
   return res.redirect("/login");
 }
 
-// 🔹 Middleware global: atualiza os dados do usuário em todas as rotas autenticadas
 async function atualizarUsuario(req, res, next) {
   if (!req.session.usuario) return next();
 
@@ -248,6 +247,97 @@ app.get("/api/estatistica-detalhada", autenticar, atualizarUsuario, verificarAss
   } catch (err) {
     console.error("❌ Erro ao buscar estatística detalhada:", err);
     return res.status(500).json({ erro: "Erro interno ao buscar estatística detalhada" });
+  }
+});
+
+// ==========================
+// 🔹 Rotas de Favoritos
+// ==========================
+app.get("/api/favoritos", autenticar, atualizarUsuario, verificarAssinatura, async (req, res) => {
+  try {
+    const usuario_id = req.session.usuario.id;
+    const query = `
+      SELECT f.magic, f.criado_em,
+             CASE WHEN l.session_token IS NOT NULL THEN true ELSE false END as tem_token
+      FROM favorito f
+      LEFT JOIN licencas l 
+        ON l.usuario_id = f.usuario_id AND l.magic = f.magic
+      WHERE f.usuario_id = $1
+    `;
+    const { rows } = await pool.query(query, [usuario_id]);
+    return res.json(rows);
+  } catch (err) {
+    console.error("❌ Erro ao buscar favoritos:", err);
+    return res.status(500).json({ erro: "Erro ao buscar favoritos" });
+  }
+});
+
+// 🔹 Adicionar favorito
+app.post("/api/favoritos", autenticar, atualizarUsuario, verificarAssinatura, async (req, res) => {
+  try {
+    const usuario_id = req.session.usuario.id;
+    const { magic } = req.body;
+
+    if (!usuario_id || !magic) {
+      return res.status(400).json({ erro: "Parâmetros inválidos" });
+    }
+
+    await pool.query(
+      `INSERT INTO favorito (usuario_id, magic, criado_em)
+      SELECT $1, $2, NOW()
+      WHERE NOT EXISTS (
+        SELECT 1 FROM favorito WHERE usuario_id = $1 AND magic = $2
+      )`,
+      [usuario_id, magic]
+    );
+
+    return res.json({ status: "ok" });
+  } catch (err) {
+    console.error("❌ Erro ao adicionar favorito:", err);
+    return res.status(500).json({ erro: "Erro ao adicionar favorito" });
+  }
+});
+
+// 🔹 Remover favorito
+app.delete("/api/favoritos/:magic", autenticar, atualizarUsuario, verificarAssinatura, async (req, res) => {
+  try {
+    const usuario_id = req.session.usuario.id;
+    const magic = parseInt(req.params.magic, 10);
+
+    if (!usuario_id || !magic) {
+      return res.status(400).json({ erro: "Parâmetros inválidos" });
+    }
+
+    await pool.query(
+      `DELETE FROM favorito WHERE usuario_id = $1 AND magic = $2`,
+      [usuario_id, magic]
+    );
+
+    return res.json({ status: "ok" });
+  } catch (err) {
+    console.error("❌ Erro ao remover favorito:", err);
+    return res.status(500).json({ erro: "Erro ao remover favorito" });
+  }
+});
+
+app.post("/api/favoritos/liberar", autenticar, atualizarUsuario, verificarAssinatura, async (req, res) => {
+  try {
+    const usuario_id = req.session.usuario.id;
+    const { magic } = req.body;
+
+    if (!usuario_id || !magic) {
+      return res.status(400).json({ erro: "Parâmetros inválidos" });
+    }
+
+    await pool.query(
+      `UPDATE licencas SET session_token = NULL WHERE usuario_id = $1 AND magic = $2`,
+      [usuario_id, magic]
+    );
+
+    return res.json({ status: "ok" });
+  } catch (err) {
+    console.error("❌ Erro ao liberar acesso:", err);
+    return res.status(500).json({ erro: "Erro ao liberar acesso" });
   }
 });
 

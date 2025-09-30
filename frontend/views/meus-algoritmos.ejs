@@ -77,15 +77,26 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="/Script.js"></script>
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      // Reaproveita a função que já renderiza estratégias
-      const favoritos = getFavoritos();
-      const filtradas = estrategiasGlobais.filter(e => favoritos.includes(e.magic));
-      renderizarEstrategiasFavoritos(filtradas);
-
-      // Gráfico consolidado só dos favoritos
-      carregarGraficoFavoritos();
-    });
+    async function liberarAcesso(magic) {
+      try {
+        const resp = await fetch("/api/favoritos/liberar", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ magic })
+        });
+        const data = await resp.json();
+        if (data.status === "ok") {
+          alert("Sessão liberada com sucesso!");
+          carregarFavoritos();
+          carregarGraficoFavoritos();
+        } else {
+          alert("Erro: " + (data.mensagem || "Falha ao liberar"));
+        }
+      } catch (err) {
+        console.error("❌ Erro ao liberar acesso:", err);
+        alert("Erro ao liberar acesso.");
+      }
+    }
   </script>
 </body>
 </html>
