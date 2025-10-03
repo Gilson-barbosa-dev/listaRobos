@@ -6,6 +6,9 @@ import fs from "fs";
 import pool from "./db.js"; // conexão com o banco
 import session from "express-session";
 import bcrypt from "bcrypt";
+import uploadEA from "./routes/uploadEA.js";
+import downloadEA from "./routes/downloadEA.js";
+import arquivosRoutes from "./routes/arquivos.js";
 
 dotenv.config();
 
@@ -26,6 +29,9 @@ app.set("view engine", "ejs");
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "../frontend")));
+app.use(uploadEA);
+app.use(downloadEA);
+app.use("/api/arquivos", arquivosRoutes);
 
 // ==========================
 // 🔹 Sessões

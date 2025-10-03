@@ -9,12 +9,15 @@
     "heroku-postbuild": "cd frontend && npm install && npm run build"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.901.0",
+    "@aws-sdk/s3-request-presigner": "^3.901.0",
     "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "ejs": "^3.1.10",
     "express": "^4.21.2",
     "express-session": "^1.18.2",
+    "multer": "^2.0.2",
     "pg": "^8.13.0"
   },
   "devDependencies": {

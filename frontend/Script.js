@@ -60,7 +60,6 @@ async function toggleFavorito(magic) {
   }
 }
 
-
 // ==========================
 // 🔹 Carregar dados do backend
 // ==========================
@@ -284,13 +283,36 @@ function criarCardEstrategia(e, isFavorito) {
       <button class="flex items-center gap-1 text-gray-400 hover:text-white">
         <i data-lucide="bar-chart-2" class="w-4 h-4"></i> Estatística
       </button>
-      <button class="flex items-center gap-1 text-gray-400 hover:text-white">
+      <button class="btn-download flex items-center gap-1 text-gray-400 hover:text-white" data-magic="${e.magic}">
         <i data-lucide="download" class="w-4 h-4"></i> Download
       </button>
     </div>
   `;
 
   return card;
+}
+
+// ==========================
+// 🔹 Baixar EA
+// ==========================
+async function baixarEA(magic) {
+  try {
+    const res = await fetch(`/api/arquivos/${magic}`);
+    if (!res.ok) throw new Error("Erro ao buscar link do EA");
+
+    const { url } = await res.json();
+
+    // Força o download
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `Strategy-${magic}.ex5`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  } catch (err) {
+    console.error("❌ Erro no download:", err);
+    alert("Erro ao baixar o arquivo.");
+  }
 }
 
 // ==========================
@@ -541,6 +563,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       e.stopImmediatePropagation();
       const magic = e.target.closest(".btn-favorito").dataset.magic;
       toggleFavorito(magic);
+    }
+    // Dentro do evento do botão Download
+    if (e.target.closest(".btn-download")) {
+      const magic = e.target.closest(".btn-download").dataset.magic;
+      baixarEA(magic);
     }
   });
 });
