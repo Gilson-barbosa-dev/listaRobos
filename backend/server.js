@@ -7,6 +7,7 @@ import pool from "./db.js"; // conexão com o banco
 import session from "express-session";
 import bcrypt from "bcrypt";
 import arquivosRoutes from "./routes/arquivos.js";
+import metricasRoutes from "./routes/metricas.js";
 
 dotenv.config();
 
@@ -28,6 +29,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "../frontend")));
 app.use("/api/arquivos", arquivosRoutes);
+app.use("/api/metricas", metricasRoutes);
 
 // ==========================
 // 🔹 Sessões

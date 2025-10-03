@@ -280,7 +280,9 @@ function criarCardEstrategia(e, isFavorito) {
       }">
         <i data-lucide="clock" class="w-4 h-4"></i> Histórico
       </button>
-      <button class="flex items-center gap-1 text-gray-400 hover:text-white">
+      <button class="btn-estatistica flex items-center gap-1 text-gray-400 hover:text-white" 
+        data-magic="${e.magic}"
+        data-arquivo="${e.arquivo}">
         <i data-lucide="bar-chart-2" class="w-4 h-4"></i> Estatística
       </button>
       <button class="btn-download flex items-center gap-1 text-gray-400 hover:text-white" data-magic="${e.magic}">
@@ -535,6 +537,57 @@ function fecharModalHistorico() {
 }
 
 // ==========================
+// 🔹 Modal Estatística
+// ==========================
+async function abrirEstatistica(magic) {
+  try {
+    console.log("📊 Abrindo estatística do Magic:", magic);
+
+    const res = await fetch(`/api/metricas/${magic}`);
+    if (!res.ok) throw new Error("Erro ao buscar imagem da métrica");
+
+    const { url } = await res.json();
+
+    const modal = document.getElementById("modalEstatistica");
+    const img = document.getElementById("imagemEstatistica");
+    const titulo = document.getElementById("tituloEstatistica");
+
+    // Atualizar título dinâmico
+    titulo.textContent = `Estatísticas da Estratégia: Magic ${magic}`;
+
+    // Atualizar imagem
+    img.src = url;
+
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+  } catch (err) {
+    console.error("❌ Erro ao abrir estatística:", err);
+  }
+}
+
+function fecharModalEstatistica() {
+  const modal = document.getElementById("modalEstatistica");
+  if (!modal) return;
+
+  modal.classList.add("hidden");
+  modal.classList.remove("flex");
+
+  const img = document.getElementById("imagemEstatistica");
+  img.src = "";
+}
+
+function fecharModalEstatistica() {
+  const modal = document.getElementById("modalEstatistica");
+  if (!modal) return;
+
+  modal.classList.add("hidden");
+  modal.classList.remove("flex");
+
+  const img = document.getElementById("imagemEstatistica");
+  img.src = "";
+}
+
+// ==========================
 // 🔹 Inicialização
 // ==========================
 document.addEventListener("DOMContentLoaded", async () => {
@@ -564,10 +617,16 @@ document.addEventListener("DOMContentLoaded", async () => {
       const magic = e.target.closest(".btn-favorito").dataset.magic;
       toggleFavorito(magic);
     }
-    // Dentro do evento do botão Download
     if (e.target.closest(".btn-download")) {
       const magic = e.target.closest(".btn-download").dataset.magic;
       baixarEA(magic);
+    }
+    if (e.target.closest(".btn-estatistica")) {
+      e.stopImmediatePropagation();
+      const btn = e.target.closest(".btn-estatistica");
+      const magic = btn.dataset.magic;
+      const arquivo = btn.dataset.arquivo;
+      abrirEstatistica(magic, arquivo);
     }
   });
 });
