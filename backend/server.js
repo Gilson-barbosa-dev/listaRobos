@@ -396,7 +396,7 @@ app.post("/recuperar", async (req, res) => {
       subject: "🔐 Recuperação de Senha - Clube Quant",
       html: `
         <div style="font-family:Arial,Helvetica,sans-serif;background-color:#0f172a;padding:40px;color:#f8fafc;text-align:center;border-radius:12px;max-width:480px;margin:auto;">
-          <img src="https://app.clubequant.com.br/img/logo_clube_quant2.png" alt="Clube Quant" style="width:160px;margin-bottom:24px;">
+          <img src="https://app.clubequant.com.br/img/logo_clube_quant2.webp" alt="Clube Quant" style="width:160px;margin-bottom:24px;">
           <h2 style="color:#60a5fa;margin-bottom:12px;">Recuperação de Senha</h2>
           <p style="color:#e2e8f0;margin-bottom:30px;">Você solicitou redefinir sua senha. Clique no botão abaixo para continuar:</p>
           <a href="${link}" style="display:inline-block;background-color:#3b82f6;color:#fff;text-decoration:none;font-weight:bold;padding:12px 20px;border-radius:8px;">🔑 Redefinir minha senha</a>
