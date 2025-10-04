@@ -346,7 +346,7 @@ app.post("/api/favoritos/liberar", autenticar, atualizarUsuario, verificarAssina
 });
 
 // Gerenciamento mesa
-app.get("/gerenciamento-mesa", (req, res) => {
+app.get("/gerenciamento-mesa", autenticar, atualizarUsuario, verificarAssinatura, async (req, res) => {
   res.render("gerenciamento-mesa");
 });
 
