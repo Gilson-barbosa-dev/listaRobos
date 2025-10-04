@@ -345,6 +345,12 @@ app.post("/api/favoritos/liberar", autenticar, atualizarUsuario, verificarAssina
   }
 });
 
+// Gerenciamento mesa
+app.get("/gerenciamento-mesa", (req, res) => {
+  res.render("gerenciamento-mesa");
+});
+
+
 // ==========================
 // 🔹 Inicializar servidor
 // ==========================
