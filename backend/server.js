@@ -461,12 +461,12 @@ app.post("/resetar/:token", async (req, res) => {
         erro: "Token inválido ou expirado. Solicite uma nova recuperação.",
         mensagem: null,
         token: null,
+        redirect: false
       });
     }
 
     // 🔐 Atualiza senha com hash e limpa token
     const hash = await bcrypt.hash(senha, 10);
-
     await pool.query(
       "UPDATE usuarios SET senha_hash=$1, reset_token=NULL, reset_expira=NULL WHERE reset_token=$2",
       [hash, token]
@@ -474,14 +474,21 @@ app.post("/resetar/:token", async (req, res) => {
 
     console.log("✅ Senha redefinida com sucesso para usuário ID:", rows[0].id);
 
+    // ✅ Envia flag redirect:true
     res.render("resetar", {
       erro: null,
-      mensagem: "Senha redefinida com sucesso! Você já pode fazer login novamente.",
+      mensagem: "Senha redefinida! Redirecionando para o login...",
       token: null,
+      redirect: true
     });
   } catch (err) {
     console.error("❌ Erro ao redefinir senha:", err);
-    res.render("resetar", { erro: "Erro ao redefinir senha. Tente novamente.", mensagem: null, token });
+    res.render("resetar", {
+      erro: "Erro ao redefinir senha. Tente novamente.",
+      mensagem: null,
+      token,
+      redirect: false
+    });
   }
 });
 

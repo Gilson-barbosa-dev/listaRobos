@@ -32,5 +32,12 @@
       </button>
     </form>
   </div>
+  <% if (typeof redirect !== 'undefined' && redirect) { %>
+<script>
+  setTimeout(() => {
+    window.location.href = "/login";
+  }, 5000);
+</script>
+<% } %>
 </body>
 </html>
