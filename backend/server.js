@@ -169,9 +169,16 @@ app.get("/meus-algoritmos", autenticar, atualizarUsuario, verificarAssinatura, (
   res.render("meus-algoritmos", { page: "meus-algoritmos", usuario: req.session.usuario })
 );
 
-app.get("/planos", autenticar, atualizarUsuario, (req, res) =>
-  res.render("planos", { page: "planos", usuario: req.session.usuario })
-);
+app.get("/planos", autenticar, atualizarUsuario, (req, res) => {
+  const usuario = req.session.usuario;
+
+  // 🔹 Normalizar status da assinatura
+  usuario.ativo = usuario.status_assinatura === true;
+  usuario.status = usuario.status_assinatura ? "ativo" : "inativo";
+
+  res.render("planos", { page: "planos", usuario });
+});
+
 
 app.get("/primeiros-passos", autenticar, atualizarUsuario, verificarAssinatura, (req, res) => {
   fs.readFile(path.join(__dirname, "../frontend/primeiros-passos.json"), "utf8", (err, data) => {

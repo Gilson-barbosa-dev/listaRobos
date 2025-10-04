@@ -25,8 +25,23 @@
         <span>Gerenciamento de Planos</span>
       </h1>
 
-      <!-- Plano atual -->
-      <% if (usuario.plano) { 
+      <% 
+        const planoAtivo = usuario.ativo && usuario.plano && usuario.status !== 'inativo';
+        const temPlano = usuario.plano && usuario.plano.trim() !== "";
+      %>
+
+      <!-- 🔸 Caso não tenha plano ativo -->
+      <% if (!planoAtivo) { %>
+        <div class="bg-gray-800 rounded-xl shadow-md p-6 mb-12 border border-red-600/50 relative">
+          <span class="absolute top-4 right-4 bg-red-600/90 text-white text-xs font-bold px-3 py-1 rounded-full shadow">
+            Nenhum Plano Ativo
+          </span>
+          <h2 class="text-xl font-semibold text-red-400 mb-2">Você não possui um plano ativo</h2>
+          <p class="text-gray-300">
+            Para continuar utilizando o Clube Quant, selecione um dos planos abaixo e realize a assinatura.
+          </p>
+        </div>
+      <% } else { 
         const detalhesPlano = {
           starter: { preco: "R$ 97/mês", limite: "Até 4 algoritmos" },
           plus: { preco: "R$ 197/mês", limite: "Até 8 algoritmos" },
@@ -34,11 +49,11 @@
           diamond: { preco: "Consulte", limite: "Acesso ilimitado" }
         }[usuario.plano.toLowerCase()] || { preco: "N/D", limite: "N/D" };
       %>
-        <div class="bg-gray-800 rounded-xl shadow-md p-6 mb-12 border border-quant-purple/30">
+        <div class="bg-gray-800 rounded-xl shadow-md p-6 mb-12 border border-quant-purple/30 relative">
           <h2 class="text-xl font-semibold text-quant-purple">Seu Plano Atual</h2>
           <p class="mt-2 text-gray-300">
-            Você está no plano <strong><%= usuario.plano.toLowerCase() %></strong>, válido até
-            <span class="text-quant-green">
+            Você está no plano <strong><%= usuario.plano.toLowerCase() %></strong>, válido até 
+            <span class="text-quant-green font-semibold">
               <%= usuario.vencimento ? new Date(usuario.vencimento).toLocaleDateString("pt-BR") : "N/D" %>
             </span>.
           </p>
@@ -58,26 +73,35 @@
       <h2 class="text-lg font-bold mb-6 px-1">Planos Disponíveis</h2>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8 px-1">
         <% 
-          const planos = [
+          let planos = [
             { nome: "Starter", preco: "R$ 97/mês", desc: "Ideal para começar", limite: "Até 4 algoritmos", link: "https://pay.zouti.com.br/checkout?poi=prod_offer_rw4arkjywwtvst66qb6f35" },
             { nome: "Plus", preco: "R$ 197/mês", desc: "Mais recursos e flexibilidade", limite: "Até 8 algoritmos", link: "https://pay.zouti.com.br/checkout?poi=prod_offer_u86x1k92h6v8gu8nenhc5k" },
             { nome: "Premium", preco: "R$ 297/mês", desc: "Para traders avançados", limite: "Até 12 algoritmos", link: "https://pay.zouti.com.br/checkout?poi=prod_offer_ad7lhtpltf4l7lecmuiccx" },
-            { nome: "Diamond", preco: "Consulte", desc: "Plano exclusivo para profissionais", limite: "Acesso ilimitado", link: "#" }
+            { nome: "Diamond", preco: "Consulte", desc: "Plano exclusivo para profissionais", limite: "Acesso ilimitado", link: "http://wa.me/5511966073938" }
           ];
+
+          // 🔹 Quando o plano estiver inativo, remove o Diamond
+          if (!planoAtivo) {
+            planos = planos.filter(p => p.nome.toLowerCase() !== "diamond");
+          }
 
           const ordemPlanos = ["starter", "plus", "premium", "diamond"];
           const indiceAtual = ordemPlanos.indexOf((usuario.plano || "").toLowerCase());
 
-          planos
-            .filter(plano => plano.nome.toLowerCase() !== (usuario.plano || "").toLowerCase())
-            .forEach(plano => {
-              const indicePlano = ordemPlanos.indexOf(plano.nome.toLowerCase());
-              let acao = "Upgrade";
-              if (plano.nome.toLowerCase() === "diamond") {
-                acao = "Consultar";
-              } else if (indicePlano < indiceAtual) {
-                acao = "Downgrade";
-              }
+          planos.forEach(plano => {
+            const indicePlano = ordemPlanos.indexOf(plano.nome.toLowerCase());
+            let acao = "Assinar";
+
+            // 🔸 Ocultar o plano atual quando ativo
+            if (planoAtivo && plano.nome.toLowerCase() === (usuario.plano || "").toLowerCase()) {
+              return;
+            }
+
+            if (planoAtivo) {
+              if (plano.nome.toLowerCase() === "diamond") acao = "Consultar";
+              else if (indicePlano > indiceAtual) acao = "Upgrade";
+              else if (indicePlano < indiceAtual) acao = "Downgrade";
+            }
         %>
         <div class="flex flex-col justify-between bg-gray-900 border border-gray-700 rounded-xl p-6 shadow-md">
           <div>
@@ -97,6 +121,14 @@
                 <i data-lucide="check-circle" class="w-4 h-4 text-green-400"></i>
                 <span>Suporte dedicado</span>
               </li>
+              <li class="flex items-center gap-2 text-gray-300">
+                <i data-lucide="check-circle" class="w-4 h-4 text-green-400"></i>
+                <span>Comunidade ativa</span>
+              </li>
+              <li class="flex items-center gap-2 text-gray-300">
+                <i data-lucide="check-circle" class="w-4 h-4 text-green-400"></i>
+                <span>Gerenciamento de mesa</span>
+              </li>
             </ul>
           </div>
 
@@ -108,8 +140,8 @@
               </a>
             <% } else { %>
               <a href="<%= plano.link %>" target="_blank"
-                class="flex items-center gap-2 px-3 py-1.5 rounded-md bg-gray-800 hover:bg-gray-700 text-sm text-gray-300 font-medium transition">
-                <i data-lucide="<%= acao === 'Upgrade' ? 'arrow-up-circle' : 'arrow-down-circle' %>" class="w-4 h-4"></i> <%= acao %>
+                class="flex items-center gap-2 px-3 py-1.5 rounded-md bg-blue-600 hover:bg-blue-500 text-sm text-white font-semibold transition">
+                <i data-lucide="credit-card" class="w-4 h-4"></i> <%= acao %>
               </a>
             <% } %>
           </div>
@@ -119,6 +151,5 @@
 
     </div>
   </main>
-
 </body>
 </html>
