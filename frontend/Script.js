@@ -65,10 +65,22 @@ async function toggleFavorito(magic) {
 // ==========================
 async function carregarEstrategias() {
   try {
+    // Busca todas as estratégias
     const res = await fetch("/api/estrategias");
     if (!res.ok) throw new Error("Erro ao buscar estratégias");
-
     estrategiasGlobais = await res.json();
+
+    // Busca favoritos atuais do banco
+    const respFav = await fetch("/api/favoritos");
+    const favoritos = respFav.ok ? await respFav.json() : [];
+    const listaMagicsFav = favoritos.map((f) => String(f.magic));
+
+    // Marca os que são favoritos
+    estrategiasGlobais = estrategiasGlobais.map((e) => ({
+      ...e,
+      isFavorito: listaMagicsFav.includes(String(e.magic)),
+    }));
+
     aplicarFiltros();
   } catch (err) {
     console.error("❌ Erro ao carregar estratégias:", err);
