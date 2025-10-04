@@ -6,6 +6,8 @@ import fs from "fs";
 import pool from "./db.js"; // conexão com o banco
 import session from "express-session";
 import bcrypt from "bcrypt";
+import crypto from "crypto";
+import { Resend } from "resend";
 import arquivosRoutes from "./routes/arquivos.js";
 import metricasRoutes from "./routes/metricas.js";
 
@@ -17,6 +19,7 @@ const PORT = process.env.PORT || 3001;
 // Corrigir __dirname no ESModules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 // ==========================
 // 🔹 Configuração do EJS
@@ -357,6 +360,130 @@ app.get("/gerenciamento-mesa", autenticar, atualizarUsuario, verificarAssinatura
   res.render("gerenciamento-mesa");
 });
 
+// ==========================
+// 🔹 Recuperar acesso (Esqueceu a senha)
+// ==========================
+// ==========================
+// 🔹 Recuperar acesso (Esqueceu a senha)
+// ==========================
+app.get("/recuperar", (req, res) => {
+  res.render("recuperar", { erro: null, mensagem: null });
+});
+
+app.post("/recuperar", async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    const { rows } = await pool.query("SELECT id FROM usuarios WHERE email = $1", [email]);
+    if (rows.length === 0)
+      return res.render("recuperar", { erro: "E-mail não encontrado.", mensagem: null });
+
+    const token = crypto.randomBytes(32).toString("hex");
+
+    // 🔧 adiciona +1h de validade +3h de fuso (UTC → SP)
+    const expira = new Date(Date.now() + 3600000 + 3 * 60 * 60 * 1000);
+
+    await pool.query(
+      "UPDATE usuarios SET reset_token=$1, reset_expira=$2 WHERE email=$3",
+      [token, expira, email]
+    );
+
+    const link = `${process.env.BASE_URL}/resetar/${token}`;
+
+    await resend.emails.send({
+      from: "Clube Quant <no-reply@clubequant.com.br>",
+      to: email,
+      subject: "🔐 Recuperação de Senha - Clube Quant",
+      html: `
+        <div style="font-family:Arial,Helvetica,sans-serif;background-color:#0f172a;padding:40px;color:#f8fafc;text-align:center;border-radius:12px;max-width:480px;margin:auto;">
+          <img src="https://app.clubequant.com.br/img/logo_clube_quant2.png" alt="Clube Quant" style="width:160px;margin-bottom:24px;">
+          <h2 style="color:#60a5fa;margin-bottom:12px;">Recuperação de Senha</h2>
+          <p style="color:#e2e8f0;margin-bottom:30px;">Você solicitou redefinir sua senha. Clique no botão abaixo para continuar:</p>
+          <a href="${link}" style="display:inline-block;background-color:#3b82f6;color:#fff;text-decoration:none;font-weight:bold;padding:12px 20px;border-radius:8px;">🔑 Redefinir minha senha</a>
+          <p style="color:#94a3b8;margin-top:30px;font-size:13px;">Se você não fez esta solicitação, ignore este e-mail.<br>O link expira em 1 hora.</p>
+        </div>
+      `,
+    });
+
+    res.render("recuperar", { erro: null, mensagem: "Enviamos um link de recuperação para o seu e-mail." });
+  } catch (err) {
+    console.error("❌ Erro ao enviar recuperação:", err);
+    res.render("recuperar", { erro: "Erro ao enviar o e-mail.", mensagem: null });
+  }
+});
+
+// ==========================
+// 🔹 Página de redefinição
+// ==========================
+app.get("/resetar/:token", async (req, res) => {
+  const { token } = req.params;
+
+  try {
+    // 🔍 Valida token e expiração
+    const { rows } = await pool.query(
+      "SELECT id FROM usuarios WHERE reset_token=$1 AND reset_expira > NOW()",
+      [token]
+    );
+
+    if (rows.length === 0) {
+      console.warn("⚠️ Token inválido ou expirado:", token);
+      return res.render("resetar", {
+        erro: "Token inválido ou expirado. Solicite uma nova recuperação.",
+        mensagem: null,
+        token: null,
+      });
+    }
+
+    // ✅ Token válido → renderiza formulário
+    res.render("resetar", { erro: null, mensagem: null, token });
+  } catch (err) {
+    console.error("❌ Erro ao carregar token:", err);
+    res.render("resetar", { erro: "Erro interno. Tente novamente.", mensagem: null, token: null });
+  }
+});
+
+// ==========================
+// 🔹 Atualizar senha
+// ==========================
+app.post("/resetar/:token", async (req, res) => {
+  const { token } = req.params;
+  const { senha } = req.body;
+
+  try {
+    const { rows } = await pool.query(
+      "SELECT id FROM usuarios WHERE reset_token=$1 AND reset_expira > NOW()",
+      [token]
+    );
+
+    if (rows.length === 0) {
+      console.warn("⚠️ Tentativa de redefinir com token inválido:", token);
+      return res.render("resetar", {
+        erro: "Token inválido ou expirado. Solicite uma nova recuperação.",
+        mensagem: null,
+        token: null,
+      });
+    }
+
+    // 🔐 Atualiza senha com hash e limpa token
+    const hash = await bcrypt.hash(senha, 10);
+
+    await pool.query(
+      "UPDATE usuarios SET senha_hash=$1, reset_token=NULL, reset_expira=NULL WHERE reset_token=$2",
+      [hash, token]
+    );
+
+    console.log("✅ Senha redefinida com sucesso para usuário ID:", rows[0].id);
+
+    res.render("resetar", {
+      erro: null,
+      mensagem: "Senha redefinida com sucesso! Você já pode fazer login novamente.",
+      token: null,
+    });
+  } catch (err) {
+    console.error("❌ Erro ao redefinir senha:", err);
+    res.render("resetar", { erro: "Erro ao redefinir senha. Tente novamente.", mensagem: null, token });
+  }
+});
 
 // ==========================
 // 🔹 Inicializar servidor
