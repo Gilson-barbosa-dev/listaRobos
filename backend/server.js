@@ -202,7 +202,6 @@ app.get("/api/estrategias", async (req, res) => {
     const result = await pool.query(`
       SELECT 
         magic,
-        estrategia,
         ativo,
         lucro_total,
         total_operacoes,
@@ -214,10 +213,10 @@ app.get("/api/estrategias", async (req, res) => {
       ORDER BY id DESC
     `);
 
-    return res.json(result.rows || []);
+    res.json(result.rows || []);
   } catch (err) {
     console.error("❌ Erro ao buscar estratégias:", err);
-    return res.status(500).json({ erro: "Erro ao buscar estratégias" });
+    res.status(500).json({ erro: "Erro ao buscar estratégias" });
   }
 });
 

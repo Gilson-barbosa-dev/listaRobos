@@ -167,20 +167,44 @@ function renderizarEstrategias(estrategias) {
 // ==========================
 async function carregarFavoritos() {
   try {
+    // 🔹 Garante que as estratégias estão carregadas antes
+    if (!estrategiasGlobais || estrategiasGlobais.length === 0) {
+      console.warn("⚠️ Estratégias ainda não carregadas, aguardando...");
+      await carregarEstrategias();
+    }
+
+    // 🔹 Busca favoritos
     const resp = await fetch("/api/favoritos");
     if (!resp.ok) throw new Error("Erro ao buscar favoritos");
     const favoritos = await resp.json();
 
-    const unicos = [];
-    const vistos = new Set();
-    favoritos.forEach((f) => {
-      if (!vistos.has(f.magic)) {
-        vistos.add(f.magic);
-        unicos.push(f);
-      }
-    });
+    console.log("🟢 Favoritos recebidos:", favoritos);
 
-    renderizarEstrategiasFavoritos(unicos);
+    if (!favoritos || favoritos.length === 0) {
+      const painel = document.getElementById("painel-favoritos");
+      painel.innerHTML = `<div class="bg-gray-800 text-gray-300 rounded-xl p-6 shadow-md">
+        Nenhum algoritmo favoritado ⭐
+      </div>`;
+      atualizarKPIs("fav", {
+        vencedoras: 0,
+        perdedoras: 0,
+        trades: 0,
+        lucro: 0,
+        fator: 0,
+      });
+      const elCapital = document.getElementById("fav-capital-total");
+      if (elCapital) elCapital.textContent = "$0.00";
+      return;
+    }
+
+    // 🔹 Extrai apenas os magics únicos
+    const listaMagics = [...new Set(favoritos.map(f => String(f.magic)))];
+    const listaFavoritos = listaMagics.map(magic => ({ magic }));
+
+    console.log("✅ Lista processada de favoritos:", listaFavoritos);
+
+    // 🔹 Renderiza os cards
+    renderizarEstrategiasFavoritos(listaFavoritos);
   } catch (err) {
     console.error("❌ Erro ao carregar favoritos:", err);
     const painel = document.getElementById("painel-favoritos");
@@ -196,50 +220,87 @@ function renderizarEstrategiasFavoritos(listaFavoritos) {
   const painel = document.getElementById("painel-favoritos");
   if (!painel) return;
 
+  console.log("🟣 Estratégias globais carregadas:", estrategiasGlobais.length);
+  console.log("🟣 Favoritos recebidos para renderizar:", listaFavoritos);
+
   let vencedoras = 0,
     perdedoras = 0,
     totalTrades = 0,
-    lucroTotal = 0;
+    lucroTotal = 0,
+    capitalTotal = 0;
+
   painel.innerHTML = "";
 
   if (!listaFavoritos || listaFavoritos.length === 0) {
     painel.innerHTML = `<div class="bg-gray-800 text-gray-300 rounded-xl p-6 shadow-md">
       Nenhum algoritmo favoritado ⭐
     </div>`;
-    atualizarKPIs("fav", {
-      vencedoras: 0,
-      perdedoras: 0,
-      trades: 0,
-      lucro: 0,
-      fator: 0,
-    });
+
+    try {
+      atualizarKPIs("fav", {
+        vencedoras: 0,
+        perdedoras: 0,
+        trades: 0,
+        lucro: 0,
+        fator: 0,
+      });
+    } catch (e) {
+      console.warn("⚠️ Erro ao atualizar KPIs (nenhum KPI encontrado)", e);
+    }
+
+    const elCapital = document.getElementById("fav-capital-total");
+    if (elCapital) elCapital.textContent = "$0.00";
     return;
   }
 
+  // 🔹 Renderiza cada estratégia favorita
   listaFavoritos.forEach((fav) => {
-    const estrategia = estrategiasGlobais.find((e) => e.magic == fav.magic);
-    if (!estrategia) return;
+    const estrategia = estrategiasGlobais.find(
+      (e) => String(e.magic) === String(fav.magic)
+    );
+    if (!estrategia) {
+      console.warn("⚠️ Estratégia não encontrada para magic:", fav.magic);
+      return;
+    }
 
     const trades = estrategia.total_operacoes || 0;
     const lucro = Number(estrategia.lucro_total) || 0;
-
     totalTrades += trades;
     lucroTotal += lucro;
     lucro > 0 ? vencedoras++ : perdedoras++;
+
+    if (estrategia.capital_minimo)
+      capitalTotal += parseFloat(estrategia.capital_minimo);
 
     const card = criarCardEstrategia({ ...estrategia, isFavorito: true }, true);
     painel.appendChild(card);
   });
 
-  const fatorLucro =
-    perdedoras > 0 ? (vencedoras / perdedoras).toFixed(2) : vencedoras;
-  atualizarKPIs("fav", {
-    vencedoras,
-    perdedoras,
-    trades: totalTrades,
-    lucro: lucroTotal,
-    fator: fatorLucro,
-  });
+  // 🔹 Atualiza os KPIs com segurança
+  try {
+    const fatorLucro = perdedoras > 0 ? (vencedoras / perdedoras).toFixed(2) : vencedoras;
+    atualizarKPIs("fav", {
+      vencedoras,
+      perdedoras,
+      trades: totalTrades,
+      lucro: lucroTotal,
+      fator: fatorLucro,
+    });
+  } catch (err) {
+    console.warn("⚠️ Erro ao atualizar KPIs:", err);
+  }
+
+  // 🔹 Atualiza o capital total do portfólio
+  const elCapital = document.getElementById("fav-capital-total");
+  if (elCapital) {
+    elCapital.textContent = capitalTotal.toLocaleString("en-US", {
+      style: "currency",
+      currency: "USD",
+    });
+  } else {
+    console.warn("⚠️ Elemento #fav-capital-total não encontrado no DOM.");
+  }
+
   lucide.createIcons();
 }
 
@@ -333,12 +394,40 @@ async function baixarEA(magic) {
 // 🔹 Atualizar KPIs
 // ==========================
 function atualizarKPIs(prefixo, { vencedoras, perdedoras, trades, lucro, fator }) {
-  document.getElementById(`${prefixo}-vencedoras`).textContent = vencedoras;
-  document.getElementById(`${prefixo}-perdedoras`).textContent = perdedoras;
-  document.getElementById(`${prefixo}-trades`).textContent = trades;
-  document.getElementById(`${prefixo}-lucro`).textContent = lucro.toFixed(2);
-  document.getElementById(`${prefixo}-fator-lucro`).textContent = fator;
+  const elVenc = document.getElementById(`${prefixo}-vencedoras`);
+  const elPerd = document.getElementById(`${prefixo}-perdedoras`);
+  const elTrades = document.getElementById(`${prefixo}-trades`);
+  const elLucro = document.getElementById(`${prefixo}-lucro`);
+  const elCapital = document.getElementById(`${prefixo}-capital-total`);
+  const elFator = document.getElementById(`${prefixo}-fator-lucro`);
+
+  if (elVenc) elVenc.textContent = vencedoras ?? 0;
+  if (elPerd) elPerd.textContent = perdedoras ?? 0;
+  if (elTrades) elTrades.textContent = trades ?? 0;
+
+  // ✅ Formato americano ($4,619.32)
+  const formatarMoeda = (valor) =>
+    `$${Number(valor || 0).toLocaleString("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
+
+  if (elLucro) elLucro.textContent = formatarMoeda(lucro);
+  if (elCapital) elCapital.textContent = formatarMoeda(fator);
+
+  // Mantém fator para outros contextos
+  if (elFator && prefixo !== "fav") elFator.textContent = fator ?? 0;
 }
+
+// Formata o valor
+function formatarMoeda(valor) {
+  return valor.toLocaleString("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 2,
+  });
+}
+
 
 // ==========================
 // 🔹 Gráficos

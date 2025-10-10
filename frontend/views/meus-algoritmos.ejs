@@ -45,12 +45,12 @@
           <small class="text-gray-400">Total de Trades</small>
         </div>
         <div class="bg-gray-900 rounded-xl shadow-md p-5 text-center">
-          <span id="fav-lucro" class="block text-5xl font-bold text-white">0</span>
+          <span id="fav-lucro" class="block font-bold text-green-400 text-4xl tracking-tight">US$ 0,00</span>
           <small class="text-gray-400">Lucro Total</small>
         </div>
         <div class="bg-gray-900 rounded-xl shadow-md p-5 text-center">
-          <span id="fav-fator-lucro" class="block text-5xl font-bold text-white">0</span>
-          <small class="text-gray-400">Fator de Lucro</small>
+          <span id="fav-capital-total" class="block font-bold text-green-400 text-4xl tracking-tight">US$ 0,00</span>
+          <small class="text-gray-400">Capital Mínimo do Portfólio</small>
         </div>
       </div>
 
@@ -74,14 +74,49 @@
   </div>
 
   <!-- Modal Estatística -->
-  <div id="modalEstatistica" class="hidden fixed inset-0 z-[9999] items-center justify-center bg-black/70">
-    <div class="bg-gradient-to-br from-gray-800 to-gray-900 border border-quant-purple/30 rounded-2xl p-6 shadow-lg w-full max-w-4xl relative flex flex-col">
-      <button onclick="fecharModalEstatistica()" class="absolute top-3 right-3 text-gray-400 hover:text-white">
+  <div id="modalEstatistica"
+      class="hidden fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 px-4">
+    <div class="bg-gradient-to-br from-gray-800 to-gray-900 border border-quant-purple/30 rounded-2xl p-6 shadow-lg w-full max-w-5xl relative flex flex-col"
+        style="max-height: 90vh; height: auto;">
+
+      <!-- Botão Fechar -->
+      <button onclick="fecharModalEstatistica()" 
+        class="absolute top-3 right-3 text-gray-400 hover:text-white">
         <i data-lucide="x" class="w-6 h-6"></i>
       </button>
+
       <!-- 🔹 Título dinâmico -->
-      <h2 id="tituloEstatistica" class="text-lg font-bold mb-4 text-white">Estatísticas da Estratégia</h2>
-      <img id="imagemEstatistica" src="" alt="Estatísticas" class="rounded-lg shadow-md max-h-[80vh] object-contain"/>
+      <h2 id="tituloEstatistica" class="text-lg font-bold mb-4 text-white text-center">
+        Estatísticas da Estratégia
+      </h2>
+
+      <!-- 🔹 Informações principais -->
+      <div id="infoEstrategia" class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5 text-sm">
+        <div class="bg-gray-900/70 rounded-lg p-3 text-center border border-gray-700">
+          <span class="block text-gray-400 text-xs uppercase">Magic</span>
+          <span id="infoMagic" class="text-white font-semibold">---</span>
+        </div>
+        <div class="bg-gray-900/70 rounded-lg p-3 text-center border border-gray-700">
+          <span class="block text-gray-400 text-xs uppercase">Tipo</span>
+          <span id="infoTipo" class="text-white font-semibold">---</span>
+        </div>
+        <div class="bg-gray-900/70 rounded-lg p-3 text-center border border-gray-700">
+          <span class="block text-gray-400 text-xs uppercase">Time Frame</span>
+          <span id="infoTimeframe" class="text-white font-semibold">---</span>
+        </div>
+        <div class="bg-gray-900/70 rounded-lg p-3 text-center border border-gray-700">
+          <span class="block text-gray-400 text-xs uppercase">Capital Mínimo</span>
+          <span id="infoCapital" class="text-white font-semibold">---</span>
+        </div>
+      </div>
+
+      <!-- 🔹 Imagem de Estatística -->
+      <img id="imagemEstatistica"
+          src=""
+          alt="Estatísticas"
+          class="rounded-lg shadow-md object-contain w-full"
+          style="max-height: calc(90vh - 180px);">
+
     </div>
   </div>
 
