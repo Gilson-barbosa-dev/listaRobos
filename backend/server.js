@@ -113,6 +113,7 @@ app.post("/login", async (req, res) => {
       id: usuario.id, 
       nome: usuario.nome, 
       email: usuario.email, 
+      role: usuario.role || "user", 
       status_assinatura: usuario.status_assinatura,
       plano: usuario.plano,
       vencimento: usuario.vencimento
@@ -164,9 +165,11 @@ app.post("/register", async (req, res) => {
 // ==========================
 // 🔹 Rotas de páginas protegidas
 // ==========================
-app.get("/", autenticar, atualizarUsuario, verificarAssinatura, (req, res) => 
-  res.render("index", { page: "index", usuario: req.session.usuario })
-);
+app.get("/", autenticar, atualizarUsuario, verificarAssinatura, (req, res) => {
+  const usuario = req.session.usuario;
+  const tipoUsuario = usuario?.role === "admin" ? "admin" : "user";
+  res.render("index", { page: "index", usuario, tipoUsuario });
+});
 
 app.get("/meus-algoritmos", autenticar, atualizarUsuario, verificarAssinatura, (req, res) =>
   res.render("meus-algoritmos", { page: "meus-algoritmos", usuario: req.session.usuario })
@@ -195,30 +198,38 @@ app.get("/primeiros-passos", autenticar, atualizarUsuario, verificarAssinatura, 
 });
 
 // ==========================
-// 🔹 APIs protegidas
+// 🔹 API - pegar estratégias
 // ==========================
 app.get("/api/estrategias", async (req, res) => {
   try {
-    const result = await pool.query(`
+    const tipo = req.query.tipo || "user";
+
+    let query = `
       SELECT 
         magic,
+        estrategia,
         ativo,
         lucro_total,
         total_operacoes,
         assertividade,
-        tipo_estrategia,
-        timeframe,
-        capital_minimo
+        COALESCE(aprovado, false) AS aprovado
       FROM estatistica
-      ORDER BY id DESC
-    `);
+    `;
 
-    res.json(result.rows || []);
+    if (tipo !== "admin") {
+      query += " WHERE COALESCE(aprovado, false) = true";
+    }
+
+    query += " ORDER BY id DESC";
+
+    const result = await pool.query(query);
+    return res.json(result.rows || []);
   } catch (err) {
     console.error("❌ Erro ao buscar estratégias:", err);
-    res.status(500).json({ erro: "Erro ao buscar estratégias" });
+    return res.status(500).json({ erro: "Erro ao buscar estratégias" });
   }
 });
+
 
 app.get("/api/consolidado-diario", autenticar, atualizarUsuario, verificarAssinatura, async (req, res) => {
   try {

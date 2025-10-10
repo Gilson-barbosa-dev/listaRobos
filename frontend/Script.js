@@ -1,6 +1,7 @@
 // Script.js
 
 let estrategiasGlobais = [];
+let tipoUsuario = window.tipoUsuario || "user";
 
 // ==========================
 // 🔹 Favoritos (Banco via API)
@@ -65,9 +66,10 @@ async function toggleFavorito(magic) {
 // ==========================
 async function carregarEstrategias() {
   try {
-    // Busca todas as estratégias
-    const res = await fetch("/api/estrategias");
+    // Busca estratégias conforme tipo de usuário
+    const res = await fetch(`/api/estrategias?tipo=${tipoUsuario}`);
     if (!res.ok) throw new Error("Erro ao buscar estratégias");
+
     estrategiasGlobais = await res.json();
 
     // Busca favoritos atuais do banco
@@ -75,7 +77,7 @@ async function carregarEstrategias() {
     const favoritos = respFav.ok ? await respFav.json() : [];
     const listaMagicsFav = favoritos.map((f) => String(f.magic));
 
-    // Marca os que são favoritos
+    // Marca os favoritos
     estrategiasGlobais = estrategiasGlobais.map((e) => ({
       ...e,
       isFavorito: listaMagicsFav.includes(String(e.magic)),
@@ -91,20 +93,31 @@ async function carregarEstrategias() {
 // 🔹 Filtros (Página principal)
 // ==========================
 function aplicarFiltros() {
-  const busca =
-    document.querySelector('input[type="text"]')?.value?.toLowerCase() || "";
-  const ordenarPor = document.querySelector("select")?.value || "lucro_total";
+  const inputBusca = document.querySelector('input[type="text"]');
+  const selectOrdenar = document.querySelector('select:not(#filtroStatus)');
+  const selectStatus = document.getElementById("filtroStatus");
 
+  const busca = inputBusca?.value?.toLowerCase() || "";
+  const ordenarPor = selectOrdenar?.value || "lucro_total";
+  const statusFiltro = selectStatus?.value || "todas";
+
+  // 🔹 Filtra por texto e status
   let filtradas = estrategiasGlobais.filter((e) => {
     const magic = String(e.magic || "").toLowerCase();
     const ativo = String(e.ativo || "").toLowerCase();
-    return magic.includes(busca) || ativo.includes(busca);
+    const aprovado = e.aprovado === true || e.aprovado === "true";
+    const condicaoBusca = magic.includes(busca) || ativo.includes(busca);
+
+    if (statusFiltro === "aprovadas") return condicaoBusca && aprovado;
+    if (statusFiltro === "teste") return condicaoBusca && !aprovado;
+    return condicaoBusca;
   });
 
-  filtradas.sort((a, b) => {
-    if (ordenarPor === "lucro_total") return b.lucro_total - a.lucro_total;
-    if (ordenarPor === "assertividade") return b.assertividade - a.assertividade;
-    if (ordenarPor === "operacoes") return b.total_operacoes - a.total_operacoes;
+  // 🔹 Aplica ordenação sem alterar o filtro
+  filtradas = [...filtradas].sort((a, b) => {
+    if (ordenarPor === "lucro_total") return (b.lucro_total || 0) - (a.lucro_total || 0);
+    if (ordenarPor === "assertividade") return (b.assertividade || 0) - (a.assertividade || 0);
+    if (ordenarPor === "operacoes") return (b.total_operacoes || 0) - (a.total_operacoes || 0);
     return 0;
   });
 
@@ -146,7 +159,22 @@ function renderizarEstrategias(estrategias) {
     lucroTotal += lucro;
     lucro > 0 ? vencedoras++ : perdedoras++;
 
+    // Cria o card da estratégia
     const card = criarCardEstrategia(e, false);
+
+    // 🔹 Adiciona a label “Em teste” (somente admin e estratégias não aprovadas)
+    if (tipoUsuario === "admin" && e.aprovado === false) {
+      const label = document.createElement("div");
+      label.className =
+        "absolute -top-3 left-1/2 -translate-x-1/2 flex items-center gap-1 bg-[#8b5cf6]/90 text-white text-[11px] md:text-xs font-semibold px-4 py-[3px] rounded-full shadow-md border border-[#a78bfa]/70 backdrop-blur-sm";
+      label.innerHTML = `<i data-lucide="flask-conical" class="w-3.5 h-3.5 text-white"></i> Em teste`;
+      card.classList.add("relative");
+      card.appendChild(label);
+      lucide.createIcons();
+    }
+
+
+
     painel.appendChild(card);
   });
 
@@ -747,6 +775,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   await carregarEstrategias();
   carregarGraficoDiario();
 
+  // 🔹 Exibir filtro de status apenas se for admin
+  if (tipoUsuario === "admin") {
+    document.getElementById("filtroStatus")?.classList.remove("hidden");
+  }
+
   if (window.location.pathname.includes("meus-algoritmos")) {
     carregarFavoritos();
     carregarGraficoFavoritos();
@@ -755,9 +788,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   document
     .querySelector('input[type="text"]')
     ?.addEventListener("input", aplicarFiltros);
-  document
-    .querySelector("select")
-    ?.addEventListener("change", aplicarFiltros);
+    // 🎯 Eventos separados para cada filtro
+    document.querySelector('select:not(#filtroStatus)')?.addEventListener("change", aplicarFiltros);
+    document.getElementById("filtroStatus")?.addEventListener("change", aplicarFiltros);
+
 
   document.addEventListener("click", (e) => {
     if (e.target.closest(".btn-historico")) {
@@ -783,3 +817,4 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 });
+
