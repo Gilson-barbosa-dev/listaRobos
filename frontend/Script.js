@@ -398,25 +398,52 @@ function atualizarKPIs(prefixo, { vencedoras, perdedoras, trades, lucro, fator }
   const elPerd = document.getElementById(`${prefixo}-perdedoras`);
   const elTrades = document.getElementById(`${prefixo}-trades`);
   const elLucro = document.getElementById(`${prefixo}-lucro`);
-  const elCapital = document.getElementById(`${prefixo}-capital-total`);
   const elFator = document.getElementById(`${prefixo}-fator-lucro`);
 
-  if (elVenc) elVenc.textContent = vencedoras ?? 0;
-  if (elPerd) elPerd.textContent = perdedoras ?? 0;
-  if (elTrades) elTrades.textContent = trades ?? 0;
-
-  // ✅ Formato americano ($4,619.32)
+  // 🔹 Formato americano ($23,086.92)
   const formatarMoeda = (valor) =>
     `$${Number(valor || 0).toLocaleString("en-US", {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     })}`;
 
-  if (elLucro) elLucro.textContent = formatarMoeda(lucro);
-  if (elCapital) elCapital.textContent = formatarMoeda(fator);
+  const aplicarEstiloPadrao = (el, cor = "text-white") => {
+    if (!el) return;
+    el.classList.remove("text-5xl", "text-3xl");
+    el.classList.add(
+      cor,
+      "font-bold",
+      "text-4xl",        // 🔸 Tamanho unificado
+      "leading-tight",   // 🔸 Altura da linha ajustada
+      "tracking-tight",  // 🔸 Espaçamento horizontal equilibrado
+      "whitespace-nowrap"
+    );
+  };
 
-  // Mantém fator para outros contextos
-  if (elFator && prefixo !== "fav") elFator.textContent = fator ?? 0;
+  if (elVenc) {
+    elVenc.textContent = vencedoras ?? 0;
+    aplicarEstiloPadrao(elVenc);
+  }
+
+  if (elPerd) {
+    elPerd.textContent = perdedoras ?? 0;
+    aplicarEstiloPadrao(elPerd);
+  }
+
+  if (elTrades) {
+    elTrades.textContent = trades ?? 0;
+    aplicarEstiloPadrao(elTrades);
+  }
+
+  if (elFator) {
+    elFator.textContent = fator ?? 0;
+    aplicarEstiloPadrao(elFator);
+  }
+
+  if (elLucro) {
+    elLucro.textContent = formatarMoeda(lucro);
+    aplicarEstiloPadrao(elLucro, "text-green-400");
+  }
 }
 
 // Formata o valor
