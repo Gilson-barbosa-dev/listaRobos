@@ -551,31 +551,56 @@ function fecharModalHistorico() {
 // ==========================
 // 🔹 Modal Estatística
 // ==========================
+
 async function abrirEstatistica(magic) {
   try {
     console.log("📊 Abrindo estatística do Magic:", magic);
 
+    // 🔹 Busca a imagem da métrica
     const res = await fetch(`/api/metricas/${magic}`);
     if (!res.ok) throw new Error("Erro ao buscar imagem da métrica");
-
     const { url } = await res.json();
 
+    // 🔹 Busca dados da estratégia atual em cache
+    const estrategia = estrategiasGlobais.find(
+      (e) => String(e.magic) === String(magic)
+    );
+
+    // 🔹 Atualiza título e imagem
+    document.getElementById("tituloEstatistica").textContent =
+      `Estatísticas da Estratégia`;
+    document.getElementById("imagemEstatistica").src = url || "";
+
+    // 🔹 Atualiza blocos de informações
+    document.getElementById("infoMagic").textContent = estrategia?.magic || "---";
+    document.getElementById("infoTipo").textContent =
+      estrategia?.tipo_estrategia || "Não informado";
+    document.getElementById("infoTimeframe").textContent =
+      estrategia?.timeframe || "—";
+
+    // 🔹 Formata capital mínimo com símbolo de dólar e duas casas decimais
+    if (estrategia?.capital_minimo != null && estrategia?.capital_minimo !== "") {
+      const capital = parseFloat(estrategia.capital_minimo).toLocaleString("en-US", {
+        style: "currency",
+        currency: "USD",
+      });
+      document.getElementById("infoCapital").textContent = capital;
+    } else {
+      document.getElementById("infoCapital").textContent = "—";
+    }
+
+    // 🔹 Exibe o modal
     const modal = document.getElementById("modalEstatistica");
-    const img = document.getElementById("imagemEstatistica");
-    const titulo = document.getElementById("tituloEstatistica");
-
-    // Atualizar título dinâmico
-    titulo.textContent = `Estatísticas da Estratégia: Magic ${magic}`;
-
-    // Atualizar imagem
-    img.src = url;
-
     modal.classList.remove("hidden");
     modal.classList.add("flex");
+
+    lucide.createIcons();
   } catch (err) {
     console.error("❌ Erro ao abrir estatística:", err);
+    alert("Erro ao abrir estatística. Veja o console.");
   }
 }
+
 
 function fecharModalEstatistica() {
   const modal = document.getElementById("modalEstatistica");

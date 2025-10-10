@@ -197,10 +197,19 @@ app.get("/primeiros-passos", autenticar, atualizarUsuario, verificarAssinatura, 
 // ==========================
 // 🔹 APIs protegidas
 // ==========================
-app.get("/api/estrategias", autenticar, atualizarUsuario, verificarAssinatura, async (req, res) => {
+app.get("/api/estrategias", async (req, res) => {
   try {
     const result = await pool.query(`
-      SELECT magic, estrategia, ativo, lucro_total, total_operacoes, assertividade
+      SELECT 
+        magic,
+        estrategia,
+        ativo,
+        lucro_total,
+        total_operacoes,
+        assertividade,
+        tipo_estrategia,
+        timeframe,
+        capital_minimo
       FROM estatistica
       ORDER BY id DESC
     `);
