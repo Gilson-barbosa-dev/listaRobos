@@ -287,7 +287,6 @@ function renderizarEstrategiasFavoritos(listaFavoritos) {
       (e) => String(e.magic) === String(fav.magic)
     );
     if (!estrategia) {
-      console.warn("⚠️ Estratégia não encontrada para magic:", fav.magic);
       return;
     }
 

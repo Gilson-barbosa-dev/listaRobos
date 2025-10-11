@@ -212,10 +212,14 @@ app.get("/api/estrategias", async (req, res) => {
         lucro_total,
         total_operacoes,
         assertividade,
+        timeframe,
+        tipo_estrategia,
+        capital_minimo,
         COALESCE(aprovado, false) AS aprovado
       FROM estatistica
     `;
 
+    // 🔹 Usuários comuns só veem estratégias aprovadas
     if (tipo !== "admin") {
       query += " WHERE COALESCE(aprovado, false) = true";
     }
@@ -229,7 +233,6 @@ app.get("/api/estrategias", async (req, res) => {
     return res.status(500).json({ erro: "Erro ao buscar estratégias" });
   }
 });
-
 
 app.get("/api/consolidado-diario", autenticar, atualizarUsuario, verificarAssinatura, async (req, res) => {
   try {

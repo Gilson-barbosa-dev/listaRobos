@@ -2488,12 +2488,12 @@ video {
   padding-right: 1rem;
 }
 
-.pt-3 {
-  padding-top: 0.75rem;
-}
-
 .pr-8 {
   padding-right: 2rem;
+}
+
+.pt-3 {
+  padding-top: 0.75rem;
 }
 
 .text-left {
