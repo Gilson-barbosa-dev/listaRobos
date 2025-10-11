@@ -521,7 +521,7 @@ app.post("/criar-senha/:token", async (req, res) => {
 
     await pool.query(
       `UPDATE usuarios 
-       SET senha = $1, reset_token = NULL, reset_expira = NULL 
+       SET senha_hash = $1, reset_token = NULL, reset_expira = NULL 
        WHERE id = $2`,
       [hash, usuarioId]
     );
