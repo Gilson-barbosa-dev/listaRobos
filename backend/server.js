@@ -60,7 +60,7 @@ async function atualizarUsuario(req, res, next) {
 
   try {
     const { rows } = await pool.query(
-      "SELECT id, nome, email, status_assinatura, plano, vencimento FROM usuarios WHERE id = $1",
+      "SELECT id, nome, email, status_assinatura, plano, proxima_cobranca FROM usuarios WHERE id = $1",
       [req.session.usuario.id]
     );
 
@@ -117,7 +117,7 @@ app.post("/login", async (req, res) => {
       role: usuario.role || "user", 
       status_assinatura: usuario.status_assinatura,
       plano: usuario.plano,
-      vencimento: usuario.vencimento
+      proxima_cobranca: usuario.proxima_cobranca
     };
 
     return res.redirect("/");
@@ -152,7 +152,7 @@ app.post("/register", async (req, res) => {
     const senhaHash = await bcrypt.hash(senha, 10);
 
     await pool.query(
-      "INSERT INTO usuarios (nome, email, senha_hash, status_assinatura, plano, vencimento) VALUES ($1, $2, $3, $4, $5, $6)",
+      "INSERT INTO usuarios (nome, email, senha_hash, status_assinatura, plano, proxima_cobranca) VALUES ($1, $2, $3, $4, $5, $6)",
       [nome, email, senhaHash, false, null, null]
     );
 
