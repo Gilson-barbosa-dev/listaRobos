@@ -7,9 +7,10 @@ import pool from "./db.js"; // conexão com o banco
 import session from "express-session";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
-import { Resend } from "resend";
 import arquivosRoutes from "./routes/arquivos.js";
 import metricasRoutes from "./routes/metricas.js";
+import zoutiWebhook from "./routes/zoutiWebhook.js";
+import { enviarEmailRecuperacao } from "./utils/email.js";
 
 dotenv.config();
 
@@ -19,7 +20,6 @@ const PORT = process.env.PORT || 3001;
 // Corrigir __dirname no ESModules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const resend = new Resend(process.env.RESEND_API_KEY);
 
 // ==========================
 // 🔹 Configuração do EJS
@@ -33,6 +33,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "../frontend")));
 app.use("/api/arquivos", arquivosRoutes);
 app.use("/api/metricas", metricasRoutes);
+app.use(zoutiWebhook);
 
 // ==========================
 // 🔹 Sessões
@@ -385,9 +386,6 @@ app.get("/gerenciamento-mesa", autenticar, atualizarUsuario, verificarAssinatura
 // ==========================
 // 🔹 Recuperar acesso (Esqueceu a senha)
 // ==========================
-// ==========================
-// 🔹 Recuperar acesso (Esqueceu a senha)
-// ==========================
 app.get("/recuperar", (req, res) => {
   res.render("recuperar", { erro: null, mensagem: null });
 });
@@ -402,7 +400,7 @@ app.post("/recuperar", async (req, res) => {
 
     const token = crypto.randomBytes(32).toString("hex");
 
-    // 🔧 adiciona +1h de validade +3h de fuso (UTC → SP)
+    // 🔧 adiciona +1h de validade +3h fuso (UTC → São Paulo)
     const expira = new Date(Date.now() + 3600000 + 3 * 60 * 60 * 1000);
 
     await pool.query(
@@ -411,26 +409,18 @@ app.post("/recuperar", async (req, res) => {
     );
 
     const link = `${process.env.BASE_URL}/resetar/${token}`;
+    await enviarEmailRecuperacao({ email, link });
 
-    await resend.emails.send({
-      from: "Clube Quant <no-reply@clubequant.com.br>",
-      to: email,
-      subject: "🔐 Recuperação de Senha - Clube Quant",
-      html: `
-        <div style="font-family:Arial,Helvetica,sans-serif;background-color:#0f172a;padding:40px;color:#f8fafc;text-align:center;border-radius:12px;max-width:480px;margin:auto;">
-          <img src="https://app.clubequant.com.br/img/logo_clube_quant2.webp" alt="Clube Quant" style="width:160px;margin-bottom:24px;">
-          <h2 style="color:#60a5fa;margin-bottom:12px;">Recuperação de Senha</h2>
-          <p style="color:#e2e8f0;margin-bottom:30px;">Você solicitou redefinir sua senha. Clique no botão abaixo para continuar:</p>
-          <a href="${link}" style="display:inline-block;background-color:#3b82f6;color:#fff;text-decoration:none;font-weight:bold;padding:12px 20px;border-radius:8px;">🔑 Redefinir minha senha</a>
-          <p style="color:#94a3b8;margin-top:30px;font-size:13px;">Se você não fez esta solicitação, ignore este e-mail.<br>O link expira em 1 hora.</p>
-        </div>
-      `,
+    res.render("recuperar", {
+      erro: null,
+      mensagem: "Enviamos um link de recuperação para o seu e-mail.",
     });
-
-    res.render("recuperar", { erro: null, mensagem: "Enviamos um link de recuperação para o seu e-mail." });
   } catch (err) {
     console.error("❌ Erro ao enviar recuperação:", err);
-    res.render("recuperar", { erro: "Erro ao enviar o e-mail.", mensagem: null });
+    res.render("recuperar", {
+      erro: "Erro ao enviar o e-mail.",
+      mensagem: null,
+    });
   }
 });
 
