@@ -1,10 +1,9 @@
 import express from "express";
 import pool from "../db.js";
 import crypto from "crypto";
-import { enviarEmailBoasVindas } from "../utils/email.js"; // helper já existente
+import { enviarEmailBoasVindas } from "../utils/email.js";
 
 const router = express.Router();
-const SENHA_PADRAO = "123456";
 
 // Função auxiliar para próxima cobrança (28 dias)
 function calcularProximaCobranca(dias = 28) {
@@ -41,11 +40,8 @@ router.post("/webhook/zouti", async (req, res) => {
       return res.status(200).json({ ok: true });
     }
 
-    // Busca usuário existente
-    const result = await pool.query(
-      "SELECT * FROM usuarios WHERE email = $1 AND product_id = $2",
-      [email, productId]
-    );
+    // Busca usuário existente por email (um plano por usuário)
+    const result = await pool.query("SELECT * FROM usuarios WHERE email = $1", [email]);
     const usuario = result.rows[0];
 
     // ✅ Caso ACTIVE
@@ -53,20 +49,16 @@ router.post("/webhook/zouti", async (req, res) => {
       const agora = new Date();
       const proximaCobranca = calcularProximaCobranca(28);
 
-        // Novo usuário
-        if (!usuario) {
-        const agora = new Date();
-        const proximaCobranca = calcularProximaCobranca(28);
-
-        // 🔹 Gera token de criação de senha
+      // 🔸 NOVO USUÁRIO
+      if (!usuario) {
         const token = crypto.randomBytes(32).toString("hex");
         const expira = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24h
 
         await pool.query(
-            `INSERT INTO usuarios
+          `INSERT INTO usuarios
             (nome, email, telefone, role, criado_em, data_pagamento, status_assinatura, product_id, plano, proxima_cobranca, reset_token, reset_expira)
-            VALUES ($1,$2,$3,'user',$4,$5,true,$6,$7,$8,$9,$10)`,
-            [
+           VALUES ($1,$2,$3,'user',$4,$5,true,$6,$7,$8,$9,$10)`,
+          [
             nome,
             email,
             telefone,
@@ -77,7 +69,7 @@ router.post("/webhook/zouti", async (req, res) => {
             proximaCobranca,
             token,
             expira,
-            ]
+          ]
         );
 
         console.log(`✅ Novo usuário criado (${plano}): ${email}`);
@@ -86,25 +78,21 @@ router.post("/webhook/zouti", async (req, res) => {
         const link = `${process.env.APP_URL}/criar-senha/${token}`;
         await enviarEmailBoasVindas({ nome, email, link });
         return res.json({ ok: true });
-        }
-
-
-      // Usuário ativo → ignora se dentro da janela
-      if (usuario.status_assinatura && new Date() < usuario.proxima_cobranca) {
-        console.log(`⏳ Renovação ignorada (dentro do período): ${email}`);
-        return res.json({ ok: true });
       }
 
-      // Reativação ou renovação
+      // 🔁 USUÁRIO EXISTENTE (Renovação ou Upgrade/Downgrade)
       await pool.query(
         `UPDATE usuarios
          SET status_assinatura = true,
              data_pagamento = $1,
-             proxima_cobranca = $2
-         WHERE id = $3`,
-        [agora, proximaCobranca, usuario.id]
+             proxima_cobranca = $2,
+             plano = $3,
+             product_id = $4
+         WHERE id = $5`,
+        [agora, proximaCobranca, plano, productId, usuario.id]
       );
-      console.log(`🔄 Usuário renovado (${plano}): ${email}`);
+
+      console.log(`🔄 Usuário ${email} atualizado para o plano ${plano}`);
       return res.json({ ok: true });
     }
 
@@ -114,7 +102,7 @@ router.post("/webhook/zouti", async (req, res) => {
         "UPDATE usuarios SET status_assinatura = false WHERE id = $1",
         [usuario.id]
       );
-      console.log(`🚫 Usuário cancelado: ${email}`);
+      console.log(`🚫 Usuário cancelado: ${email} (Plano ${usuario.plano})`);
     }
 
     return res.json({ ok: true });
