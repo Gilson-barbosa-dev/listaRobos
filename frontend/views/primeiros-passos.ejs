@@ -25,7 +25,7 @@
         <div class="lg:col-span-2 bg-gray-900 rounded-xl shadow-md p-4 relative">
           <div id="player-container" class="aspect-w-16 aspect-h-9">
             <iframe id="video-player" 
-              src="<%= modulos[0].videos[0].url %>" 
+              src="<%= modulos[0].videos[0].url.replace('watch?v=', 'embed/').replace('youtu.be/', 'www.youtube.com/embed/') %>" 
               class="w-full h-[500px] rounded-lg" 
               frameborder="0" allowfullscreen>
             </iframe>
@@ -102,9 +102,22 @@
     lucide.createIcons();
 
     function trocarVideo(url, titulo, descricao, material, mi, vi) {
-      document.getElementById("video-player").src = url;
+      // 🔹 Corrige automaticamente links do YouTube
+      if (url.includes("watch?v=")) {
+        url = url.replace("watch?v=", "embed/");
+      }
+      if (url.includes("youtu.be/")) {
+        url = url.replace("youtu.be/", "www.youtube.com/embed/");
+      }
+
+      // 🔹 Atualiza o player principal
+      const player = document.getElementById("video-player");
+      player.src = url;
+
+      // 🔹 Atualiza título
       document.querySelector("#video-info h2").textContent = titulo;
-      
+
+      // 🔹 Atualiza ou remove a descrição
       const descEl = document.querySelector("#video-info p");
       if (descricao) {
         if (descEl) {
@@ -119,6 +132,7 @@
         descEl.remove();
       }
 
+      // 🔹 Atualiza o botão de material de apoio
       const btnAntigo = document.querySelector("#video-info a");
       if (material) {
         if (btnAntigo) {
@@ -127,7 +141,8 @@
           const a = document.createElement("a");
           a.href = material;
           a.target = "_blank";
-          a.className = "inline-block mt-3 px-4 py-2 bg-blue-600 rounded-lg text-white text-sm hover:bg-blue-500";
+          a.className =
+            "inline-block mt-3 px-4 py-2 bg-blue-600 rounded-lg text-white text-sm hover:bg-blue-500";
           a.textContent = "📂 Material de Apoio";
           document.getElementById("video-info").appendChild(a);
         }
@@ -135,26 +150,33 @@
         btnAntigo.remove();
       }
 
-      // Atualiza vídeo atual
+      // 🔹 Atualiza o estado atual do vídeo
       videoAtual = { mi, vi };
 
-      // Verifica se já concluído
+      // 🔹 Atualiza botão "Concluir" de acordo com o progresso salvo
       const id = `video-${mi}-${vi}`;
       const concluirBtn = document.getElementById("btn-concluir");
 
       if (progresso[id]) {
-        document.getElementById("btn-concluir-icon").setAttribute("data-lucide", "check-square");
+        document
+          .getElementById("btn-concluir-icon")
+          .setAttribute("data-lucide", "check-square");
         document.getElementById("btn-concluir-text").textContent = "Concluído";
         concluirBtn.classList.remove("bg-gray-800", "text-gray-300");
         concluirBtn.classList.add("bg-green-600", "text-white");
       } else {
-        document.getElementById("btn-concluir-icon").setAttribute("data-lucide", "square");
+        document
+          .getElementById("btn-concluir-icon")
+          .setAttribute("data-lucide", "square");
         document.getElementById("btn-concluir-text").textContent = "Concluir";
         concluirBtn.classList.remove("bg-green-600", "text-white");
         concluirBtn.classList.add("bg-gray-800", "text-gray-300");
       }
+
+      // 🔹 Atualiza ícones
       lucide.createIcons();
     }
+
 
     // Marca ou desmarca como concluído
     document.getElementById("btn-concluir").addEventListener("click", () => {

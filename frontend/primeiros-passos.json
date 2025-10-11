@@ -5,18 +5,18 @@
       {
         "titulo": "Bem-vindo ao Clube Quant",
         "descricao": "Explicação inicial sobre o uso da plataforma.",
-        "url": "https://www.youtube.com/watch?v=1oeJ04fYzwg",
+        "url": "https://www.youtube.com/embed/1oeJ04fYzwg",
         "material": "https://drive.google.com/file/d/xxxxxxx/view"
       },
       {
         "titulo": "Como são geradas as estratégias",
         "descricao": "Tutorial completo de como são geradas as estratégias.",
-        "url": "https://www.youtube.com/watch?v=36cepQSXaIY"
+        "url": "https://www.youtube.com/embed/36cepQSXaIY"
       },
       {
         "titulo": "Como avaliar estratégias",
         "descricao": "Tutorial completo de como avaliar estratégias e ver se é para o seu perfil de investidor.",
-        "url": "https://www.youtube.com/watch?v=NwNLZ_qtXZ0"
+        "url": "https://www.youtube.com/embed/NwNLZ_qtXZ0"
       }
     ]
   },
