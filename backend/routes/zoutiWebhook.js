@@ -3,8 +3,6 @@ import pool from "../db.js";
 import crypto from "crypto";
 import { enviarEmailBoasVindas } from "../utils/email.js";
 
-// Comentário para parar o push
-
 const router = express.Router();
 
 // Função auxiliar para próxima cobrança (28 dias)
@@ -42,7 +40,7 @@ router.post("/webhook/zouti", async (req, res) => {
       return res.status(200).json({ ok: true });
     }
 
-    // Busca usuário existente por email (um plano por usuário)
+    // Busca usuário existente (um plano por e-mail)
     const result = await pool.query("SELECT * FROM usuarios WHERE email = $1", [email]);
     const usuario = result.rows[0];
 
@@ -51,7 +49,7 @@ router.post("/webhook/zouti", async (req, res) => {
       const agora = new Date();
       const proximaCobranca = calcularProximaCobranca(28);
 
-      // 🔸 NOVO USUÁRIO
+      // 🟢 1. NOVO USUÁRIO
       if (!usuario) {
         const token = crypto.randomBytes(32).toString("hex");
         const expira = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24h
@@ -75,14 +73,26 @@ router.post("/webhook/zouti", async (req, res) => {
         );
 
         console.log(`✅ Novo usuário criado (${plano}): ${email}`);
-
-        // 🔔 Envia email de boas-vindas com link de criação de senha
         const link = `${process.env.APP_URL}/criar-senha/${token}`;
         await enviarEmailBoasVindas({ nome, email, link });
         return res.json({ ok: true });
       }
 
-      // 🔁 USUÁRIO EXISTENTE (Renovação ou Upgrade/Downgrade)
+      // 🟠 2. USUÁRIO EXISTENTE — verificar se é renovação ou mudança de plano
+      const planoAtual = usuario.plano;
+      const proxima = usuario.proxima_cobranca ? new Date(usuario.proxima_cobranca) : null;
+      const mudouPlano = planoAtual !== plano;
+      const podeRenovar = proxima && agora >= proxima;
+
+      // ❌ Bloquear ACTIVE inválido
+      if (!mudouPlano && !podeRenovar) {
+        console.log(
+          `🚫 Ignorado ACTIVE inválido: ${email} | Plano atual: ${planoAtual} | Próx. cobrança: ${usuario.proxima_cobranca}`
+        );
+        return res.status(200).json({ ignorado: true });
+      }
+
+      // 🟢 Renovação ou upgrade/downgrade autorizado
       await pool.query(
         `UPDATE usuarios
          SET status_assinatura = true,
@@ -94,20 +104,22 @@ router.post("/webhook/zouti", async (req, res) => {
         [agora, proximaCobranca, plano, productId, usuario.id]
       );
 
-      console.log(`🔄 Usuário ${email} atualizado para o plano ${plano}`);
+      const tipo = mudouPlano ? "mudança de plano" : "renovação";
+      console.log(`🔄 Usuário ${email} atualizado (${tipo} para ${plano})`);
       return res.json({ ok: true });
     }
 
-    // ❌ Caso CANCELED
+    // ❌ Caso CANCELED — sempre permitido
     if (status === "CANCELED" && usuario) {
       await pool.query(
         "UPDATE usuarios SET status_assinatura = false WHERE id = $1",
         [usuario.id]
       );
       console.log(`🚫 Usuário cancelado: ${email} (Plano ${usuario.plano})`);
+      return res.json({ ok: true });
     }
 
-    return res.json({ ok: true });
+    return res.json({ ignorado: true });
   } catch (err) {
     console.error("❌ Erro no webhook Zouti:", err);
     return res.status(500).json({ erro: "Erro interno no webhook" });
