@@ -54,7 +54,7 @@
           <p class="mt-2 text-gray-300">
             Você está no plano <strong><%= usuario.plano.toLowerCase() %></strong>, válido até 
             <span class="text-quant-green font-semibold">
-              <%= usuario.vencimento ? new Date(usuario.vencimento).toLocaleDateString("pt-BR") : "N/D" %>
+              <%= usuario.proxima_cobranca ? new Date(usuario.proxima_cobranca).toLocaleDateString("pt-BR") : "N/D" %>
             </span>.
           </p>
           <p class="mt-2 text-gray-300">
