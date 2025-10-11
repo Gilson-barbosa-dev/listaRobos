@@ -5,13 +5,18 @@
       {
         "titulo": "Bem-vindo ao Clube Quant",
         "descricao": "Explicação inicial sobre o uso da plataforma.",
-        "url": "https://www.youtube.com/embed/xxxxxxxx",
+        "url": "https://youtu.be/1oeJ04fYzwg",
         "material": "https://drive.google.com/file/d/xxxxxxx/view"
       },
       {
-        "titulo": "Como instalar o algoritmo",
-        "descricao": "Tutorial completo de instalação do EA.",
-        "url": "https://www.youtube.com/embed/yyyyyyyy"
+        "titulo": "Como são geradas as estratégias",
+        "descricao": "Tutorial completo de como são geradas as estratégias.",
+        "url": "https://youtu.be/36cepQSXaIY"
+      },
+      {
+        "titulo": "Como avaliar estratégias",
+        "descricao": "Tutorial completo de como avaliar estratégias e ver se é para o seu perfil de investidor.",
+        "url": "https://youtu.be/NwNLZ_qtXZ0"
       }
     ]
   },
