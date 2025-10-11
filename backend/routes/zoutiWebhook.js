@@ -3,6 +3,8 @@ import pool from "../db.js";
 import crypto from "crypto";
 import { enviarEmailBoasVindas } from "../utils/email.js";
 
+// Comentário para parar o push
+
 const router = express.Router();
 
 // Função auxiliar para próxima cobrança (28 dias)
