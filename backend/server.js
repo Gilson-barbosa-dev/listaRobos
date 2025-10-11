@@ -454,6 +454,96 @@ app.get("/resetar/:token", async (req, res) => {
   }
 });
 
+// =============================================
+// 🆕 Criar Senha (Primeiro Acesso)
+// =============================================
+app.get("/criar-senha/:token", async (req, res) => {
+  const { token } = req.params;
+
+  try {
+    const { rows } = await pool.query(
+      "SELECT id, reset_expira FROM usuarios WHERE reset_token = $1",
+      [token]
+    );
+
+    if (rows.length === 0) {
+      return res.render("criar-senha", {
+        erro: "Link inválido ou expirado.",
+        mensagem: null,
+        token: null,
+      });
+    }
+
+    const usuario = rows[0];
+    const agora = new Date();
+    const expira = new Date(usuario.reset_expira);
+
+    if (agora > expira) {
+      return res.render("criar-senha", {
+        erro: "O link expirou. Solicite um novo acesso.",
+        mensagem: null,
+        token: null,
+      });
+    }
+
+    res.render("criar-senha", { erro: null, mensagem: null, token });
+  } catch (err) {
+    console.error("❌ Erro ao carregar página de criação de senha:", err);
+    res.render("criar-senha", {
+      erro: "Erro ao carregar página.",
+      mensagem: null,
+      token: null,
+    });
+  }
+});
+
+app.post("/criar-senha/:token", async (req, res) => {
+  const { token } = req.params;
+  const { senha } = req.body;
+
+  try {
+    const { rows } = await pool.query(
+      "SELECT id FROM usuarios WHERE reset_token = $1 AND reset_expira > NOW()",
+      [token]
+    );
+
+    if (rows.length === 0) {
+      return res.render("criar-senha", {
+        erro: "Link inválido ou expirado.",
+        mensagem: null,
+        token: null,
+      });
+    }
+
+    const bcrypt = await import("bcrypt");
+    const hash = await bcrypt.hash(senha, 10);
+    const usuarioId = rows[0].id;
+
+    await pool.query(
+      `UPDATE usuarios 
+       SET senha = $1, reset_token = NULL, reset_expira = NULL 
+       WHERE id = $2`,
+      [hash, usuarioId]
+    );
+
+    console.log(`🔐 Senha criada com sucesso (ID ${usuarioId})`);
+    res.render("criar-senha", {
+      erro: null,
+      mensagem: "Senha criada com sucesso! Redirecionando para login...",
+      token: null,
+      redirect: true,
+    });
+  } catch (err) {
+    console.error("❌ Erro ao criar senha:", err);
+    res.render("criar-senha", {
+      erro: "Erro ao salvar nova senha.",
+      mensagem: null,
+      token,
+    });
+  }
+});
+
+
 // ==========================
 // 🔹 Atualizar senha
 // ==========================
