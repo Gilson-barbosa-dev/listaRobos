@@ -50,6 +50,7 @@
       </div>
 
       <!-- 🧪 Filtro de status (Admin apenas) -->
+       <% if (tipoUsuario === "admin") { %>
       <div class="relative w-full md:w-40" id="filtroWrapper">
         <i data-lucide="filter" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-purple-400"></i>
         <select
@@ -62,6 +63,7 @@
         </select>
         <i data-lucide="chevron-down" class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"></i>
       </div>
+      <% } %>
 
     </div>
 
@@ -162,6 +164,15 @@
 
 
   <!-- Scripts -->
+  <script>
+  document.addEventListener("DOMContentLoaded", () => {
+    // 🔒 Se não for admin, esconder o filtro de status
+    if (window.tipoUsuario !== "admin") {
+      const filtro = document.getElementById("filtroWrapper");
+      if (filtro) filtro.classList.add("hidden");
+    }
+  });
+</script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="/Script.js"></script>
 </body>
