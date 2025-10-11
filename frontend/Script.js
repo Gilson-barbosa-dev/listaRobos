@@ -777,8 +777,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // 🔹 Exibir filtro de status apenas se for admin
   if (tipoUsuario === "admin") {
-    document.getElementById("filtroStatus")?.classList.remove("hidden");
+    const filtroWrapper = document.getElementById("filtroWrapper");
+    if (filtroWrapper) filtroWrapper.classList.remove("hidden");
   }
+
+  // 🔹 Garante renderização dos ícones Lucide (inclusive chevron)
+  lucide.createIcons();
 
   if (window.location.pathname.includes("meus-algoritmos")) {
     carregarFavoritos();

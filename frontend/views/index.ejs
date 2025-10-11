@@ -23,28 +23,48 @@
   <main class="ml-64 p-6 flex-1">
     <div class="max-w-6xl mx-auto">
       <!-- Top bar -->
-      <div class="flex flex-col md:flex-row gap-4 justify-center items-center mb-6">
+    <div class="flex flex-col md:flex-row gap-4 justify-center items-center mb-6">
+
+      <!-- 🔍 Busca -->
+      <div class="relative w-full md:w-64">
+        <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"></i>
         <input 
           type="text" 
-          placeholder="🔍 Magic ou Ativo..."
-          class="w-full md:w-64 px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+          placeholder="Magic ou Ativo..."
+          class="w-full pl-9 pr-4 py-2 rounded-lg bg-gray-800 border border-gray-700 text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:outline-none"
         >
+      </div>
+
+      <!-- 📊 Ordenação -->
+      <div class="relative w-full md:w-40">
+        <i data-lucide="bar-chart-3" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-blue-400"></i>
         <select 
-          class="w-full md:w-40 px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 text-white focus:ring-2 focus:ring-blue-400 focus:outline-none"
+          name="ordenar"
+          class="w-full pl-9 pr-8 py-2 rounded-lg bg-gray-800 border border-gray-700 text-white focus:ring-2 focus:ring-blue-400 focus:outline-none appearance-none"
         >
-          <option value="lucro_total">📈 Lucro Total</option>
-          <option value="assertividade">✅ Assertividade</option>
-          <option value="operacoes">📊 Operações</option>
+          <option value="lucro_total">Lucro Total</option>
+          <option value="assertividade">Assertividade</option>
+          <option value="operacoes">Operações</option>
         </select>
+        <i data-lucide="chevron-down" class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"></i>
+      </div>
+
+      <!-- 🧪 Filtro de status (Admin apenas) -->
+      <div class="relative w-full md:w-40" id="filtroWrapper">
+        <i data-lucide="filter" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-purple-400"></i>
         <select
           id="filtroStatus"
-          class="hidden w-full md:w-40 px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 text-white focus:ring-2 focus:ring-blue-400 focus:outline-none"
+          class="w-full pl-9 pr-8 py-2 rounded-lg bg-gray-800 border border-gray-700 text-white focus:ring-2 focus:ring-purple-400 focus:outline-none appearance-none"
         >
-          <option value="todas">🔎 Todas</option>
-          <option value="aprovadas">✅ Aprovadas</option>
-          <option value="teste">🧪 Em Teste</option>
+          <option value="todas">Todas</option>
+          <option value="aprovadas">Aprovadas</option>
+          <option value="teste">Em Teste</option>
         </select>
+        <i data-lucide="chevron-down" class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"></i>
       </div>
+
+    </div>
+
 
       <!-- Dashboard consolidado -->
       <div class="p-6 bg-gray-800 rounded-xl shadow-md">
