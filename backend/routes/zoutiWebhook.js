@@ -73,7 +73,7 @@ router.post("/webhook/zouti", async (req, res) => {
         );
 
         console.log(`✅ Novo usuário criado (${plano}): ${email}`);
-        const link = `${process.env.APP_URL}/criar-senha/${token}`;
+        const link = `${process.env.BASE_URL}/criar-senha/${token}`;
         await enviarEmailBoasVindas({ nome, email, link });
         return res.json({ ok: true });
       }
