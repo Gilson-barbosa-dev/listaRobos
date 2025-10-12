@@ -9,69 +9,107 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/img/favicon.png">
   <meta name="theme-color" content="#000000">
 </head>
-<body class="bg-gradient-to-br from-black via-gray-900 to-black text-white min-h-screen font-sans">
+<body class="bg-gradient-to-br from-black via-gray-900 to-black text-white min-h-screen font-sans overflow-hidden">
 
   <!-- Sidebar -->
   <%- include("partials/sidebar") %>
 
   <div class="ml-64 p-6">
     <div class="max-w-6xl mx-auto">
-      <!-- Título -->
-      <h1 class="text-2xl font-bold mb-6 flex items-center gap-2">
+      <!-- Título da página -->
+      <h1 class="text-2xl font-bold mb-4 flex items-center gap-2">
         <i data-lucide="book-open" class="w-6 h-6 text-yellow-400"></i>
         <span class="text-white">Primeiros Passos</span>
       </h1>
 
+      <!-- Banner informativo com botão (suave) -->
+      <div class="mb-6 bg-gray-800/70 border border-gray-700 hover:border-blue-500/40 transition-all rounded-xl shadow-sm p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <p class="text-sm text-gray-300 leading-relaxed flex items-center gap-2">
+          <i data-lucide="info" class="w-4 h-4 text-blue-400"></i>
+          Participe da comunidade oficial do <span class="font-semibold text-white">Clube Quant</span> no WhatsApp — compartilhe resultados, tire dúvidas e acompanhe novidades exclusivas.
+        </p>
+        <a href="https://chat.whatsapp.com/CE8zrXpFRWUKaRpQWT5oDs" target="_blank"
+           class="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-700 hover:bg-blue-600 text-white text-sm font-medium transition whitespace-nowrap">
+          <i data-lucide="message-circle" class="w-4 h-4"></i>
+          Entrar na Comunidade
+        </a>
+      </div>
+
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
-        <!-- Player de vídeo -->
-        <div class="lg:col-span-2 bg-gray-900 rounded-xl shadow-md p-4 relative">
+        <!-- Player e infos -->
+        <div class="lg:col-span-2 bg-gray-900 rounded-xl shadow-md p-4">
           <div id="player-container" class="aspect-w-16 aspect-h-9">
-            <iframe id="video-player" 
-              src="<%= modulos[0].videos[0].url.replace('watch?v=', 'embed/').replace('youtu.be/', 'www.youtube.com/embed/') %>" 
-              class="w-full h-[500px] rounded-lg" 
+            <iframe id="video-player"
+              src="<%= modulos[0].videos[0].url.replace('watch?v=', 'embed/').replace('youtu.be/', 'www.youtube.com/embed/') %>"
+              class="w-full h-[500px] rounded-lg"
               frameborder="0" allowfullscreen>
             </iframe>
           </div>
 
-          <div id="video-info" class="mt-4 pr-28"> <!-- padding-right para não colidir com botão -->
-            <h2 class="text-xl font-bold text-blue-400">
-              <%= modulos[0].videos[0].titulo %>
-            </h2>
-            <% if (modulos[0].videos[0].descricao) { %>
-              <p class="text-gray-400 mt-1"><%= modulos[0].videos[0].descricao %></p>
-            <% } %>
-            <% if (modulos[0].videos[0].material) { %>
-              <a href="<%= modulos[0].videos[0].material %>" target="_blank"
-                class="inline-block mt-3 px-4 py-2 bg-blue-600 rounded-lg text-white text-sm hover:bg-blue-500">
-                📂 Material de Apoio
-              </a>
-            <% } %>
-          </div>
+          <!-- Info do vídeo + concluir -->
+          <div id="video-info" class="mt-4 flex items-start justify-between">
+            <div class="flex-1 pr-8">
+              <h2 class="text-xl font-bold text-blue-400 flex items-center gap-2">
+                <i data-lucide="play-circle" class="w-5 h-5 text-blue-400"></i>
+                <span id="video-title-text"><%= modulos[0].videos[0].titulo %></span>
+              </h2>
 
-          <!-- Botão concluir no canto inferior direito -->
-          <button id="btn-concluir" 
-            class="absolute bottom-4 right-4 flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-800 hover:bg-blue-600 text-gray-300 hover:text-white font-medium transition">
-            <i id="btn-concluir-icon" data-lucide="square" class="w-5 h-5"></i>
-            <span id="btn-concluir-text">Concluir</span>
-          </button>
+              <% if (modulos[0].videos[0].descricao) { %>
+                <p id="video-desc" class="text-gray-400 mt-1"><%= modulos[0].videos[0].descricao %></p>
+              <% } else { %>
+                <p id="video-desc" class="text-gray-400 mt-1 hidden"></p>
+              <% } %>
+
+              <% if (modulos[0].videos[0].material) { %>
+                <a id="video-material" href="<%= modulos[0].videos[0].material %>" target="_blank"
+                   class="inline-flex items-center gap-2 mt-3 px-4 py-2 bg-blue-600 rounded-lg text-white text-sm hover:bg-blue-500 transition">
+                  <i data-lucide="folder-open" class="w-4 h-4"></i>
+                  Material de Apoio
+                </a>
+              <% } else { %>
+                <a id="video-material" href="#" target="_blank"
+                   class="inline-flex items-center gap-2 mt-3 px-4 py-2 bg-blue-600 rounded-lg text-white text-sm hover:bg-blue-500 transition hidden">
+                  <i data-lucide="folder-open" class="w-4 h-4"></i>
+                  Material de Apoio
+                </a>
+              <% } %>
+            </div>
+
+            <!-- Botão Concluir -->
+            <button id="btn-concluir"
+              class="flex items-center gap-2 h-fit px-4 py-2 rounded-lg bg-gray-800 hover:bg-blue-600 text-gray-300 hover:text-white font-medium transition">
+              <i id="btn-concluir-icon" data-lucide="square" class="w-5 h-5"></i>
+              <span id="btn-concluir-text">Concluir</span>
+            </button>
+          </div>
         </div>
 
-        <!-- Lista de módulos -->
-        <div class="bg-gray-900 rounded-xl shadow-md p-4">
-          <h2 class="text-lg font-semibold text-white mb-4">Conteúdo</h2>
+        <!-- Lista de módulos com scroll -->
+        <div class="bg-gray-900 rounded-xl shadow-md p-4 overflow-y-auto max-h-[calc(100vh-180px)] custom-scroll">
+          <h2 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <i data-lucide="list" class="w-5 h-5 text-blue-400"></i>
+            Conteúdo
+          </h2>
+
           <div class="space-y-4">
             <% modulos.forEach((modulo, mi) => { %>
               <div class="bg-gray-800 rounded-lg p-3">
-                <h3 class="font-bold text-blue-400 mb-2"><%= (mi+1) %>. <%= modulo.modulo %></h3>
+                <h3 class="font-bold text-blue-400 mb-2 flex items-center gap-2">
+                  <i data-lucide="folder" class="w-4 h-4 text-blue-400"></i>
+                  <%= (mi + 1) %>. <%= modulo.modulo %>
+                </h3>
+
                 <ul class="space-y-2">
                   <% modulo.videos.forEach((v, vi) => { %>
                     <li>
-                      <button 
+                      <button
                         id="video-<%= mi %>-<%= vi %>"
                         class="btn-video w-full text-left px-3 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 transition text-sm flex items-center justify-between"
-                        onclick="trocarVideo('<%= v.url %>', '<%= v.titulo %>', '<%= v.descricao || '' %>', '<%= v.material || '' %>', '<%= mi %>', '<%= vi %>')">
-                        <span>🎬 <%= v.titulo %></span>
+                        onclick="trocarVideo('<%= v.url %>', '<%- v.titulo.replace(/'/g, '&#39;') %>', '<%- (v.descricao || '').replace(/'/g, '&#39;') %>', '<%- (v.material || '').replace(/'/g, '&#39;') %>', <%= mi %>, <%= vi %>)">
+                        <span class="flex items-center gap-2 text-gray-200">
+                          <i data-lucide="video" class="w-4 h-4 text-blue-400"></i>
+                          <%= v.titulo %>
+                        </span>
                         <span class="checkbox text-gray-400 text-sm">
                           <i data-lucide="square" class="w-4 h-4"></i>
                         </span>
@@ -87,6 +125,7 @@
     </div>
   </div>
 
+  <!-- Scripts -->
   <script src="https://unpkg.com/lucide@latest"></script>
   <script>
     lucide.createIcons();
@@ -94,7 +133,7 @@
     let videoAtual = { mi: 0, vi: 0 };
     const progresso = JSON.parse(localStorage.getItem("progressoVideos") || "{}");
 
-    // Atualiza estado da lista ao carregar
+    // Marcar na lista o que já foi concluído
     document.querySelectorAll(".btn-video").forEach(btn => {
       const id = btn.id;
       if (progresso[id]) {
@@ -105,91 +144,68 @@
     lucide.createIcons();
 
     function trocarVideo(url, titulo, descricao, material, mi, vi) {
-      // 🔹 Corrige automaticamente links do YouTube
-      if (url.includes("watch?v=")) {
-        url = url.replace("watch?v=", "embed/");
-      }
-      if (url.includes("youtu.be/")) {
-        url = url.replace("youtu.be/", "www.youtube.com/embed/");
-      }
+      // Ajusta URLs do YouTube
+      if (url.includes("watch?v=")) url = url.replace("watch?v=", "embed/");
+      if (url.includes("youtu.be/")) url = url.replace("youtu.be/", "www.youtube.com/embed/");
 
-      // 🔹 Atualiza o player principal
+      // Player
       const player = document.getElementById("video-player");
       player.src = url;
 
-      // 🔹 Atualiza título
-      document.querySelector("#video-info h2").textContent = titulo;
+      // Atualiza título
+      document.getElementById("video-title-text").textContent = titulo;
 
-      // 🔹 Atualiza ou remove a descrição
-      const descEl = document.querySelector("#video-info p");
-      if (descricao) {
-        if (descEl) {
-          descEl.textContent = descricao;
-        } else {
-          const p = document.createElement("p");
-          p.className = "text-gray-400 mt-1";
-          p.textContent = descricao;
-          document.getElementById("video-info").appendChild(p);
-        }
-      } else if (descEl) {
-        descEl.remove();
+      // Atualiza descrição
+      const descEl = document.getElementById("video-desc");
+      if (descricao && descricao.trim() !== "") {
+        descEl.textContent = descricao;
+        descEl.classList.remove("hidden");
+      } else {
+        descEl.textContent = "";
+        descEl.classList.add("hidden");
       }
 
-      // 🔹 Atualiza o botão de material de apoio
-      const btnAntigo = document.querySelector("#video-info a");
-      if (material) {
-        if (btnAntigo) {
-          btnAntigo.href = material;
-        } else {
-          const a = document.createElement("a");
-          a.href = material;
-          a.target = "_blank";
-          a.className =
-            "inline-block mt-3 px-4 py-2 bg-blue-600 rounded-lg text-white text-sm hover:bg-blue-500";
-          a.textContent = "📂 Material de Apoio";
-          document.getElementById("video-info").appendChild(a);
-        }
-      } else if (btnAntigo) {
-        btnAntigo.remove();
+      // Atualiza material
+      const matEl = document.getElementById("video-material");
+      if (material && material.trim() !== "") {
+        matEl.href = material;
+        matEl.classList.remove("hidden");
+      } else {
+        matEl.href = "#";
+        matEl.classList.add("hidden");
       }
 
-      // 🔹 Atualiza o estado atual do vídeo
+      // Guarda referência do atual
       videoAtual = { mi, vi };
 
-      // 🔹 Atualiza botão "Concluir" de acordo com o progresso salvo
+      // Atualiza estado do botão Concluir conforme progresso salvo
       const id = `video-${mi}-${vi}`;
       const concluirBtn = document.getElementById("btn-concluir");
-
       if (progresso[id]) {
-        document
-          .getElementById("btn-concluir-icon")
-          .setAttribute("data-lucide", "check-square");
+        document.getElementById("btn-concluir-icon").setAttribute("data-lucide", "check-square");
         document.getElementById("btn-concluir-text").textContent = "Concluído";
         concluirBtn.classList.remove("bg-gray-800", "text-gray-300");
         concluirBtn.classList.add("bg-green-600", "text-white");
       } else {
-        document
-          .getElementById("btn-concluir-icon")
-          .setAttribute("data-lucide", "square");
+        document.getElementById("btn-concluir-icon").setAttribute("data-lucide", "square");
         document.getElementById("btn-concluir-text").textContent = "Concluir";
         concluirBtn.classList.remove("bg-green-600", "text-white");
         concluirBtn.classList.add("bg-gray-800", "text-gray-300");
       }
 
-      // 🔹 Atualiza ícones
       lucide.createIcons();
     }
 
-
-    // Marca ou desmarca como concluído
+    // Toggle concluir
     document.getElementById("btn-concluir").addEventListener("click", () => {
       const id = `video-${videoAtual.mi}-${videoAtual.vi}`;
       const btn = document.getElementById(id);
+      if (!btn) return;
+
       const checkbox = btn.querySelector(".checkbox");
       const concluirBtn = document.getElementById("btn-concluir");
 
       if (progresso[id]) {
-        // Desmarcar
         delete progresso[id];
         checkbox.innerHTML = `<i data-lucide="square" class="w-4 h-4"></i>`;
         document.getElementById("btn-concluir-icon").setAttribute("data-lucide", "square");
@@ -197,7 +213,6 @@
         concluirBtn.classList.remove("bg-green-600", "text-white");
         concluirBtn.classList.add("bg-gray-800", "text-gray-300");
       } else {
-        // Marcar
         progresso[id] = true;
         checkbox.innerHTML = `<i data-lucide="check-square" class="w-4 h-4 text-green-400"></i>`;
         document.getElementById("btn-concluir-icon").setAttribute("data-lucide", "check-square");
@@ -206,10 +221,16 @@
         concluirBtn.classList.add("bg-green-600", "text-white");
       }
 
-      // Salva no localStorage
       localStorage.setItem("progressoVideos", JSON.stringify(progresso));
       lucide.createIcons();
     });
   </script>
+
+  <style>
+    /* Scrollbar discreta */
+    .custom-scroll::-webkit-scrollbar { width: 6px; }
+    .custom-scroll::-webkit-scrollbar-thumb { background-color: #4b5563; border-radius: 6px; }
+    .custom-scroll::-webkit-scrollbar-thumb:hover { background-color: #6b7280; }
+  </style>
 </body>
 </html>

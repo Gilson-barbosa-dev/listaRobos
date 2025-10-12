@@ -3,30 +3,85 @@
     "modulo": "Introdução",
     "videos": [
       {
-        "titulo": "Bem-vindo ao Clube Quant",
-        "descricao": "Explicação inicial sobre o uso da plataforma.",
-        "url": "https://www.youtube.com/embed/1oeJ04fYzwg",
-        "material": "https://drive.google.com/file/d/xxxxxxx/view"
+        "titulo": "Bem-vindo",
+        "descricao": "Apresentação inicial e visão geral do Clube Quant.",
+        "url": "https://www.youtube.com/embed/1oeJ04fYzwg"
       },
       {
-        "titulo": "Como são geradas as estratégias",
-        "descricao": "Tutorial completo de como são geradas as estratégias.",
+        "titulo": "O que é StrategyQuant",
+        "descricao": "Entenda como funciona a ferramenta utilizada para gerar estratégias automatizadas.",
         "url": "https://www.youtube.com/embed/36cepQSXaIY"
       },
       {
-        "titulo": "Como avaliar estratégias",
-        "descricao": "Tutorial completo de como avaliar estratégias e ver se é para o seu perfil de investidor.",
-        "url": "https://www.youtube.com/embed/NwNLZ_qtXZ0"
+        "titulo": "Como funciona o operacional dos robôs",
+        "descricao": "Explicação prática sobre como os robôs executam operações no mercado.",
+        "url": "https://www.youtube.com/embed/_0c6eYc3GDk"
       }
     ]
   },
   {
-    "modulo": "Configuração",
+    "modulo": "Plataforma de negociação",
     "videos": [
       {
-        "titulo": "Configurando o MetaTrader",
-        "descricao": "Passo a passo para configurar a plataforma MetaTrader 5.",
-        "url": "https://www.youtube.com/embed/zzzzzzzz"
+        "titulo": "Como instalar MetaTrader 5",
+        "descricao": "Guia completo de instalação e configuração do MetaTrader 5.",
+        "url": "https://www.youtube.com/embed/ha6tYeY9C5I",
+        "material": "https://www.metatrader5.com/pt"
+      },
+      {
+        "titulo": "Tipo de conta Hedge e Netting",
+        "descricao": "Diferenças entre tipos de conta e como escolher o ideal para seu robô.",
+        "url": "https://www.youtube.com/embed/MP2QPxQS6CQ"
+      },
+      {
+        "titulo": "VPS para robôs",
+        "descricao": "Como escolher e configurar um VPS para operar seus robôs 24h por dia.",
+        "url": "https://www.youtube.com/embed/xxxxxxxxx"
+      }
+    ]
+  },
+  {
+    "modulo": "Configurando",
+    "videos": [
+      {
+        "titulo": "Analisando estratégias",
+        "descricao": "Aprenda a analisar estratégias para o seu perfil de investidor",
+        "url": "https://www.youtube.com/embed/NwNLZ_qtXZ0"
+      },
+      {
+        "titulo": "Instalando robôs",
+        "descricao": "Como adicionar robôs no MetaTrader 5 e iniciar suas operações.",
+        "url": "https://www.youtube.com/embed/4awz4DrI6jY"
+      },
+      {
+        "titulo": "Instalando robô Gerenciamento de mesa",
+        "descricao": "Configuração do robô de gerenciamento de mesa proprietária.",
+        "url": "https://www.youtube.com/embed/xxxxxxxxx"
+      }
+    ]
+  },
+  {
+    "modulo": "Bônus",
+    "videos": [
+      {
+        "titulo": "Operando com pouco capital (Microlote)",
+        "descricao": "Como operar com contas pequenas e aproveitar microlotes de forma inteligente.",
+        "url": "https://www.youtube.com/embed/xxxxxxxxx"
+      },
+      {
+        "titulo": "Ganhando dinheiro com lotes (Como as corretoras ganham)",
+        "descricao": "Entenda como o volume e os lotes influenciam seus ganhos e os das corretoras.",
+        "url": "https://www.youtube.com/embed/xxxxxxxxx"
+      },
+      {
+        "titulo": "Copy trade (Ganhando dinheiro com rendimento de cópias)",
+        "descricao": "Como copiar operações de traders de sucesso e lucrar com rendimento de cópias.",
+        "url": "https://www.youtube.com/embed/xxxxxxxxx"
+      },
+      {
+        "titulo": "Ganhando dinheiro com indicações",
+        "descricao": "Como gerar renda extra indicando a plataforma e os robôs Clube Quant.",
+        "url": "https://www.youtube.com/embed/xxxxxxxxx"
       }
     ]
   }
