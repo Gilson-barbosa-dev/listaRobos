@@ -10,7 +10,7 @@
     "modulo": "Bônus",
     "videos": [
       {
-        "titulo": "Operando com pouco capital (Microlote)",
+        "titulo": "Operando com pouco capital (Conta cent)",
         "descricao": "Como operar com contas pequenas e aproveitar microlotes de forma inteligente.",
         "url": "https://www.youtube.com/embed/xxxxxxxxx"
       },

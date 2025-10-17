@@ -60,5 +60,22 @@
         "url": "https://www.youtube.com/embed/ZazFI04L4Ag"
       }
     ]
+  },
+  {
+    "modulo": "Bônus",
+    "videos": [
+      {
+        "titulo": "Ganhando dinheiro com lotes (Como as corretoras ganham)",
+        "descricao": "Entenda como o volume e os lotes influenciam seus ganhos e os das corretoras.",
+        "url": "https://www.youtube.com/embed/Ul2oHxNPNH8",
+        "material": "https://vigco.co/Rr6bam"
+      },
+      {
+        "titulo": "Copy trade (Ganhando dinheiro com rendimento de cópias)",
+        "descricao": "Como fornecer sinais de operações e lucrar com rendimento de cópias.",
+        "url": "https://www.youtube.com/embed/ZQ23WTG_kr4",
+        "material": "https://vigco.co/Rr6bam"
+      }
+    ]
   }
 ]
