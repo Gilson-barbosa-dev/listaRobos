@@ -44,6 +44,12 @@
         "url": "https://www.youtube.com/embed/NwNLZ_qtXZ0"
       },
       {
+        "titulo": "Instalando indicadores",
+        "descricao": "Como adicionar indicadores dos robôs no MetaTrader 5 (Passo Obrigatório)",
+        "url": "https://www.youtube.com/embed/2BSmbtbSGcM",
+        "material": "https://pub-24a3f70b95eb474e9cfad55538df9f96.r2.dev/Indicators.zip"
+      },
+      {
         "titulo": "Instalando robôs",
         "descricao": "Como adicionar robôs no MetaTrader 5 e iniciar suas operações.",
         "url": "https://www.youtube.com/embed/4awz4DrI6jY"
