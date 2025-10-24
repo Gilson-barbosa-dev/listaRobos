@@ -15,7 +15,6 @@ import { enviarEmailRecuperacao } from "./utils/email.js";
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3001;
 
 // Corrigir __dirname no ESModules
 const __filename = fileURLToPath(import.meta.url);
@@ -597,6 +596,14 @@ app.post("/resetar/:token", async (req, res) => {
 // ==========================
 // 🔹 Inicializar servidor
 // ==========================
-app.listen(PORT, () => {
-  console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
+const PORT = process.env.PORT || 3001;
+const HOST = "0.0.0.0";
+
+app.listen(PORT, HOST, () => {
+  console.log(`🚀 Servidor rodando em http://${HOST}:${PORT}`);
 });
+
+setInterval(() => {
+  console.log("💓 App ativo - Health check interno OK");
+}, 30000);
+
