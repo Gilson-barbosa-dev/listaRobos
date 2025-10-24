@@ -13,17 +13,7 @@
         "titulo": "Operando com pouco capital (Conta cent)",
         "descricao": "Como operar com contas pequenas e aproveitar microlotes de forma inteligente.",
         "url": "https://www.youtube.com/embed/xxxxxxxxx"
-      },
-      {
-        "titulo": "Ganhando dinheiro com lotes (Como as corretoras ganham)",
-        "descricao": "Entenda como o volume e os lotes influenciam seus ganhos e os das corretoras.",
-        "url": "https://www.youtube.com/embed/xxxxxxxxx"
-      },
-      {
-        "titulo": "Copy trade (Ganhando dinheiro com rendimento de cópias)",
-        "descricao": "Como copiar operações de traders de sucesso e lucrar com rendimento de cópias.",
-        "url": "https://www.youtube.com/embed/xxxxxxxxx"
-      },
+      }
       {
         "titulo": "Ganhando dinheiro com indicações",
         "descricao": "Como gerar renda extra indicando a plataforma e os robôs Clube Quant.",
