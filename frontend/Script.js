@@ -118,6 +118,11 @@ function aplicarFiltros() {
     if (ordenarPor === "lucro_total") return (b.lucro_total || 0) - (a.lucro_total || 0);
     if (ordenarPor === "assertividade") return (b.assertividade || 0) - (a.assertividade || 0);
     if (ordenarPor === "operacoes") return (b.total_operacoes || 0) - (a.total_operacoes || 0);
+    if (ordenarPor === "recentes") {
+      const dataA = new Date(a.ultima_operacao || 0);
+      const dataB = new Date(b.ultima_operacao || 0);
+      return dataB - dataA; // Mais recentes primeiro
+    }
     return 0;
   });
 

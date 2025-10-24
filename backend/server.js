@@ -207,25 +207,33 @@ app.get("/api/estrategias", async (req, res) => {
 
     let query = `
       SELECT 
-        magic,
-        estrategia,
-        ativo,
-        lucro_total,
-        total_operacoes,
-        assertividade,
-        timeframe,
-        tipo_estrategia,
-        capital_minimo,
-        COALESCE(aprovado, false) AS aprovado
-      FROM estatistica
+        e.magic,
+        e.estrategia,
+        e.ativo,
+        e.lucro_total,
+        e.total_operacoes,
+        e.assertividade,
+        e.timeframe,
+        e.tipo_estrategia,
+        e.capital_minimo,
+        COALESCE(e.aprovado, false) AS aprovado,
+        MAX(ed.data_ordem) AS ultima_operacao
+      FROM estatistica e
+      LEFT JOIN estatistica_detalhada ed ON e.magic = ed.magic
     `;
 
     // 🔹 Usuários comuns só veem estratégias aprovadas
     if (tipo !== "admin") {
-      query += " WHERE COALESCE(aprovado, false) = true";
+      query += " WHERE COALESCE(e.aprovado, false) = true";
     }
 
-    query += " ORDER BY id DESC";
+    query += `
+      GROUP BY 
+        e.magic, e.estrategia, e.ativo, e.lucro_total, 
+        e.total_operacoes, e.assertividade, e.timeframe, 
+        e.tipo_estrategia, e.capital_minimo, e.aprovado, e.id
+      ORDER BY e.id DESC
+    `;
 
     const result = await pool.query(query);
     return res.json(result.rows || []);
