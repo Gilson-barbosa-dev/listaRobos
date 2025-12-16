@@ -25,18 +25,30 @@ router.post("/webhook/zouti", async (req, res) => {
     const email = body.customer?.email;
     const nome = body.customer?.name || "Usuário";
     const telefone = body.customer?.phone || null;
-    const productId =
-      body.line_items?.[0]?.product_id || body.plan?.id || null;
+    
+    // Extrair offer_id (plano) e product_id (produto)
+    const offerId = body.line_items?.[0]?.offer_id || body.plan?.id || null;
+    const productId = body.line_items?.[0]?.product_id || "prod_v8tg0qam1wg42dqg466m4y";
 
-    if (!email || !productId) {
-      console.log("❌ Webhook inválido — sem email ou product_id:", body);
+    // Log para debug
+    console.log("📦 Webhook recebido:", {
+      status,
+      email,
+      offerId,
+      productId,
+      line_items: body.line_items
+    });
+
+    if (!email || !offerId) {
+      console.log("❌ Webhook inválido — sem email ou offer_id:", body);
       return res.status(400).json({ erro: "Dados incompletos" });
     }
 
-    // Apenas produtos conhecidos
-    const plano = planosZouti[productId];
+    // Mapear plano pela offer_id
+    const plano = planosZouti[offerId];
     if (!plano) {
-      console.log("⚠️ Produto não mapeado:", productId);
+      console.log("⚠️ Oferta não mapeada:", offerId);
+      console.log("📋 Ofertas conhecidas:", Object.keys(planosZouti));
       return res.status(200).json({ ok: true });
     }
 
@@ -64,7 +76,7 @@ router.post("/webhook/zouti", async (req, res) => {
             telefone,
             agora,
             agora,
-            productId,
+            offerId,
             plano,
             proximaCobranca,
             token,
@@ -101,7 +113,7 @@ router.post("/webhook/zouti", async (req, res) => {
              plano = $3,
              product_id = $4
          WHERE id = $5`,
-        [agora, proximaCobranca, plano, productId, usuario.id]
+        [agora, proximaCobranca, plano, offerId, usuario.id]
       );
 
       const tipo = mudouPlano ? "mudança de plano" : "renovação";
