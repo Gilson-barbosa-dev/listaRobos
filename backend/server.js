@@ -10,6 +10,7 @@ import crypto from "crypto";
 import arquivosRoutes from "./routes/arquivos.js";
 import metricasRoutes from "./routes/metricas.js";
 import zoutiWebhook from "./routes/zoutiWebhook.js";
+import licencasRoutes from "./routes/licencas.js";
 import { enviarEmailRecuperacao } from "./utils/email.js";
 
 dotenv.config();
@@ -33,6 +34,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "../frontend")));
 app.use("/api/arquivos", arquivosRoutes);
 app.use("/api/metricas", metricasRoutes);
+app.use("/api/licenca", licencasRoutes);
 app.use(zoutiWebhook);
 
 // ==========================

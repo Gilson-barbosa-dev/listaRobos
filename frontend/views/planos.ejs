@@ -46,10 +46,10 @@
         </div>
       <% } else { 
         const detalhesPlano = {
-          starter: { preco: "R$ 97/mês", limite: "Até 4 algoritmos" },
-          plus: { preco: "R$ 197/mês", limite: "Até 8 algoritmos" },
-          premium: { preco: "R$ 297/mês", limite: "Até 12 algoritmos" },
-          diamond: { preco: "Consulte", limite: "Acesso ilimitado" }
+          starter: { preco: "R$ 97/mês", limite: "Até 4 EAs ativos simultaneamente" },
+          plus: { preco: "R$ 197/mês", limite: "Até 8 EAs ativos simultaneamente" },
+          premium: { preco: "R$ 297/mês", limite: "EAs ilimitados" },
+          diamond: { preco: "Consulte", limite: "EAs ilimitados + suporte VIP" }
         }[usuario.plano.toLowerCase()] || { preco: "N/D", limite: "N/D" };
       %>
         <div class="bg-gray-800 rounded-xl shadow-md p-6 mb-12 border border-quant-purple/30 relative">
@@ -80,10 +80,10 @@
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8 px-1">
         <% 
           let planos = [
-            { nome: "Starter", preco: "R$ 97/mês", desc: "Ideal para começar", limite: "Até 4 algoritmos", link: "https://pay.zouti.com.br/checkout?poi=prod_offer_rw4arkjywwtvst66qb6f35" },
-            { nome: "Plus", preco: "R$ 197/mês", desc: "Mais recursos e flexibilidade", limite: "Até 8 algoritmos", link: "https://pay.zouti.com.br/checkout?poi=prod_offer_u86x1k92h6v8gu8nenhc5k" },
-            { nome: "Premium", preco: "R$ 297/mês", desc: "Para traders avançados", limite: "Até 12 algoritmos", link: "https://pay.zouti.com.br/checkout?poi=prod_offer_ad7lhtpltf4l7lecmuiccx" },
-            { nome: "Diamond", preco: "Consulte", desc: "Plano exclusivo para profissionais", limite: "Acesso ilimitado", link: "http://wa.me/5511966073938" }
+            { nome: "Starter", preco: "R$ 97/mês", desc: "Ideal para começar", limite: "4 EAs ativos", link: "https://pay.zouti.com.br/checkout?poi=prod_offer_rw4arkjywwtvst66qb6f35" },
+            { nome: "Plus", preco: "R$ 197/mês", desc: "Mais recursos e flexibilidade", limite: "8 EAs ativos", link: "https://pay.zouti.com.br/checkout?poi=prod_offer_u86x1k92h6v8gu8nenhc5k" },
+            { nome: "Premium", preco: "R$ 297/mês", desc: "Para traders avançados", limite: "EAs ilimitados", link: "https://pay.zouti.com.br/checkout?poi=prod_offer_ad7lhtpltf4l7lecmuiccx" },
+            { nome: "Diamond", preco: "Consulte", desc: "Plano exclusivo para profissionais", limite: "EAs ilimitados + VIP", link: "http://wa.me/5511966073938" }
           ];
 
           // 🔹 Quando o plano estiver inativo, remove o Diamond
@@ -153,6 +153,36 @@
           </div>
         </div>
         <% }) %>
+      </div>
+
+      <!-- 📖 Informações sobre limites -->
+      <div class="mt-12 bg-gray-900/50 border border-gray-700 rounded-xl p-6 max-w-4xl mx-auto">
+        <h3 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+          <i data-lucide="info" class="w-5 h-5 text-blue-400"></i>
+          Como funciona o limite de EAs?
+        </h3>
+        <div class="space-y-3 text-gray-300 text-sm">
+          <p class="flex items-start gap-2">
+            <i data-lucide="check" class="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0"></i>
+            <span><strong>Downloads ilimitados:</strong> Você pode baixar quantos algoritmos quiser, sem restrições.</span>
+          </p>
+          <p class="flex items-start gap-2">
+            <i data-lucide="check" class="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0"></i>
+            <span><strong>Favoritar sem limite:</strong> Adicione todos os algoritmos que desejar aos seus favoritos.</span>
+          </p>
+          <p class="flex items-start gap-2">
+            <i data-lucide="alert-circle" class="w-4 h-4 text-yellow-400 mt-0.5 flex-shrink-0"></i>
+            <span><strong>Limite de execução:</strong> O limite do plano se aplica apenas aos EAs <em>rodando simultaneamente</em> no MetaTrader. Exemplo: no plano Starter (4 EAs), você pode ter 4 robôs operando ao mesmo tempo.</span>
+          </p>
+          <p class="flex items-start gap-2">
+            <i data-lucide="settings" class="w-4 h-4 text-cyan-400 mt-0.5 flex-shrink-0"></i>
+            <span><strong>Gerenciamento de Mesa:</strong> Os robôs de gerenciamento de mesa <strong>não contam</strong> no limite. Você pode usar quantos quiser, independente do plano.</span>
+          </p>
+          <p class="flex items-start gap-2">
+            <i data-lucide="rotate-ccw" class="w-4 h-4 text-purple-400 mt-0.5 flex-shrink-0"></i>
+            <span>Para trocar um EA, basta fechar o que está rodando no MetaTrader e ativar outro. Você pode alternar livremente entre os algoritmos baixados.</span>
+          </p>
+        </div>
       </div>
 
     </div>
