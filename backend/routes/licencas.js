@@ -24,13 +24,16 @@ const MAGICS_GERENCIAMENTO_MESA = [
 // ==========================
 router.post("/validar", async (req, res) => {
   try {
-    const { email, magic, session_id } = req.body;
+    const { email, magic, session_id, account_id } = req.body;
+    
+    // 🔸 Compatibilidade: aceita session_id OU account_id
+    const sessionId = session_id || account_id;
 
     // 🔍 Validação de parâmetros
-    if (!email || !magic || !session_id) {
+    if (!email || !magic || !sessionId) {
       return res.status(400).json({ 
         autorizado: false, 
-        mensagem: "Parâmetros inválidos (email, magic, session_id)" 
+        mensagem: "Parâmetros inválidos (email, magic, session_id ou account_id)" 
       });
     }
 
@@ -74,11 +77,11 @@ router.post("/validar", async (req, res) => {
       [usuario.id, magicInt]
     );
 
-    // ✅ Se já existe licença com mesmo session_id, renovar
+    // ✅ Se já existe licença com mesmo sessionId, renovar
     if (licencaResult.rows.length > 0) {
       const licenca = licencaResult.rows[0];
       
-      if (licenca.session_token === session_id) {
+      if (licenca.session_token === sessionId) {
         // Renovar última atividade
         await pool.query(
           "UPDATE licencas SET ultima_atividade = NOW() WHERE id = $1",
@@ -128,14 +131,14 @@ router.post("/validar", async (req, res) => {
         `UPDATE licencas 
          SET session_token = $1, ultima_atividade = NOW() 
          WHERE id = $2`,
-        [session_id, licencaResult.rows[0].id]
+        [sessionId, licencaResult.rows[0].id]
       );
     } else {
       // Criar nova licença
       await pool.query(
         `INSERT INTO licencas (usuario_id, magic, session_token, criado_em, ultima_atividade)
          VALUES ($1, $2, $3, NOW(), NOW())`,
-        [usuario.id, magicInt, session_id]
+        [usuario.id, magicInt, sessionId]
       );
     }
 
@@ -163,9 +166,10 @@ router.post("/validar", async (req, res) => {
 // ==========================
 router.post("/heartbeat", async (req, res) => {
   try {
-    const { email, magic, session_id } = req.body;
+    const { email, magic, session_id, account_id } = req.body;
+    const sessionId = session_id || account_id;
 
-    if (!email || !magic || !session_id) {
+    if (!email || !magic || !sessionId) {
       return res.status(400).json({ ativo: false });
     }
 
@@ -186,7 +190,7 @@ router.post("/heartbeat", async (req, res) => {
       `UPDATE licencas 
        SET ultima_atividade = NOW() 
        WHERE usuario_id = $1 AND magic = $2 AND session_token = $3
-       RETURNING id`,
+       RETURNING id`,I
       [usuario.id, parseInt(magic, 10), session_id]
     );
 
@@ -206,9 +210,10 @@ router.post("/heartbeat", async (req, res) => {
 // 🔹 Desativar Licença (EA chama ao fechar)
 // ==========================
 router.post("/desativar", async (req, res) => {
-  try {
-    const { email, magic, session_id } = req.body;
+  try {, account_id } = req.body;
+    const sessionId = session_id || account_id;
 
+    if (!email || !magic || !sessionI
     if (!email || !magic || !session_id) {
       return res.status(400).json({ sucesso: false });
     }
@@ -228,7 +233,7 @@ router.post("/desativar", async (req, res) => {
     // Limpar session_token
     await pool.query(
       `UPDATE licencas 
-       SET session_token = NULL 
+       SET session_token = NULL I
        WHERE usuario_id = $1 AND magic = $2 AND session_token = $3`,
       [usuario.id, parseInt(magic, 10), session_id]
     );
