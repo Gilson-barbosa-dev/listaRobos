@@ -89,7 +89,8 @@ router.post("/validar", async (req, res) => {
         );
 
         return res.json({ 
-          autorizado: true, 
+          autorizado: true,
+          status: "ativo",
           mensagem: "Licença renovada com sucesso",
           plano: usuario.plano
         });
@@ -145,7 +146,8 @@ router.post("/validar", async (req, res) => {
     console.log(`✅ Licença autorizada: ${email} | Magic ${magicInt} | Plano ${usuario.plano} | Ativos: ${easAtivos + 1}/${limitePlano}`);
 
     return res.json({ 
-      autorizado: true, 
+      autorizado: true,
+      status: "ativo",
       mensagem: "Licença autorizada com sucesso",
       plano: usuario.plano,
       limite: limitePlano === Infinity ? "Ilimitado" : limitePlano,
@@ -190,8 +192,8 @@ router.post("/heartbeat", async (req, res) => {
       `UPDATE licencas 
        SET ultima_atividade = NOW() 
        WHERE usuario_id = $1 AND magic = $2 AND session_token = $3
-       RETURNING id`,I
-      [usuario.id, parseInt(magic, 10), session_id]
+       RETURNING id`,
+      [usuario.id, parseInt(magic, 10), sessionId]
     );
 
     if (updateResult.rows.length === 0) {
