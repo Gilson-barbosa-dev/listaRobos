@@ -89,3 +89,5 @@ export async function enviarEmailRecuperacao({ email, link }) {
     console.error("❌ Erro ao enviar email de recuperação:", err);
   }
 }
+
+//
