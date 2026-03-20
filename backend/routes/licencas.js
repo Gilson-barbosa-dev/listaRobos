@@ -210,11 +210,11 @@ router.post("/heartbeat", async (req, res) => {
 // 🔹 Desativar Licença (EA chama ao fechar)
 // ==========================
 router.post("/desativar", async (req, res) => {
-  try {, account_id } = req.body;
+  try {
+    const { email, magic, session_id, account_id } = req.body;
     const sessionId = session_id || account_id;
 
-    if (!email || !magic || !sessionI
-    if (!email || !magic || !session_id) {
+    if (!email || !magic || !sessionId) {
       return res.status(400).json({ sucesso: false });
     }
 
@@ -233,9 +233,9 @@ router.post("/desativar", async (req, res) => {
     // Limpar session_token
     await pool.query(
       `UPDATE licencas 
-       SET session_token = NULL I
+       SET session_token = NULL 
        WHERE usuario_id = $1 AND magic = $2 AND session_token = $3`,
-      [usuario.id, parseInt(magic, 10), session_id]
+      [usuario.id, parseInt(magic, 10), sessionId]
     );
 
     console.log(`🔓 Licença liberada: ${email} | Magic ${magic}`);
