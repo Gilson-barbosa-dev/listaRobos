@@ -77,6 +77,12 @@ router.post("/validar", async (req, res) => {
       [usuario.id, magicInt]
     );
 
+    console.log(`🔍 DEBUG: Licenças encontradas para magic ${magicInt}:`, licencaResult.rows.length);
+    if (licencaResult.rows.length > 0) {
+      console.log(`   Session Token anterior: ${licencaResult.rows[0].session_token ? 'Preenchido' : 'NULL'}`);
+      console.log(`   Session Token novo: ${sessionId.substring(0, 20)}...`);
+    }
+
     // ✅ Se já existe licença para este magic number
     if (licencaResult.rows.length > 0) {
       const licenca = licencaResult.rows[0];
@@ -88,6 +94,8 @@ router.post("/validar", async (req, res) => {
           [licenca.id]
         );
 
+        console.log(`✅ Licença renovada (mesmo session): ${email} | Magic ${magicInt}`);
+
         return res.json({ 
           autorizado: true,
           status: "ativo",
@@ -96,7 +104,7 @@ router.post("/validar", async (req, res) => {
         });
       }
       
-      // 🔄 Se é session_id diferente, significa que o EA foi reiniciado/reaberto
+      // 🔄 Se é session_id diferente ou NULL, significa que o EA foi reiniciado/reaberto
       // Atualizar o session_token (não conta como EA adicional, é o MESMO EA)
       await pool.query(
         `UPDATE licencas 
@@ -105,7 +113,7 @@ router.post("/validar", async (req, res) => {
         [sessionId, licenca.id]
       );
 
-      console.log(`🔄 Licença atualizada (reinício): ${email} | Magic ${magicInt} | Plano ${usuario.plano}`);
+      console.log(`🔄 Licença atualizada (reinício/reativação): ${email} | Magic ${magicInt} | Session anterior: ${licenca.session_token ? 'Ativo' : 'NULL'}`);
 
       return res.json({ 
         autorizado: true,
