@@ -77,12 +77,12 @@ router.post("/validar", async (req, res) => {
       [usuario.id, magicInt]
     );
 
-    // ✅ Se já existe licença com mesmo sessionId, renovar
+    // ✅ Se já existe licença para este magic number
     if (licencaResult.rows.length > 0) {
       const licenca = licencaResult.rows[0];
       
+      // Se é o mesmo session_id, apenas renovar
       if (licenca.session_token === sessionId) {
-        // Renovar última atividade
         await pool.query(
           "UPDATE licencas SET ultima_atividade = NOW() WHERE id = $1",
           [licenca.id]
@@ -95,6 +95,24 @@ router.post("/validar", async (req, res) => {
           plano: usuario.plano
         });
       }
+      
+      // 🔄 Se é session_id diferente, significa que o EA foi reiniciado/reaberto
+      // Atualizar o session_token (não conta como EA adicional, é o MESMO EA)
+      await pool.query(
+        `UPDATE licencas 
+         SET session_token = $1, ultima_atividade = NOW() 
+         WHERE id = $2`,
+        [sessionId, licenca.id]
+      );
+
+      console.log(`🔄 Licença atualizada (reinício): ${email} | Magic ${magicInt} | Plano ${usuario.plano}`);
+
+      return res.json({ 
+        autorizado: true,
+        status: "ativo",
+        mensagem: "Licença reativada com sucesso",
+        plano: usuario.plano
+      });
     }
 
     // 📊 Contar EAs ativos (excluir gerenciamento de mesa)
@@ -125,23 +143,12 @@ router.post("/validar", async (req, res) => {
       });
     }
 
-    // ✅ Autorizar: criar ou atualizar licença
-    if (licencaResult.rows.length > 0) {
-      // Atualizar session_token existente
-      await pool.query(
-        `UPDATE licencas 
-         SET session_token = $1, ultima_atividade = NOW() 
-         WHERE id = $2`,
-        [sessionId, licencaResult.rows[0].id]
-      );
-    } else {
-      // Criar nova licença
-      await pool.query(
-        `INSERT INTO licencas (usuario_id, magic, session_token, criado_em, ultima_atividade)
-         VALUES ($1, $2, $3, NOW(), NOW())`,
-        [usuario.id, magicInt, sessionId]
-      );
-    }
+    // ✅ Criar nova licença (se chegou aqui, não existe registro anterior)
+    await pool.query(
+      `INSERT INTO licencas (usuario_id, magic, session_token, criado_em, ultima_atividade)
+       VALUES ($1, $2, $3, NOW(), NOW())`,
+      [usuario.id, magicInt, sessionId]
+    );
 
     console.log(`✅ Licença autorizada: ${email} | Magic ${magicInt} | Plano ${usuario.plano} | Ativos: ${easAtivos + 1}/${limitePlano}`);
 
